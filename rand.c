@@ -27,7 +27,7 @@ struct list
 
 struct list sc=
 {
-	NULL,0,0
+	NULL,0,0,0
 };
 
 struct randval rv=
@@ -90,7 +90,7 @@ int free_rands_list(struct list l)
 int rands_m(int *s,int n,int m)
 {//generate no repeated random number within m times
 	int i,j,k;
-	if(m<=0||m>=n)
+	if(m<=0||m>n)
 	{
 		printf("Error: invalid m provided\n");
 		return -1;
