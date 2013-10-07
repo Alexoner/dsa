@@ -20,6 +20,7 @@ struct randval
 struct list
 {
 	int *p;
+	int *s;//Set s,needed when using multiple sets
 	int size;//synchronous with currtimes
 	int max_length;
 };
