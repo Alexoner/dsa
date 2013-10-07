@@ -36,10 +36,14 @@ struct randval rv=
 
 int s[]={1,2,3,4,5,6};
 
+extern void quicksort(int *a,int p,int r);
 
 int list_has(int *l,int n,int a);
 int init_rands(struct list l,int n,struct randval rv,int m);
+int free_rands_list(struct list l);
 int rands_m(int *s,int n,int m);
+int rands_m_gt(int *s,int n,int m,int a);
+int rands_m_lt(int *s,int n,int m,int a);
 int rands_lt(int *s,int n,int a);
 int rands_gt(int *s,int n,int a);
 int rand_lt(int a);
@@ -72,9 +76,24 @@ int init_rands(struct list l,int n,struct randval rv,int m)
 	return 0;
 }
 
+int free_rands_list(struct list l)
+{
+	if(l.p)
+	{
+		free(l.p);
+		l.p=NULL;
+	}
+	return 0;
+}
+
 int rands_m(int *s,int n,int m)
 {//generate no repeated random number within m times
 	int i,j,k;
+	if(m<=0||m>=n)
+	{
+		printf("Error: invalid m provided\n");
+		return -1;
+	}
 	if(sc.p==NULL||sc.max_length<n)
 	{
 		sc.p=realloc(sc.p,n);
@@ -120,10 +139,59 @@ int rands_m(int *s,int n,int m)
 	return s[j];
 }
 
+int rands_m_gt(int *s,int n,int m,int a)
+{//random without repeatition,and bigger than a in set s
+	int i,pos,max_rand;
+	quicksort(s,0,n-1);
+	for(i=0;i<n;i++)
+	{
+		if(s[i]>a)
+		{
+			break;
+		}
+	}
+	if(i>=n)
+	{//no element bigger than a in set s
+		return -1;
+	}
+	pos=i;
+	max_rand=n-i;
+	if(m>0&&m<max_rand)
+		return rands_m(s+pos,max_rand,m);
+	else
+	{
+		return -1;
+	}
+}
+
+int rands_m_lt(int *s,int n,int m,int a)
+{
+	int i,pos,max_rand;
+	quicksort(s,0,n-1);
+	for(i=0;i<n;i++)
+	{
+		if(s[i]>a)
+		{
+			break;
+		}
+	}
+	if(i<1)
+	{
+		return -1;
+	}
+	pos=i-1;
+	max_rand=i-1;
+	if(m>0&&m<max_rand)
+	{
+		return rands_m(s,max_rand,m);
+	}
+	return -1;
+}
+
 int rands_lt(int *s,int n,int a)
 {
 	int i,pos,max_rand,rand_num;
-	//quicksort(s,0,n-1);
+	quicksort(s,0,n-1);
 	for(i=0;i<n;i++)
 	{
 		if(s[i]>a)
@@ -138,13 +206,14 @@ int rands_lt(int *s,int n,int a)
 	pos=i-1;
 	max_rand=i-1;
 	rand_num=rand_lt(max_rand);
-	return pos;
+	i=s[rand_num];
+	return i;
 }
 
 int rands_gt(int *s,int n,int a)
 {//generate random number bigger than a from set sorted set s
 	int i,pos,max_rand,rand_num;
-	//quicksort(s,0,n-1);
+	quicksort(s,0,n-1);
 	for(i=0;i<n;i++)
 	{
 		if(s[i]>a)
@@ -159,7 +228,8 @@ int rands_gt(int *s,int n,int a)
 	pos=i;
 	max_rand=n-i;
 	rand_num=rand_lt(max_rand);
-	return pos;
+	i=s[pos+rand_num];
+	return i;
 }
 
 int rand_lt(int a)
@@ -178,15 +248,19 @@ int main()
 {
 	int i;
 	srand(time(NULL));
-	for(i=0;i<6;i++)
+	/*for(i=0;i<6;i++)
 	{
 		printf("random is : %d\n",rands_m(s,6,4));
-		//printf("(%d,%d)",sc.size,rv.currtimes);
 	}
 	printf("\n");
 	for(i=0;i<20;i++)
 	{
 		printf("random is: %d\n",rands_m(s,6,3));
+	}
+	printf("%d\n",rands_gt(s,6,2));*/
+	for(i=0;i<10;i++)
+	{
+		printf("%d\n",rands_m_lt(s,6,3,5));
 	}
 	return 0;
 }
