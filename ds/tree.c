@@ -11,6 +11,22 @@
 
 #define MAX 30
 
+/**
+ * @1 Preorder,in-order,post-order traversing a tree are DEPTH-FIRST
+ * algorithem,implemented with recurse ,or essentially,STACK,a first in last
+ * out data structure(LIFO).In depth-first algorithm,we push nodes until no
+ * more children are found.We use a pointer to tree's node to iterate in a
+ * loop,update its value to its left child and right child
+ *
+ * @2 BREADTH-FIRST search is a algorithm must be implemented with QUEUE,a first
+ * in first out(FIFO) list data structure
+ * 1)push a node into queue
+ * 2)from the first node in the queue to the last node in the queue,do this:
+ *		visit it,push  all of its children into the queue and pop the node out
+ *		till the queue is empty
+ * 3)
+ */
+
 typedef struct tree
 {
     void *data;
@@ -33,10 +49,10 @@ Tree *CreatebiTree(Tree **T)
         if(!(*T=(Tree*)malloc(sizeof(Tree))))
             return NULL;
         memset(*T,0,sizeof(Tree));
-        (*T)->data=num;
-        printf("Enter the left child value of node %d\n",(*T)->data);
+        (*T)->data=(void*)num;
+        printf("Enter the left child value of node %p\n",(*T)->data);
         CreatebiTree(&(*T)->lchild);
-        printf("Enter the right child value of node %d\n",(*T)->data);
+        printf("Enter the right child value of node %p\n",(*T)->data);
         CreatebiTree(&(*T)->rchild);
     }
     return *T;
@@ -61,13 +77,13 @@ Tree *PreTraverses(Tree *T,int (*visit)(Tree*))
     while(top>=0||T)
     {
         while(T)
-        {
+        {//push
             visit(T);
             stack[++top]=T;
             T=T->lchild;
         }
         T=stack[top]->rchild;//push right child
-        top--;
+        top--;//pop
     }
     top=-1;
     return T;
@@ -90,12 +106,14 @@ Tree *InTraverses(Tree *T,int (*visit)(Tree *))
     while(top>=0||T)
     {
         while(T)
-        {
+        {//pushing is the same as preorder
             stack[++top]=T;
             T=T->lchild;
         }//left child into the stack
         visit(stack[top]);
-        T=stack[top]->rchild;//whether it's root node
+        T=stack[top]->rchild;
+		//maybe it's a root node with only right child
+
         top--;
     }
     top=-1;
@@ -149,7 +167,6 @@ Tree *PostTraverses(Tree *T,int (*visit)(Tree *))
     return NULL;
 }
 
-
 int leaf_numberr(Tree *T)
 {
     if(!T)
@@ -193,7 +210,7 @@ int leaf_numbers(Tree *T)
 }
 
 Tree *Traverse(Tree *T,int (*visit)(Tree*))
-{
+{//breadth-first traversing a tree
     if(!T)
         return NULL;
     stack[++top]=T;
@@ -262,7 +279,7 @@ int TreeHights(Tree *T)
 int visit(Tree *T)
 {
     if(T)
-        printf("%d ",T->data);
+        printf("%p ",T->data);
     return 1;
 }
 
