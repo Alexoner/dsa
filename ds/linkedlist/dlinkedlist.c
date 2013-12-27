@@ -47,15 +47,15 @@ Node *list_insert(List *list, Node *position, Node *node)
     if (prev)
     {
         prev->next = node;
-        node->prev = prev;
     }
     else
     {
         list->head = node;
-        node->prev = NULL;
     }
 
     position->prev = node;
+
+    node->prev = prev;
     node->next = position;
 
     list->length++;
@@ -85,6 +85,12 @@ Node *list_insert_after(List *list, Node *position, Node *node)
     return node;
 }
 
+Node *list_append(List *list, Node *node)
+{
+    list_insert_after(list, list->tail, node);
+    return node;
+}
+
 Node *list_remove(List *list, Node *position)
 {
     Node *prev = position->prev;
@@ -92,20 +98,20 @@ Node *list_remove(List *list, Node *position)
 
     if (prev)
     {
-        prev->next = position->next;
+        prev->next = next;
     }
     else
     {
-        list->head = position->next;
+        list->head = next;
     }
 
     if (next)
     {
-        next->prev = position->prev;
+        next->prev = prev;
     }
     else
     {
-        list->tail = position->prev;
+        list->tail = prev;
     }
 
     free(position);
@@ -115,13 +121,75 @@ Node *list_remove(List *list, Node *position)
     return position;
 }
 
+//insert Node *node before *position
 Node *list_move(List *list, Node *position, Node *node)
 {
+    Node *prev = NULL;
+    Node *next = NULL;
+
+    prev = node->prev;
+    next = node->next;
+
+    if (prev)
+    {
+        prev->next = next;
+    }
+    else
+    {
+        list->head = next;
+    }
+
+    if (next)
+    {
+        next->prev = prev;
+    }
+    else
+    {
+        list->tail = NULL;
+    }
+
+    prev = position->prev;
+    next = position->next;
+
+    if (prev)
+    {
+        prev->next = node;
+    }
+    else
+    {
+        list->head = node;
+    }
+
+    position->prev = node;
+
+    node->prev = prev;
+    node->next = position;
+
     return node;
 }
 
 list *list_swap(List *list, Node *x, Node *y)
 {
+    Node *ynext = NULL;
+    if (y->next)
+    {
+        //Node *y has a node next to it
+        ynext = y->next;
+    }
+    else
+    {
+        //Node *y doesn't have a node next to it,the last one
+        ynext = y->prev;
+    }
+    list_move(list, x, y);
+    if (ynext)
+    {
+        list_move(list, x, ynext);
+    }
+    else
+    {
+        list_append(list, x);
+    }
     return list;
 }
 
