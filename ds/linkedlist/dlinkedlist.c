@@ -115,6 +115,16 @@ Node *list_remove(List *list, Node *position)
     return position;
 }
 
+Node *list_move(List *list, Node *position, Node *node)
+{
+    return node;
+}
+
+list *list_swap(List *list, Node *x, Node *y)
+{
+    return list;
+}
+
 List *list_traverse(List *list, int (*visit)(List*, Node *))
 {
     Node *p = NULL;
