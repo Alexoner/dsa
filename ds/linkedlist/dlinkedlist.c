@@ -258,6 +258,11 @@ Node *list_append(List *list, Node *node)
     return node;
 }
 
+Node *list_push(List *list, Node *key)
+{
+    return list_append(list, key);
+}
+
 //remove position from list
 int list_remove(List *list, Node *position)
 {

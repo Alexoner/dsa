@@ -61,6 +61,8 @@ Node *list_insert_after_by_index(List *list, int n, Node *key);
 
 Node *list_append(List *list, Node *key);
 
+Node *list_push(List *list, Node *key);
+
 int list_remove(List *list, Node *position);
 int list_remove_by_index(List *list, int n);
 
