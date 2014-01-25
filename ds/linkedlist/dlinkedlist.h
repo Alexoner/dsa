@@ -27,6 +27,7 @@ struct Node
 };
 
 Node *node_new(void *data);
+Node *node_new_int(int i);
 Node *node_destroy(Node *p, void* data_destroy(void*));
 
 List *list_init(List *list);

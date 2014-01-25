@@ -14,6 +14,15 @@ Node *node_new(void *data)
     return node;
 }
 
+Node *node_new_int(int i)
+{
+    Node *p = node_new(NULL);
+    p->data = malloc(sizeof(int));
+    *(int*)p->data = i;
+    return p;
+}
+
+
 Node *node_destroy(Node *p, void* data_destroy(void*))
 {
     if (data_destroy)
