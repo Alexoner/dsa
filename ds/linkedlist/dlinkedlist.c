@@ -160,15 +160,18 @@ int list_index(List *list, Node *key)
 {
     int i = 0;
     Node *p = NULL;
-    for (p = list->head; p; p = p->next, i++)
+    for (p = list->head; p && p != key; p = p->next, i++);
+    if (!p)
     {
-
+        return -1;
     }
-    return 0;
+    return i;
 }
 
 Node *list_replace(List *list, Node *position, Node *key)
 {
+    list_insert(list, position, key);
+    list_remove(list, position);
     return key;
 }
 
