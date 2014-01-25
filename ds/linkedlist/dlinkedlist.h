@@ -37,6 +37,15 @@ int list_is_empty(List *list);
 
 Node *list_nth_node(List *list, int n);
 
+//pop out the node with index as n
+Node *list_pop(List *list, int n);
+
+//pop out the head node
+Node *list_pop_head(List *list);
+
+//pop out the tail node
+Node *list_pop_tail(List *list);
+
 Node *list_find(List *list, Node *key, int (*compare)(Node*, Node*));
 
 int list_index(List *list, Node *key);
@@ -55,11 +64,11 @@ Node *list_append(List *list, Node *key);
 int list_remove(List *list, Node *position);
 int list_remove_by_index(List *list, int n);
 
-Node *list_move(List *list, Node *position, Node *node);
-Node *list_move_by_index(List *list, int a, int b);
+int list_move(List *list, Node *position, Node *node);
+int list_move_by_index(List *list, int a, int b);
 
-List *list_swap(List *list, Node *x, Node *y);
-List *list_swap_by_index(List *list, int a, int b);
+int list_swap(List *list, Node *x, Node *y);
+int list_swap_by_index(List *list, int a, int b);
 
 List *list_traverse(List *list, int (*visit)(List*, Node *));
 
