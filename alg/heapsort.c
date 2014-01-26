@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include "define.h"
 #define left(x) (2*(i))

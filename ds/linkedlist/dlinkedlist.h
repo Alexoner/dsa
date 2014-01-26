@@ -28,11 +28,17 @@ struct Node
 
 Node *node_new(void *data);
 Node *node_new_int(int i);
+Node *node_new_num(double f);
+
+int compare_int(void *x, void *y);
+float compare_float(void *x, void *y);
+double comare_double(void *x, void *y);
+
 Node *node_destroy(Node *p, void* data_destroy(void*));
 
 List *list_init(List *list);
 
-List *list_destroy(List *list);
+List *list_destroy(List *list, void (*data_destroy)(void *));
 
 int list_is_empty(List *list);
 
@@ -47,6 +53,8 @@ Node *list_pop_head(List *list);
 //pop out the tail node
 Node *list_pop_tail(List *list);
 
+//compare can be strcmp() or memcpy() or other self defined functions for
+//comparing
 Node *list_find(List *list, Node *key, int (*compare)(Node*, Node*));
 
 int list_index(List *list, Node *key);
@@ -64,8 +72,8 @@ Node *list_append(List *list, Node *key);
 
 Node *list_push(List *list, Node *key);
 
-int list_remove(List *list, Node *position);
-int list_remove_by_index(List *list, int n);
+int list_remove(List *list, Node *position, void (*data_destroy)(void *));
+int list_remove_by_index(List *list, int n, void (*data_destroy)(void *));
 
 int list_move(List *list, Node *position, Node *node);
 int list_move_by_index(List *list, int a, int b);
@@ -73,12 +81,13 @@ int list_move_by_index(List *list, int a, int b);
 int list_swap(List *list, Node *x, Node *y);
 int list_swap_by_index(List *list, int a, int b);
 
+//func is a callback function dealing with Node::data
 List *list_traverse(List *list, int (*visit)(List*, Node *));
 
-List *list_copy(List *lx, List *ly, int (*copy)(Node *, Node *));
+List *list_copy(List *lx, List *ly, int (*copy)(void *, void*));
 
-List *list_sort_merge(List *list, int (*compare)(Node*, Node*));
+List *list_sort_merge(List *list, int (*compare)(void*, void*));
 
-List *list_sort_bubble(List *list, int (*compare)(Node*, Node*));
+List *list_sort_bubble(List *list, int (*compare)(void*, void*));
 
 #endif

@@ -6,10 +6,9 @@ int main()
     int i = 1000;
     Node *p = node_new(&i);
 
-    printf("Node: %d\n", *(int*)p->data);
     List *l = list_init(NULL);
 
-    node_destroy(p, NULL);
+    /*node_destroy(p, NULL);*/
 
     for (i = 0; i < 10; i++)
     {
@@ -34,18 +33,19 @@ int main()
     list_insert_by_index(l, 0, node_new_int(1992));
     list_insert_by_index(l, 15, node_new_int(311));
     list_append(l, node_new_int(611));
-    /*list_traverse(l, NULL);*/
     list_move_by_index(l, 0, 5);
-    list_remove_by_index(l, 8);
-    list_remove_by_index(l, 0);
-    list_remove_by_index(l, 611);
-    list_remove_by_index(l, 15);
-    list_traverse(l, NULL);
+    list_remove_by_index(l, 8, free);
+    list_remove_by_index(l, 0, free);
+    list_remove_by_index(l, 611, free);
+    list_remove_by_index(l, 15, free);
+    /*list_traverse(l, NULL);*/
     /*list_move_by_index(l, 6, 7);*/
-    /*list_move_by_index(l, 7, 8);*/
-    /*list_swap_by_index(l, 6, 8);*/
+    list_move_by_index(l, 7, 8);
+    list_swap_by_index(l, 6, 8);
     list_swap_by_index(l, 0, 14);
-    /*list_swap_by_index(l, 1, 13);*/
+    list_swap_by_index(l, 1, 13);
+    list_traverse(l, NULL);
+    list_sort_merge(l, NULL);
     list_traverse(l, NULL);
     return 0;
 }
