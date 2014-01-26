@@ -75,6 +75,8 @@ int list_swap_by_index(List *list, int a, int b);
 
 List *list_traverse(List *list, int (*visit)(List*, Node *));
 
+List *list_copy(List *lx, List *ly, int (*copy)(Node *, Node *));
+
 List *list_sort_merge(List *list, int (*compare)(Node*, Node*));
 
 List *list_sort_bubble(List *list, int (*compare)(Node*, Node*));
