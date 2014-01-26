@@ -89,6 +89,8 @@ List *list_traverse_reverse(List *list, int (*visit)(List*, Node *));
 
 List *list_copy(List *lx, List *ly, int (*copy)(void *, void*));
 List *list_revert(List *list);
+List *list_merge(List *lx, List *ly);
+List *list_split(List *lx, Node *p);
 
 List *list_mergesort(List *list, int (*compare)(void*, void*));
 
