@@ -573,8 +573,9 @@ List *list_sort_merge(List *list, int (*compare)(void*, void*))
                 break;
             }
 
-            printf("qsize: %d,x:%d,y:%d\n", qsize,
-                   *(int*)p->data, *(int*)q->data);
+            /*printf("qsize: %d,x:%d,y:%d\n", qsize,*/
+            /**(int*)p->data, *(int*)q->data);*/
+
             //merge two lists
             for (i = 0; psize || (qsize && q); i = 0)
             {
@@ -603,21 +604,21 @@ List *list_sort_merge(List *list, int (*compare)(void*, void*))
                     q = q->next;
                     qsize--;
                     i = 1;
-                    printf("compared i: %d,psize: %d\n", i, psize);
                 }
 
                 if (i && psize)
                 {
                     list_move(list, p, key);
-                    printf("moved:\n");
-                    list_traverse(list, NULL);
+                    /*printf("moved:\n");*/
+                    /*list_traverse(list, NULL);*/
                 }
             }//merge two lists
 
             p = q;
             nmerges++;
-            /*list_traverse(list, NULL);*/
         }
+        printf("after merging list with size %d: \n", listsize);
+        list_traverse(list, NULL);
         if (nmerges <= 1 )
         {
             return list;
