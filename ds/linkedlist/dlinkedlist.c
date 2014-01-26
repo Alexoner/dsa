@@ -605,6 +605,8 @@ List *list_mergesort(List *list, int (*compare)(void*, void*))
     {
         compare = compare_int;
     }
+
+    //merge N(log N) passes
     while (1)
     {
         //It makes log N passes along the list,(N = 2 ^ n)
@@ -612,6 +614,8 @@ List *list_mergesort(List *list, int (*compare)(void*, void*))
         //small sorted lists into one larger sorted list
         p = list->head;
         nmerges = 0;
+
+        //merged along the list
         while (p)
         {
             //In each pass,
@@ -676,12 +680,23 @@ List *list_mergesort(List *list, int (*compare)(void*, void*))
         {
             return list;
         }
+
         //doublize the listsize to merge
         listsize *= 2;
     }//merged a pass
 }
 
-/*Bubble sort the list*/
+/*quick sort the list*/
+/**********************************************************************
+ * ALGORITHM description
+ *
+ * The quick sort algorithm is considered the fastest sorting algorithm, and
+ * the standard C library includes a quick sort function (qsort) but it works
+ * on arrays, not linked lists. However, we can build an array holding
+ * pointers to successive items in a linked list, use the qsort function and
+ * then rebuild the linked list from the array of sorted pointers.
+ */
+
 List *list_quicksort(List *list, int (*compare)(void*, void*))
 {
     return list;
