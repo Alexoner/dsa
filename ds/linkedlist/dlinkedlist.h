@@ -64,11 +64,11 @@ int list_index(List *list, Node *key);
 Node *list_replace(List *list, Node *position, Node *key);
 Node *list_replace_by_index(List *list, int n, Node *key);
 
-Node *list_insert(List *list, Node *position, Node *key);
-Node *list_insert_by_index(List *list, int n, Node *key);
+Node *list_insert(List *list, Node *key, Node *position);
+Node *list_insert_by_index(List *list, Node *key, int n);
 
-Node *list_insert_after(List *list, Node *position, Node *key);
-Node *list_insert_after_by_index(List *list, int n, Node *key);
+Node *list_insert_after(List *list, Node *key, Node *position);
+Node *list_insert_after_by_index(List *list, Node *key, int n);
 
 Node *list_append(List *list, Node *key);
 
@@ -77,7 +77,7 @@ Node *list_push(List *list, Node *key);
 int list_remove(List *list, Node *position, void (*data_destroy)(void *));
 int list_remove_by_index(List *list, int n, void (*data_destroy)(void *));
 
-int list_move(List *list, Node *position, Node *node);
+int list_move(List *list, Node *key, Node *position);
 int list_move_by_index(List *list, int a, int b);
 
 int list_swap(List *list, Node *x, Node *y);

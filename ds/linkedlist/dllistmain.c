@@ -20,6 +20,7 @@ int main()
         list_append(l, key);
     }
 
+    list_traverse(l, NULL);
     for (i = 0; i < 5; i++)
     {
         int j = 7 * (i + 1);
@@ -29,13 +30,13 @@ int main()
         q.data = &i;
         p = list_find(l, &q, NULL);
         q.data = &j;
-        list_insert(l, p, node);
+        list_insert(l, node, p);
     }
 
-    list_insert_by_index(l, 0, node_new_int(1992));
-    list_insert_by_index(l, 15, node_new_int(311));
+    list_insert_by_index(l, node_new_int(1992), 0);
+    list_insert_by_index(l, node_new_int(311), 15);
     list_append(l, node_new_int(611));
-    list_move_by_index(l, 0, 5);
+    list_move_by_index(l, 5, 0);
     list_remove_by_index(l, 8, free);
     list_remove_by_index(l, 0, free);
     list_remove_by_index(l, 611, free);

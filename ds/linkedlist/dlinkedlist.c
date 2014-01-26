@@ -215,15 +215,15 @@ int list_index(List *list, Node *key)
     return i;
 }
 
-Node *list_replace(List *list, Node *position, Node *key)
+Node *list_replace(List *list, Node *old, Node *new)
 {
-    list_insert(list, position, key);
-    list_remove(list, position, free);
-    return key;
+    list_insert(list, new, old);
+    list_remove(list, old, free);
+    return new;
 }
 
 //insert node before position
-Node *list_insert(List *list, Node *position, Node *key)
+Node *list_insert(List *list, Node *key, Node *position)
 {
     assert(list);
     assert(position);
@@ -248,12 +248,12 @@ Node *list_insert(List *list, Node *position, Node *key)
     return key;
 }
 
-Node *list_insert_by_index(List *list, int n, Node *key)
+Node *list_insert_by_index(List *list, Node *key, int n)
 {
     Node *p = list_nth_node(list, n);
     if (p)
     {
-        list_insert(list, p, key);
+        list_insert(list, key, p);
     }
     else
     {
@@ -262,35 +262,35 @@ Node *list_insert_by_index(List *list, int n, Node *key)
     return key;
 }
 
-Node *list_insert_after(List *list, Node *position, Node *node)
+Node *list_insert_after(List *list, Node *key, Node *position)
 {
     assert(list);
     assert(position);
     Node *next = position->next;
     if (next)
     {
-        node->next = next;
-        next->prev = node;
+        key->next = next;
+        next->prev = key;
     }
     else
     {
-        list->tail = node;
-        node->next = NULL;
+        list->tail = key;
+        key->next = NULL;
     }
 
-    position->next = node;
-    node->prev = position;
+    position->next = key;
+    key->prev = position;
 
     list->length++;
 
-    return node;
+    return key;
 }
 
-Node *list_insert_after_by_index(List *list, int n, Node *key)
+Node *list_insert_after_by_index(List *list, Node *key, int n)
 {
     assert(list);
     Node *p = list_nth_node(list, n);
-    list_insert_after(list, p, key);
+    list_insert_after(list, key, p);
     return key;
 }
 
@@ -299,7 +299,7 @@ Node *list_append(List *list, Node *node)
     assert(list);
     if (list->tail)
     {
-        list_insert_after(list, list->tail, node);
+        list_insert_after(list, node, list->tail);
     }
     else
     {
@@ -362,7 +362,7 @@ int list_remove_by_index(List *list, int n, void (*data_destroy)(void *))
 }
 
 //move Node *node before *position
-int list_move(List *list, Node *position, Node *key)
+int list_move(List *list, Node *key, Node *position)
 {
     Node *prev = NULL;
     Node *next = NULL;
@@ -438,14 +438,14 @@ int list_swap(List *list, Node *x, Node *y)
     /*//Node *y doesn't have a node next to it,the last one*/
     /*ynext = y->prev;*/
     /*}*/
-    list_move(list, x, y);
+    list_move(list, y, x);
     if (ynext)
     {
-        list_move(list, ynext, x);
+        list_move(list, x, ynext);
     }
     else
     {
-        list_move(list, NULL, x);
+        list_move(list, x, NULL);
     }
     return 0;
 }
@@ -505,7 +505,12 @@ List *list_traverse_reverse(List *list, int (*visit)(List*, Node *))
 }
 
 
-List *list_copy(List *lx, List *ly, int (*copy)(void *, void*));
+List *list_copy(List *lx, List *ly, int (*copy)(void *, void*))
+{
+    Node *p, *q;
+    /*for (p=)*/
+    return ly;
+}
 List *list_revert(List *list)
 {
     Node *p, *q;
@@ -664,7 +669,7 @@ List *list_mergesort(List *list, int (*compare)(void*, void*))
 
                 if (i && psize)
                 {
-                    list_move(list, p, key);
+                    list_move(list, key, p);
                     /*printf("moved:\n");*/
                     /*list_traverse(list, NULL);*/
                 }
