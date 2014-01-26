@@ -1,10 +1,12 @@
 #include "dlinkedlist.h"
 #include <stdio.h>
+#include <time.h>
 
 int main()
 {
     int i = 1000;
     Node *p = node_new(&i);
+    long t;
 
     List *l = list_init(NULL);
 
@@ -45,7 +47,34 @@ int main()
     list_swap_by_index(l, 0, 14);
     list_swap_by_index(l, 1, 13);
     list_traverse(l, NULL);
-    list_sort_merge(l, NULL);
+    list_mergesort(l, NULL);
     list_traverse(l, NULL);
+    list_destroy(l, free);
+    list_traverse(l, NULL);
+
+    t = time(NULL);
+    srand(t);
+    for (i = 0; i < 100000; i++)
+    {
+        p = node_new_int(rand() % 1000000);
+        list_push(l, p);
+    }
+    printf("before merging:\n");
+    for (i = 0; i < 100000; i++)
+    {
+        /*printf("%d\t", *(int*)list_nth_node(l, i)->data);*/
+    }
+    list_mergesort(l, NULL);
+    list_traverse(l, NULL);
+    list_traverse_reverse(l, NULL);
+    list_revert(l);
+
+    //this block of traversing the list is much slower than list_traverse(),
+    //because it calls list_nth_node too many times
+    for (i = 0; i < 100000; i++)
+    {
+        printf("%d\t", *(int*)list_nth_node(l, i)->data);
+    }
+    printf("time:%ld\n", time(NULL) - t);
     return 0;
 }

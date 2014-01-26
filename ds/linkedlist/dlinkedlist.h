@@ -44,8 +44,10 @@ int list_is_empty(List *list);
 
 Node *list_nth_node(List *list, int n);
 
+//pop out the node
+Node *list_pop(List *list, Node *p);
 //pop out the node with index as n
-Node *list_pop(List *list, int n);
+Node *list_pop_by_index(List *list, int n);
 
 //pop out the head node
 Node *list_pop_head(List *list);
@@ -83,11 +85,13 @@ int list_swap_by_index(List *list, int a, int b);
 
 //func is a callback function dealing with Node::data
 List *list_traverse(List *list, int (*visit)(List*, Node *));
+List *list_traverse_reverse(List *list, int (*visit)(List*, Node *));
 
 List *list_copy(List *lx, List *ly, int (*copy)(void *, void*));
+List *list_revert(List *list);
 
-List *list_sort_merge(List *list, int (*compare)(void*, void*));
+List *list_mergesort(List *list, int (*compare)(void*, void*));
 
-List *list_sort_bubble(List *list, int (*compare)(void*, void*));
+List *list_quicksort(List *list, int (*compare)(void*, void*));
 
 #endif

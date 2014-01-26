@@ -74,6 +74,12 @@ List *list_init(List *list)
 List *list_destroy(List *list, void (*data_destroy)(void *))
 {
     /*list_traverse(list, list_remove);*/
+    Node *p = NULL, *q;
+    for (p = list->head; p; p = q)
+    {
+        q = p->next;
+        list_remove(list, p, data_destroy);
+    }
     list->head = list->tail = NULL;
     list->length = 0;
     return list;
@@ -93,12 +99,9 @@ Node *list_nth_node(List *list, int n)
     return p;
 }
 
-Node *list_pop(List *list, int n)
+Node *list_pop(List *list, Node *p)
 {
-    Node *p = NULL;
     Node *prev = NULL, *next = NULL;
-    int i = 0;
-    for (p = list->head; p && i < n; p = p->next, i++);
 
     if (!p)
     {
@@ -129,6 +132,13 @@ Node *list_pop(List *list, int n)
     p->next = p->prev = NULL;
 
     return p;
+
+}
+
+Node *list_pop_by_index(List *list, int n)
+{
+    Node *key = list_nth_node(list, n);
+    return list_pop(list, key);
 }
 
 Node *list_pop_head(List *list)
@@ -471,6 +481,48 @@ List *list_traverse(List *list, int (*visit)(List*, Node *))
     return list;
 }
 
+List *list_traverse_reverse(List *list, int (*visit)(List*, Node *))
+{
+    Node *p = NULL;
+    int i;
+    for (i = 0, p = list->tail; p; i++, p = p->prev)
+    {
+        if (visit)
+        {
+            visit(list, p);
+        }
+        else
+        {
+            printf("%d:\t%p,%d\n", i, p, *(int*)(p->data));
+            /*printf("%d:\t%d\t", i, *(int*)(p->data));*/
+        }
+    }
+    if (!visit)
+    {
+        printf("\n\n");
+    }
+    return list;
+}
+
+
+List *list_copy(List *lx, List *ly, int (*copy)(void *, void*));
+List *list_revert(List *list)
+{
+    Node *p, *q;
+    for (p = list->tail; p; p = q)
+    {
+        q = p->prev;
+        p->prev = p->next;
+        p->next = q;
+    }
+    p = list->head;
+    list->head = list->tail;
+    list->tail = p;
+    return list;
+}
+
+
+
 /*************************************************************
  * LOOP/STACK BASED MERGE SORT to sort a linked list
  * **********************************************************
@@ -544,7 +596,7 @@ List *list_traverse(List *list, int (*visit)(List*, Node *))
  * auxiliary storage cost normally associated with the algorithm.
  */
 
-List *list_sort_merge(List *list, int (*compare)(void*, void*))
+List *list_mergesort(List *list, int (*compare)(void*, void*))
 {
     Node *p = NULL, *q = NULL, *key = NULL;
     int i, listsize, nmerges, psize, qsize;
@@ -616,29 +668,27 @@ List *list_sort_merge(List *list, int (*compare)(void*, void*))
 
             p = q;
             nmerges++;
-        }
-        printf("after merging list with size %d: \n", listsize);
-        list_traverse(list, NULL);
-        if (nmerges <= 1 )
+        }//merged along the list
+
+        /*printf("after merging list with size %d: \n", listsize);*/
+        /*list_traverse(list, NULL);*/
+        if (nmerges == 1 )
         {
             return list;
         }
+        //doublize the listsize to merge
         listsize *= 2;
-    }
+    }//merged a pass
 }
 
 /*Bubble sort the list*/
-List *list_sort_bubble(List *list, int (*compare)(void*, void*))
+List *list_quicksort(List *list, int (*compare)(void*, void*))
 {
     return list;
 }
 
 
 #ifdef TEST_CONTAINER
-int main()
-{
-    List a;
-    return 0;
-}
+
 
 #endif
