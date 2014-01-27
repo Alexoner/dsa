@@ -61,17 +61,17 @@ double compare_double(void *x, void *y)
 /*return NULL;*/
 /*}*/
 
-List *list_init(List *list)
+struct list *list_init(struct list *list)
 {
     if (!list)
     {
-        list = (List*)malloc(sizeof(List) * 1);
+        list = (struct list*)malloc(sizeof(struct list) * 1);
     }
     memset(list, 0, sizeof(*list));
     return list;
 }
 
-List *list_destroy(List *list, void (*data_destroy)(void *))
+struct list *list_destroy(struct list *list, void (*data_destroy)(void *))
 {
     /*list_traverse(list, list_remove);*/
     Node *p = NULL, *q;
@@ -85,12 +85,12 @@ List *list_destroy(List *list, void (*data_destroy)(void *))
     return list;
 }
 
-int list_is_empty(List *list)
+int list_is_empty(struct list *list)
 {
     return list->length == 0;
 }
 
-Node *list_nth_node(List *list, int n)
+Node *list_nth_node(struct list *list, int n)
 {
     //n counts from 0
     Node *p = NULL;
@@ -99,7 +99,7 @@ Node *list_nth_node(List *list, int n)
     return p;
 }
 
-Node *list_pop(List *list, Node *p)
+Node *list_pop(struct list *list, Node *p)
 {
     Node *prev = NULL, *next = NULL;
 
@@ -135,13 +135,13 @@ Node *list_pop(List *list, Node *p)
 
 }
 
-Node *list_pop_by_index(List *list, int n)
+Node *list_pop_by_index(struct list *list, int n)
 {
     Node *key = list_nth_node(list, n);
     return list_pop(list, key);
 }
 
-Node *list_pop_head(List *list)
+Node *list_pop_head(struct list *list)
 {
     Node *p = NULL;
     p = list->head;
@@ -160,7 +160,7 @@ Node *list_pop_head(List *list)
     return p;
 }
 
-Node *list_pop_tail(List *list)
+Node *list_pop_tail(struct list *list)
 {
     Node *p = NULL;
     p = list->tail;
@@ -179,7 +179,7 @@ Node *list_pop_tail(List *list)
     return p;
 }
 
-Node *list_find(List *list, Node *key, int (*compare)(Node*, Node*))
+Node *list_find(struct list *list, Node *key, int (*compare)(Node*, Node*))
 {
     Node *p = NULL;
     for (p = list->head; p; p = p->next)
@@ -203,7 +203,7 @@ Node *list_find(List *list, Node *key, int (*compare)(Node*, Node*))
     return NULL;
 }
 
-int list_index(List *list, Node *key)
+int list_index(struct list *list, Node *key)
 {
     int i = 0;
     Node *p = NULL;
@@ -215,7 +215,7 @@ int list_index(List *list, Node *key)
     return i;
 }
 
-Node *list_replace(List *list, Node *old, Node *new)
+Node *list_replace(struct list *list, Node *old, Node *new)
 {
     list_insert(list, new, old);
     list_remove(list, old, free);
@@ -223,7 +223,7 @@ Node *list_replace(List *list, Node *old, Node *new)
 }
 
 //insert node before position
-Node *list_insert(List *list, Node *key, Node *position)
+Node *list_insert(struct list *list, Node *key, Node *position)
 {
     assert(list);
     assert(position);
@@ -248,7 +248,7 @@ Node *list_insert(List *list, Node *key, Node *position)
     return key;
 }
 
-Node *list_insert_by_index(List *list, Node *key, int n)
+Node *list_insert_by_index(struct list *list, Node *key, int n)
 {
     Node *p = list_nth_node(list, n);
     if (p)
@@ -262,7 +262,7 @@ Node *list_insert_by_index(List *list, Node *key, int n)
     return key;
 }
 
-Node *list_insert_after(List *list, Node *key, Node *position)
+Node *list_insert_after(struct list *list, Node *key, Node *position)
 {
     assert(list);
     assert(position);
@@ -286,7 +286,7 @@ Node *list_insert_after(List *list, Node *key, Node *position)
     return key;
 }
 
-Node *list_insert_after_by_index(List *list, Node *key, int n)
+Node *list_insert_after_by_index(struct list *list, Node *key, int n)
 {
     assert(list);
     Node *p = list_nth_node(list, n);
@@ -294,7 +294,7 @@ Node *list_insert_after_by_index(List *list, Node *key, int n)
     return key;
 }
 
-Node *list_append(List *list, Node *node)
+Node *list_append(struct list *list, Node *node)
 {
     assert(list);
     if (list->tail)
@@ -308,13 +308,13 @@ Node *list_append(List *list, Node *node)
     return node;
 }
 
-Node *list_push(List *list, Node *key)
+Node *list_push(struct list *list, Node *key)
 {
     return list_append(list, key);
 }
 
 //remove position from list
-int list_remove(List *list, Node *position, void (*data_destroy)(void *))
+int list_remove(struct list *list, Node *position, void (*data_destroy)(void *))
 {
     assert(list);
     assert(position);
@@ -348,7 +348,7 @@ int list_remove(List *list, Node *position, void (*data_destroy)(void *))
     return 0;
 }
 
-int list_remove_by_index(List *list, int n, void (*data_destroy)(void *))
+int list_remove_by_index(struct list *list, int n, void (*data_destroy)(void *))
 {
     Node *p = list_nth_node(list, n);
     if (p)
@@ -362,7 +362,7 @@ int list_remove_by_index(List *list, int n, void (*data_destroy)(void *))
 }
 
 //move Node *node before *position
-int list_move(List *list, Node *key, Node *position)
+int list_move(struct list *list, Node *key, Node *position)
 {
     Node *prev = NULL;
     Node *next = NULL;
@@ -416,7 +416,7 @@ int list_move(List *list, Node *key, Node *position)
     return 0;
 }
 
-int list_move_by_index(List *list, int a, int b)
+int list_move_by_index(struct list *list, int a, int b)
 {
     Node *p, *q;
     p = list_nth_node(list, a);
@@ -425,7 +425,7 @@ int list_move_by_index(List *list, int a, int b)
 }
 
 //swap x and y in list
-int list_swap(List *list, Node *x, Node *y)
+int list_swap(struct list *list, Node *x, Node *y)
 {
     Node *ynext = NULL;
     if (y->next)
@@ -450,7 +450,7 @@ int list_swap(List *list, Node *x, Node *y)
     return 0;
 }
 
-int list_swap_by_index(List *list, int a, int b)
+int list_swap_by_index(struct list *list, int a, int b)
 {
     Node *p, *q;
     p = list_nth_node(list, a);
@@ -458,7 +458,7 @@ int list_swap_by_index(List *list, int a, int b)
     return list_swap(list, p, q);
 }
 
-List *list_traverse(List *list, int (*visit)(List*, Node *))
+struct list *list_traverse(struct list *list, int (*visit)(struct list*, Node *))
 {
     Node *p = NULL;
     int i;
@@ -481,7 +481,7 @@ List *list_traverse(List *list, int (*visit)(List*, Node *))
     return list;
 }
 
-List *list_traverse_reverse(List *list, int (*visit)(List*, Node *))
+struct list *list_traverse_reverse(struct list *list, int (*visit)(struct list*, Node *))
 {
     Node *p = NULL;
     int i;
@@ -505,13 +505,13 @@ List *list_traverse_reverse(List *list, int (*visit)(List*, Node *))
 }
 
 
-List *list_copy(List *lx, List *ly, int (*copy)(void *, void*))
+struct list *list_copy(struct list *lx, struct list *ly, int (*copy)(void *, void*))
 {
     Node *p, *q;
     /*for (p=)*/
     return ly;
 }
-List *list_revert(List *list)
+struct list *list_revert(struct list *list)
 {
     Node *p, *q;
     for (p = list->tail; p; p = q)
@@ -601,7 +601,7 @@ List *list_revert(List *list)
  * auxiliary storage cost normally associated with the algorithm.
  */
 
-List *list_mergesort(List *list, int (*compare)(void*, void*))
+struct list *list_mergesort(struct list *list, int (*compare)(void*, void*))
 {
     Node *p = NULL, *q = NULL, *key = NULL;
     int i, listsize, nmerges, psize, qsize;
@@ -702,7 +702,7 @@ List *list_mergesort(List *list, int (*compare)(void*, void*))
  * then rebuild the linked list from the array of sorted pointers.
  */
 
-List *list_quicksort(List *list, int (*compare)(void*, void*))
+struct list *list_quicksort(struct list *list, int (*compare)(void*, void*))
 {
     return list;
 }

@@ -1,10 +1,10 @@
 CC=gcc
 CFLAGS=-g -Wall -fPIC
 
-dlinkedlist:dlinkedlist.c dllistmain.c
+linkedlist:linkedlist.c listmain.c
 	$(CC) -o $@ $^ $(CFLAGS)
-linkedlist:linkedlist.c linkedmain.c
+slinkedlist:slinkedlist.c slinkedmain.c
 	$(CC) -o $@ $^ $(CFLAGS)
 
-liblist.so:dlinkedlist.c linkedlist.c
+liblist.so:linkedlist.c slinkedlist.c
 	$(CC) -shared -o $@ $^ $(CFLAGS)
