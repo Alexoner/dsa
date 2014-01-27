@@ -12,6 +12,7 @@ typedef struct Node Node;
 
 struct List
 {
+    int datasize;
     int length;
     //int empty;
     Node *head;
