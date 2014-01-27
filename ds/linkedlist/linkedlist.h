@@ -1,80 +1,100 @@
-/*************************************************************************
-    > File Name: linkedlist.h
-    > Author: hao
-    > Created Time: Thu 18 Oct 2012 10:53:02 AM CST
- ************************************************************************/
-#ifndef LINKEDLIST_H
-#define LINKEDLIST_H
+#ifndef DLINKEDLIST_H
+#define DLINKEDLIST_H
 
-#include <stdlib.h>
-#include <string.h>
+#include <pthread.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-#define SORT_NUM 1
-#define SORT_STR 2
+typedef struct List List;
+typedef struct Node Node;
 
-struct linkedlist
+struct List
 {
-    void *data;
-    struct linkedlist *next;
+    int datasize;
+    int length;
+    //int empty;
+    Node *head;
+    Node *tail;
+    pthread_mutex_t lock; //mutex lock for thread safe
 };
 
-/*head is the head pointer or its address of a linkedlist,and
- * next_offset is the offset of the menber "next" pointer in the struct,
- * which points to the next struct int the linkedlist
- */
+struct dlist
+{
+    void *data;
+    struct dlist  *prev;
+    struct dlist *next;
+};
 
-void *ListInit(void **head,size_t next_offset);
+Node *node_new(void *data);
+Node *node_new_int(int i);
+Node *node_new_num(double f);
 
-void *ListDestroy(void **head,size_t next_offset);
+int compare_int(void *x, void *y);
+float compare_float(void *x, void *y);
+double comare_double(void *x, void *y);
 
-int ListEmpty(void *head,size_t next_offset);//whether empty
+Node *node_destroy(Node *p, void* data_destroy(void*));
 
-int ListLength(void *head,size_t next_offset);
-//void *GetNode(void *head,size_t next_offset);
+List *list_init(List *list);
 
-void *ListLocateNode(void *head,void *p,
-        int (*compare)(void *,void *),size_t next_offset);
-//find firest node matched  "compare" with struct pointer p
+List *list_destroy(List *list, void (*data_destroy)(void *));
 
-void *ListTail(void *head,size_t next_offset);//locate the last node
+int list_is_empty(List *list);
 
-void *ListPriorNode(void *head,void *p,size_t next_offset);
-//find the predecessor of p
+Node *list_nth_node(List *list, int n);
 
-void *ListNextNode(void *head,void *p,size_t next_offset);
-//find successor of element p
+//pop out the node
+Node *list_pop(List *list, Node *p);
+//pop out the node with index as n
+Node *list_pop_by_index(List *list, int n);
 
-void *ListInsertBefore(void **head,void *position,void *q,size_t next_offset);
-//insert an element q before p
+//pop out the head node
+Node *list_pop_head(List *list);
 
-void *ListInsertAfter(void **head,void *position,void *q,size_t next_offset);
-//insert q after p
+//pop out the tail node
+Node *list_pop_tail(List *list);
 
-void *ListPrepend(void **head,void *p,size_t next_offset);
-//prepend an element p to the list
+//compare can be strcmp() or memcpy() or other self defined functions for
+//comparing
+Node *list_find(List *list, Node *key, int (*compare)(Node*, Node*));
 
-void *ListAppend(void **head,void *p,size_t next_offset);
-//append an element p to the list
+int list_index(List *list, Node *key);
 
-void *ListDeleteNode(void **head,void *p,size_t next_offset);
-//delete element p
+Node *list_replace(List *list, Node *position, Node *key);
+Node *list_replace_by_index(List *list, int n, Node *key);
 
-void ListTraverse(void *head,int (*visit)(void*),
-        size_t next_offset);
+Node *list_insert(List *list, Node *key, Node *position);
+Node *list_insert_by_index(List *list, Node *key, int n);
 
-void *ListOrderIncr(void *head,size_t size,
-        size_t data_offset,size_t next_offset,int data_flag);
-//sort a list by increasing order,string or number,
-//returning the head pointer of the list
+Node *list_insert_after(List *list, Node *key, Node *position);
+Node *list_insert_after_by_index(List *list, Node *key, int n);
 
-void *ListOrderDesc(void *head,size_t size,size_t data_offset,
-        size_t next_offset,int data_flag);
-//same as ListOrderDecr,by descending order.
+Node *list_append(List *list, Node *key);
 
-int ListSave(void *head,size_t size,
-        size_t next_offset,const char*path);
+Node *list_push(List *list, Node *key);
 
-int ListLoad(void **head,size_t size,size_t next_offset,
-        const char*path);
+int list_remove(List *list, Node *position, void (*data_destroy)(void *));
+int list_remove_by_index(List *list, int n, void (*data_destroy)(void *));
+
+int list_move(List *list, Node *key, Node *position);
+int list_move_by_index(List *list, int a, int b);
+
+int list_swap(List *list, Node *x, Node *y);
+int list_swap_by_index(List *list, int a, int b);
+
+//func is a callback function dealing with Node::data
+List *list_traverse(List *list, int (*visit)(List*, Node *));
+List *list_traverse_reverse(List *list, int (*visit)(List*, Node *));
+
+List *list_copy(List *lx, List *ly, int (*copy)(void *, void*));
+List *list_revert(List *list);
+List *list_merge(List *lx, List *ly);
+List *list_split(List *lx, Node *p);
+
+List *list_mergesort(List *list, int (*compare)(void*, void*));
+
+List *list_quicksort(List *list, int (*compare)(void*, void*));
+
 #endif
