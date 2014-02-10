@@ -1,4 +1,4 @@
-#include "dlinkedlist.h"
+#include "linkedlist.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -9,7 +9,6 @@
 struct list *node_new(void *data)
 {
     struct list *node = malloc(sizeof(struct list));
-    node->data = data;
     node->prev = node->next = NULL;
     return node;
 }
@@ -17,16 +16,16 @@ struct list *node_new(void *data)
 struct list *node_new_int(int i)
 {
     struct list *p = node_new(NULL);
-    p->data = malloc(sizeof(int));
-    *(int*)p->data = i;
+    /*p->data = malloc(sizeof(int));*/
+    /**(int*)p->data = i;*/
     return p;
 }
 
 struct list *node_new_num(double f)
 {
     struct list *p = node_new(NULL);
-    p->data = malloc(sizeof(double));
-    *(double*)p->data = f;
+    /*p->data = malloc(sizeof(double));*/
+    /**(double*)p->data = f;*/
     return p;
 }
 
@@ -74,20 +73,20 @@ struct list *list_init(struct list *list)
 struct list *list_destroy(struct list *list, void (*data_destroy)(void *))
 {
     /*list_traverse(list, list_remove);*/
-    struct list *p = NULL, *q;
-    for (p = list->head; p; p = q)
-    {
-        q = p->next;
-        list_remove(list, p, data_destroy);
-    }
-    list->head = list->tail = NULL;
-    list->length = 0;
+    /*struct list *p = NULL, *q;*/
+    /*for (p = list->head; p; p = q)*/
+    /*{*/
+    /*q = p->next;*/
+    /*list_remove(list, p, data_destroy);*/
+    /*}*/
+    /*list->head = list->tail = NULL;*/
+    /*list->length = 0;*/
     return list;
 }
 
 int list_is_empty(struct list *list)
 {
-    return list->length == 0;
+    /*return list->length == 0;*/
 }
 
 struct list *list_nth_node(struct list *list, int n)
@@ -95,7 +94,7 @@ struct list *list_nth_node(struct list *list, int n)
     //n counts from 0
     struct list *p = NULL;
     int i = 0;
-    for (p = list->head; p && i < n; p = p->next, i++);
+    /*for (p = list->head; p && i < n; p = p->next, i++);*/
     return p;
 }
 
@@ -117,7 +116,7 @@ struct list *list_pop(struct list *list, struct list *p)
     }
     else
     {
-        list->head = next;
+        /*list->head = next;*/
     }
 
     if (next)
@@ -126,7 +125,7 @@ struct list *list_pop(struct list *list, struct list *p)
     }
     else
     {
-        list->tail = prev;
+        /*list->tail = prev;*/
     }
 
     p->next = p->prev = NULL;
@@ -144,109 +143,111 @@ struct list *list_pop_by_index(struct list *list, int n)
 struct list *list_pop_head(struct list *list)
 {
     struct list *p = NULL;
-    p = list->head;
-    if (p)
-    {
-        list->head = p->next;
-        if (p->next)
-        {
-            p->next->prev = NULL;
-        }
-        else
-        {
-            list->tail = p->prev;
-        }
-    }
+    /*p = list->head;*/
+    /*if (p)*/
+    /*{*/
+    /*list->head = p->next;*/
+    /*if (p->next)*/
+    /*{*/
+    /*p->next->prev = NULL;*/
+    /*}*/
+    /*else*/
+    /*{*/
+    /*list->tail = p->prev;*/
+    /*}*/
+    /*}*/
     return p;
 }
 
 struct list *list_pop_tail(struct list *list)
 {
     struct list *p = NULL;
-    p = list->tail;
-    if (p)
-    {
-        list->tail = p->prev;
-        if (p->prev)
-        {
-            p->prev->next = NULL;
-        }
-        else
-        {
-            list->head = NULL;
-        }
-    }
+    /*p = list->tail;*/
+    /*if (p)*/
+    /*{*/
+    /*list->tail = p->prev;*/
+    /*if (p->prev)*/
+    /*{*/
+    /*p->prev->next = NULL;*/
+    /*}*/
+    /*else*/
+    /*{*/
+    /*list->head = NULL;*/
+    /*}*/
+    /*}*/
     return p;
 }
 
-struct list *list_find(struct list *list, struct list *key, int (*compare)(struct list*, struct list*))
+struct list *list_find(struct list *list,
+                       struct list *key,
+                       int (*compare)(struct list*, struct list*))
 {
     struct list *p = NULL;
-    for (p = list->head; p; p = p->next)
-    {
-        if (compare)
-        {
-            if (!compare(p, key))
-            {
-                return p;
-            }
-        }
-        else
-        {
-            //compare function is NULL pointer,compare as integers
-            if (!((*(int*)p->data) - (*(int*)key->data)))
-            {
-                return p;
-            }
-        }
-    }
+    /*for (p = list->head; p; p = p->next)*/
+    /*{*/
+    /*if (compare)*/
+    /*{*/
+    /*if (!compare(p, key))*/
+    /*{*/
+    /*return p;*/
+    /*}*/
+    /*}*/
+    /*else*/
+    /*{*/
+    /*//compare function is NULL pointer,compare as integers*/
+    /*if (!((*(int*)p->data) - (*(int*)key->data)))*/
+    /*{*/
+    /*return p;*/
+    /*}*/
+    /*}*/
+    /*}*/
     return NULL;
 }
 
-int list_index(struct list *list, struct list *key)
-{
-    int i = 0;
-    struct list *p = NULL;
-    for (p = list->head; p && p != key; p = p->next, i++);
-    if (!p)
-    {
-        return -1;
-    }
-    return i;
-}
+/*int list_index(struct list *list, struct list *key)*/
+/*{*/
+/*int i = 0;*/
+/*struct list *p = NULL;*/
+/*for (p = list->head; p && p != key; p = p->next, i++);*/
+/*if (!p)*/
+/*{*/
+/*return -1;*/
+/*}*/
+/*return i;*/
+/*}*/
 
-struct list *list_replace(struct list *list, struct list *old, struct list *new)
-{
-    list_insert(list, new, old);
-    list_remove(list, old, free);
-    return new;
-}
+/*struct list *list_replace(struct list *list, struct list *old, struct list *new)*/
+/*{*/
+/*list_insert(list, new, old);*/
+/*list_remove(list, old, free);*/
+/*return new;*/
+/*}*/
 
 //insert node before position
-struct list *list_insert(struct list *list, struct list *key, struct list *position)
-{
-    assert(list);
-    assert(position);
-    struct list *prev = position->prev;
+/*struct list *list_insert(struct list *list, struct list *key, struct list *position)*/
+/*{*/
+/*assert(list);*/
+/*assert(position);*/
+/*struct list *prev = position->prev;*/
 
-    if (prev)
-    {
-        prev->next = key;
-    }
-    else
-    {
-        list->head = key;
-    }
+/*if (prev)*/
+/*{*/
+/*prev->next = key;*/
+/*}*/
+/*else*/
+/*{*/
+/*list->head = key;*/
+/*}*/
 
-    position->prev = key;
+/*position->prev = key;*/
 
-    key->prev = prev;
-    key->next = position;
+/*key->prev = prev;*/
+/*key->next = position;*/
 
-    list->length++;
+/*list->length++;*/
 
-    return key;
-}
+/*return key;*/
+/*}*/
 
 struct list *list_insert_by_index(struct list *list, struct list *key, int n)
 {
@@ -262,51 +263,51 @@ struct list *list_insert_by_index(struct list *list, struct list *key, int n)
     return key;
 }
 
-struct list *list_insert_after(struct list *list, struct list *key, struct list *position)
-{
-    assert(list);
-    assert(position);
-    struct list *next = position->next;
-    if (next)
-    {
-        key->next = next;
-        next->prev = key;
-    }
-    else
-    {
-        list->tail = key;
-        key->next = NULL;
-    }
+/*struct list *list_insert_after(struct list *list, struct list *key, struct list *position)*/
+/*{*/
+/*assert(list);*/
+/*assert(position);*/
+/*struct list *next = position->next;*/
+/*if (next)*/
+/*{*/
+/*key->next = next;*/
+/*next->prev = key;*/
+/*}*/
+/*else*/
+/*{*/
+/*list->tail = key;*/
+/*key->next = NULL;*/
+/*}*/
 
-    position->next = key;
-    key->prev = position;
+/*position->next = key;*/
+/*key->prev = position;*/
 
-    list->length++;
+/*list->length++;*/
 
-    return key;
-}
+/*return key;*/
+/*}*/
 
-struct list *list_insert_after_by_index(struct list *list, struct list *key, int n)
-{
-    assert(list);
-    struct list *p = list_nth_node(list, n);
-    list_insert_after(list, key, p);
-    return key;
-}
+/*struct list *list_insert_after_by_index(struct list *list, struct list *key, int n)*/
+/*{*/
+/*assert(list);*/
+/*struct list *p = list_nth_node(list, n);*/
+/*list_insert_after(list, key, p);*/
+/*return key;*/
+/*}*/
 
-struct list *list_append(struct list *list, struct list *node)
-{
-    assert(list);
-    if (list->tail)
-    {
-        list_insert_after(list, node, list->tail);
-    }
-    else
-    {
-        list->tail = list->head = node;
-    }
-    return node;
-}
+/*struct list *list_append(struct list *list, struct list *node)*/
+/*{*/
+/*assert(list);*/
+/*if (list->tail)*/
+/*{*/
+/*list_insert_after(list, node, list->tail);*/
+/*}*/
+/*else*/
+/*{*/
+/*list->tail = list->head = node;*/
+/*}*/
+/*return node;*/
+/*}*/
 
 struct list *list_push(struct list *list, struct list *key)
 {
@@ -314,41 +315,41 @@ struct list *list_push(struct list *list, struct list *key)
 }
 
 //remove position from list
-int list_remove(struct list *list,
-                struct list *position,
-                void (*data_destroy)(void *))
-{
-    assert(list);
-    assert(position);
-    struct list *prev = position->prev;
-    struct list *next = position->next;
+/*int list_remove(struct list *list,*/
+/*struct list *position,*/
+/*void (*data_destroy)(void *))*/
+/*{*/
+/*assert(list);*/
+/*assert(position);*/
+/*struct list *prev = position->prev;*/
+/*struct list *next = position->next;*/
 
-    if (prev)
-    {
-        prev->next = next;
-    }
-    else
-    {
-        list->head = next;
-    }
+/*if (prev)*/
+/*{*/
+/*prev->next = next;*/
+/*}*/
+/*else*/
+/*{*/
+/*list->head = next;*/
+/*}*/
 
-    if (next)
-    {
-        next->prev = prev;
-    }
-    else
-    {
-        list->tail = prev;
-    }
+/*if (next)*/
+/*{*/
+/*next->prev = prev;*/
+/*}*/
+/*else*/
+/*{*/
+/*list->tail = prev;*/
+/*}*/
 
-    if (data_destroy && position->data)
-    {
-        data_destroy(position->data);
-    }
-    free(position);
-    list->length--;
-    return 0;
-}
+/*if (data_destroy && position->data)*/
+/*{*/
+/*data_destroy(position->data);*/
+/*}*/
+/*free(position);*/
+/*list->length--;*/
+/*return 0;*/
+/*}*/
 
 int list_remove_by_index(struct list *list, int n, void (*data_destroy)(void *))
 {
@@ -364,59 +365,59 @@ int list_remove_by_index(struct list *list, int n, void (*data_destroy)(void *))
 }
 
 //move struct list *node before *position
-int list_move(struct list *list, struct list *key, struct list *position)
-{
-    struct list *prev = NULL;
-    struct list *next = NULL;
+/*int list_move(struct list *list, struct list *key, struct list *position)*/
+/*{*/
+/*struct list *prev = NULL;*/
+/*struct list *next = NULL;*/
 
-    prev = key->prev;
-    next = key->next;
+/*prev = key->prev;*/
+/*next = key->next;*/
 
-    //"remove" node from the list
-    if (prev)
-    {
-        prev->next = next;
-    }
-    else
-    {
-        list->head = next;
-    }
-    if (next)
-    {
-        next->prev = prev;
-    }
-    else
-    {
-        list->tail = prev;
-    }
+/*//"remove" node from the list*/
+/*if (prev)*/
+/*{*/
+/*prev->next = next;*/
+/*}*/
+/*else*/
+/*{*/
+/*list->head = next;*/
+/*}*/
+/*if (next)*/
+/*{*/
+/*next->prev = prev;*/
+/*}*/
+/*else*/
+/*{*/
+/*list->tail = prev;*/
+/*}*/
 
-    //insert node into the list,before position
-    if (position)
-    {
-        prev = position->prev;
-        if (prev)
-        {
-            prev->next = key;
-        }
-        else
-        {
-            list->head = key;
-        }
+/*//insert node into the list,before position*/
+/*if (position)*/
+/*{*/
+/*prev = position->prev;*/
+/*if (prev)*/
+/*{*/
+/*prev->next = key;*/
+/*}*/
+/*else*/
+/*{*/
+/*list->head = key;*/
+/*}*/
 
-        position->prev = key;
+/*position->prev = key;*/
 
-        key->prev = prev;
-        key->next = position;
-    }
-    else
-    {
-        key->prev = list->tail;
-        key->next = NULL;
-        list->tail->next = key;
-        list->tail = key;
-    }
-    return 0;
-}
+/*key->prev = prev;*/
+/*key->next = position;*/
+/*}*/
+/*else*/
+/*{*/
+/*key->prev = list->tail;*/
+/*key->next = NULL;*/
+/*list->tail->next = key;*/
+/*list->tail = key;*/
+/*}*/
+/*return 0;*/
+/*}*/
 
 int list_move_by_index(struct list *list, int a, int b)
 {
