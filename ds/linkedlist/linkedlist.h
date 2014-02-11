@@ -165,6 +165,9 @@ static inline void list_del_init(struct list *entry)
  * list_move - delete from one list and add as another's head
  * @list: the entry to move
  * @head: the head that will precede our entry
+ *
+ * if (list == head),because __list_del() doesn't changed the deleted
+ * entry's prev and next pointer,so the list entry remains the same.
  */
 static inline void list_move(struct list *list, struct list *head)
 {
@@ -368,6 +371,13 @@ static inline struct list *list_find(struct list *list,
                                      struct list *key,
                                      int (*compare)(struct list*, struct list*));
 
+/**
+ * list_index - returns the index of an entry
+ * @list: the list
+ * @key: the entry
+ *
+ * index begins with 0
+ */
 static inline int list_index(struct list *list, struct list *key)
 {
     int i;
@@ -376,6 +386,12 @@ static inline int list_index(struct list *list, struct list *key)
     return i;
 }
 
+/**
+ * list_replace_by_index - replace the nth entry of the list with the new one
+ * @list: the list
+ * @n: the index
+ * @new: the new entry
+ */
 static inline struct list *list_replace_by_index(struct list *list,
         int n,
         struct list *new)
@@ -384,7 +400,15 @@ static inline struct list *list_replace_by_index(struct list *list,
     list_replace(old, new);
     return list;
 }
-
+/**
+ * list_add_by_index - add a new entry by index
+ * @list: list
+ * @key: new entry to be added
+ * @n: list head's index to add it after
+ *
+ * Insert a new entry after the specified head.
+ * This is good for implementing stacks.
+ */
 static inline struct list *list_add_by_index(struct list *list,
         struct list *key,
         int n)
@@ -393,13 +417,109 @@ static inline struct list *list_add_by_index(struct list *list,
     return list;
 }
 
-struct list *list_add_tail_by_index(struct list *list, struct list *key, int n);
-struct list *list_append(struct list *list, struct list *key);
-struct list *list_push(struct list *list, struct list *key);
-int list_del_by_index(struct list *list, int n, void (*data_destroy)(void *));
-int list_move_by_index(struct list *list, int a, int b);
-int list_swap(struct list *list, struct list *x, struct list *y);
-int list_swap_by_index(struct list *list, int a, int b);
+/**
+ * list_add_tail_by_index - add a new entry by index
+ * @list: list
+ * @key: new entry to be added
+ * @n: index of list head to add it before
+ *
+ * Insert a new entry before the specified head.
+ * This is useful for implementing queues.
+ */
+static inline struct list *list_add_tail_by_index(struct list *list,
+        struct list *key, int n)
+{
+    list_add_tail(key, list_nth_node(list, n));
+    return list;
+}
+
+/**
+ * list_append - add a new entry to a list's tail
+ * @list: list
+ * @key: new entry to be added
+ *
+ * Insert a new entry at a list's tail.
+ * This is useful for implementing stacks and queues.
+ */
+static inline struct list *list_append(struct list *list,
+                                       struct list *key)
+{
+    if (!list)
+    {
+        return NULL;
+    }
+    list_add(key, list->prev);
+    return list;
+}
+
+/**
+ * list_push - add a new entry to a list's tail
+ * @list: list
+ * @key: new entry to be added
+ *
+ * Insert a new entry at a list's tail.
+ * This is useful for implementing stacks and queues.
+ */
+static inline struct list *list_push(struct list *list, struct list *key)
+{
+    if (!list)
+    {
+        return NULL;
+    }
+    list_add(key, list->prev);
+    return list;
+}
+
+/**
+ * list_del_by_index - deletes entry from list by index.
+ * @list: the list
+ * @n: the index of the element to be deleted
+ * Note: list_empty() on entry does not return true after this, the entry is
+ * in an undefined state.
+ */
+static inline int list_del_by_index(struct list *list,
+                                    int n)
+{
+    list_del(list_nth_node(list, n));
+    return 0;
+}
+
+/**
+ * list_move_by_index - delete from one list and add as another's head
+ * @list: the entry to move
+ * @head: the head that will precede our entry
+ *
+ * if (list == head),because __list_del() doesn't changed the deleted
+ * entry's prev and next pointer,so the list entry remains the same.
+ */
+static inline int list_move_by_index(struct list *list, int a, int b)
+{
+    list_move(list_nth_node(list, a), list_nth_node(list, b));
+    return 0;
+}
+
+/**
+ * list_move_tail_by_index - delete from one list and add as another's head
+ * @list: the entry to move
+ * @head: the head that will precede our entry
+ *
+ * if (list == head),because __list_del() doesn't changed the deleted
+ * entry's prev and next pointer,so the list entry remains the same.
+ */
+static inline int list_move_tail_by_index(struct list *list, int a, int b)
+{
+    list_move_tail(list_nth_node(list, a), list_nth_node(list, b));
+    return 0;
+}
+
+static inline int list_swap(struct list *list,
+                            struct list *x,
+                            struct list *y)
+{
+    return 0;
+}
+
+static inline int list_swap_by_index(struct list *list, int a, int b);
 
 struct list *list_traverse(struct list *list, int (*visit)(struct list*, struct list *));
 struct list *list_traverse_reverse(struct list *list, int (*visit)(struct list*, struct list *));
