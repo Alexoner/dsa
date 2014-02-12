@@ -492,9 +492,9 @@ static inline int list_del_by_index(struct list *list,
  * if (list == head),because __list_del() doesn't changed the deleted
  * entry's prev and next pointer,so the list entry remains the same.
  */
-static inline int list_move_by_index(struct list *list, int a, int b)
+static inline int list_move_by_index(struct list *list_from, int a, struct list *list_to, int b)
 {
-    list_move(list_nth_node(list, a), list_nth_node(list, b));
+    list_move(list_nth_node(list_from, a), list_nth_node(list_to, b));
     return 0;
 }
 
@@ -512,8 +512,9 @@ static inline int list_move_tail_by_index(struct list *list, int a, int b)
     return 0;
 }
 
-static inline int list_swap(struct list *list,
+static inline int list_swap(struct list *list_x,
                             struct list *x,
+                            struct list *list_y,
                             struct list *y)
 {
     return 0;
