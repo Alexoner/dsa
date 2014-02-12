@@ -492,7 +492,8 @@ static inline int list_del_by_index(struct list *list,
  * if (list == head),because __list_del() doesn't changed the deleted
  * entry's prev and next pointer,so the list entry remains the same.
  */
-static inline int list_move_by_index(struct list *list_from, int a, struct list *list_to, int b)
+static inline int list_move_by_index(struct list *list_from, int a,
+                                     struct list *list_to, int b)
 {
     list_move(list_nth_node(list_from, a), list_nth_node(list_to, b));
     return 0;
@@ -506,28 +507,47 @@ static inline int list_move_by_index(struct list *list_from, int a, struct list 
  * if (list == head),because __list_del() doesn't changed the deleted
  * entry's prev and next pointer,so the list entry remains the same.
  */
-static inline int list_move_tail_by_index(struct list *list_from, int a, struct list *list_to, int b)
+static inline int list_move_tail_by_index(struct list *list_from, int a,
+        struct list *list_to, int b)
 {
     list_move_tail(list_nth_node(list_from, a), list_nth_node(list_to, b));
     return 0;
 }
 
-static inline int list_swap(struct list *list_x,
-                            struct list *x,
-                            struct list *list_y,
+static inline int list_swap(struct list *x,
                             struct list *y)
 {
+    struct list *p;
+    if (x->prev == y)
+    {
+        list_move(y, x);
+    }
+    else if (x->next == y)
+    {
+        list_move(x, y);
+    }
+    else
+    {
+        p = x->prev;
+        list_move(x, y);
+        list_move(y, p);
+    }
     return 0;
 }
 
-static inline int list_swap_by_index(struct list *list, int a, int b);
+static inline int list_swap_by_index(struct list *list_x, int a,
+                                     struct list *list_y, int b)
+{
+    return list_swap(list_nth_node(list_x, a), list_nth_node(list_y, b));
+}
+
 
 struct list *list_traverse(struct list *list, int (*visit)(struct list*, struct list *));
 struct list *list_traverse_reverse(struct list *list, int (*visit)(struct list*, struct list *));
 
-struct list *list_copy(struct list *lx, struct list *ly, int (*copy)(void *, void*));
-struct list *list_revert(struct list *list);
-struct list *list_mergesort(struct list *list, int (*compare)(void*, void*));
+static inline struct list *list_copy(struct list *lx, struct list *ly, int (*copy)(void *, void*));
+static inline struct list *list_revert(struct list *list);
+static inline struct list *list_mergesort(struct list *list, int (*compare)(void*, void*));
 
 struct list *list_quicksort(struct list *list, int (*compare)(void*, void*));
 
