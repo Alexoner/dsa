@@ -514,6 +514,11 @@ static inline int list_move_tail_by_index(struct list *list_from, int a,
     return 0;
 }
 
+/**
+ * list_swap - swap two entries
+ * @x: an entry
+ * @y: the other entry
+ */
 static inline int list_swap(struct list *x,
                             struct list *y)
 {
@@ -541,15 +546,58 @@ static inline int list_swap_by_index(struct list *list_x, int a,
     return list_swap(list_nth_node(list_x, a), list_nth_node(list_y, b));
 }
 
+/**
+ * list_traverse - traverse a list
+ * @list: the list to traverse
+ * @visit: the callback function to be called for each entries in the list
+ * @priv: private data, opaque to list_list_traverse(),passed to @visit
+ */
+static inline int *list_traverse(struct list *list,
+                                 int (*visit)(struct list *, void *),
+                                 void *priv)
+{
+    struct list *p = NULL;
+    int i;
+    for (i = 0, p = list->next; p; i++, p = p->next)
+    {
+        if (visit)
+        {
+            visit(p, priv);
+        }
+    }
+    return 0;
+}
 
-struct list *list_traverse(struct list *list, int (*visit)(struct list*, struct list *));
-struct list *list_traverse_reverse(struct list *list, int (*visit)(struct list*, struct list *));
+static inline int *list_traverse_reverse(struct list *list,
+        int (*visit)(struct list *, void *),
+        void *priv)
+{
+    struct list *p = NULL;
+    for (; p; p = p->next)
+    {
+        if (visit)
+        {
+            visit(p, priv);
+        }
+    }
+    return 0;
+}
 
-static inline struct list *list_copy(struct list *lx, struct list *ly, int (*copy)(void *, void*));
+static inline struct list *list_copy(struct list *src, struct list *dest,
+                                     int (*copy)(struct list *, void*))
+{
+    return dest;
+}
+
 static inline struct list *list_revert(struct list *list);
-static inline struct list *list_mergesort(struct list *list, int (*compare)(void*, void*));
 
-struct list *list_quicksort(struct list *list, int (*compare)(void*, void*));
+static inline struct list *list_mergesort(
+    struct list *list,
+    int (*compare)(struct list *, struct list*, void *),
+    void *priv);
+
+struct list *list_quicksort(struct list *list,
+                            int (*compare)(struct list *, struct list*, void *priv));
 
 /**
  * list_entry - get the struct for this entry
@@ -957,3 +1005,10 @@ int list_remove(struct list *list, struct list *position, void (*data_destroy)(v
 struct list *list_merge(struct list *lx, struct list *ly);
 
 #endif
+
+
+
+
+
+
+
