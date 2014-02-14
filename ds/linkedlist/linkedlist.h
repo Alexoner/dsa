@@ -573,7 +573,7 @@ static inline int *list_traverse_reverse(struct list *list,
         void *priv)
 {
     struct list *p = NULL;
-    for (; p; p = p->next)
+    for (p = list->next; p; p = p->next)
     {
         if (visit)
         {
@@ -589,8 +589,14 @@ static inline struct list *list_copy(struct list *src, struct list *dest,
     return dest;
 }
 
-static inline struct list *list_revert(struct list *list);
+static inline struct list *list_revert(struct list *src, struct list *dest);
 
+/**
+ * list_mergesort - merge sort a list
+ * @list: the list to traverse
+ * @visit: the callback function to be called for each entries in the list
+ * @priv: private data, opaque to list_list_traverse(),passed to @visit
+ */
 static inline struct list *list_mergesort(
     struct list *list,
     int (*compare)(struct list *, struct list*, void *),
