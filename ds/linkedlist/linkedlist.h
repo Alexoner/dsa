@@ -236,7 +236,8 @@ static inline int list_is_singular(const struct list *head)
 }
 
 static inline void __list_cut_position(struct list *list,
-                                       struct list *head, struct list *entry)
+                                       struct list *head,
+                                       struct list *entry)
 {
     struct list *new_first = entry->next;//first element of the new list
     list->next = head->next;
@@ -583,13 +584,56 @@ static inline int *list_traverse_reverse(struct list *list,
     return 0;
 }
 
-static inline struct list *list_copy(struct list *src, struct list *dest,
-                                     int (*copy)(struct list *, void*))
+static inline struct list *list_copy(
+    struct list *src, struct list *dest,
+    int (*copy)(struct list *, void*))
 {
     return dest;
 }
 
-static inline struct list *list_revert(struct list *src, struct list *dest);
+static inline struct list *list_revert(struct list *src)
+{
+    struct list *p, *q;
+    for (p = src; p != src; p = q)
+    {
+        q = p->next;
+        p->next = p->prev;
+        p->prev = q;
+    }
+    return src;
+}
+
+/*
+ * Returns a list organized in an intermediate format suited
+ * to chaining of merge() calls: null-terminated, no reserved or
+ * sentinel head node, "prev" links not maintained.
+ */
+static struct list *merge(void *priv,
+                          int (*cmp)(void *priv, struct list *a,
+                                     struct list *b),
+                          struct list *a, struct list *b)
+{
+    struct list head, *tail = &head;
+
+    while (a && b)
+    {
+        /* if equal, take 'a' -- important for sort stability */
+        if ((*cmp)(priv, a, b) <= 0)
+        {
+            tail->next = a;
+            a = a->next;
+        }
+        else
+        {
+            tail->next = b;
+            b = b->next;
+        }
+        tail = tail->next;
+    }
+    tail->next = a ? : b;
+    return head.next;
+}
+
 
 /**
  * list_mergesort - merge sort a list
