@@ -603,15 +603,21 @@ static inline struct list *list_revert(struct list *src)
     return src;
 }
 
-/*
+/**
+ * list_merge - merge two list
+ * @priv: private data,opaque
+ * @cmp: callback function for comparing
+ * @a: the one list
+ * @b: the other list
+ *
  * Returns a list organized in an intermediate format suited
  * to chaining of merge() calls: null-terminated, no reserved or
  * sentinel head node, "prev" links not maintained.
  */
-static struct list *merge(void *priv,
-                          int (*cmp)(void *priv, struct list *a,
-                                     struct list *b),
-                          struct list *a, struct list *b)
+static struct list *list_merge(void *priv,
+                               int (*cmp)(void *priv, struct list *a,
+                                       struct list *b),
+                               struct list *a, struct list *b)
 {
     struct list head, *tail = &head;
 
@@ -633,7 +639,6 @@ static struct list *merge(void *priv,
     tail->next = a ? : b;
     return head.next;
 }
-
 
 /**
  * list_mergesort - merge sort a list
