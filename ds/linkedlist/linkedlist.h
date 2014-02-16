@@ -645,6 +645,75 @@ static struct list *list_merge(void *priv,
  * @list: the list to traverse
  * @visit: the callback function to be called for each entries in the list
  * @priv: private data, opaque to list_list_traverse(),passed to @visit
+ *
+ * Algorithm Description
+ *
+ * Mergesort takes the input list and treats it as a collection of small
+ * sorted lists. It makes log N passes along the list, and in each pass it
+ * combines each adjacent pair of small sorted lists into one larger sorted
+ * list. When a pass only needs to do this once, the whole output list must
+ * be sorted.
+ *
+ * So here's the algorithm. In each pass, we are merging lists of size K into
+ * lists of size 2K. (Initially K equals 1.) So we start by pointing a
+ * temporary pointer p at the head of the list, and also preparing an empty
+ * list L which we will add elements to the end of as we finish dealing with
+ * them. Then:
+ *
+ * If p is null, terminate this pass.
+ * Otherwise, there is at least one element in the next pair of length-K
+ * lists , so increment the number of merges performed in this pass.
+ * Point another temporary pointer, q, at the same place as p. Step q along
+ * the list by K places, or until the end of the list, whichever comes first.
+ * Let psize be the number of elements you managed to step q past.
+ * Let qsize equal K. Now we need to merge a list starting at p, of length
+ * psize, with a list starting at q of length at most qsize.
+ * So, as long as either the p-list is non-empty (psize > 0) or the q-list is
+ * non-empty (qsize > 0 and q points to something non-null):
+ * Choose which list to take the next element from. If either list is empty,
+ * we must choose from the other one. (By assumption, at least one is
+ * non-empty at this point.) If both lists are non-empty, compare the first
+ * element of each and choose the lower one. If the first elements compare
+ * equal, choose from the p-list. (This ensures that any two elements which
+ * compare equal are never swapped, so stability is guaranteed.)
+ * Remove that element, e, from the start of its list, by advancing p or q to
+ * the next element along, and decrementing psize or qsize.
+ * Add e to the end of the list L we are building up.
+ * Now we have advanced p until it is where q started out, and we have
+ * advanced q until it is pointing at the next pair of length-K lists to
+ * merge. So set p to the value of q, and go back to the start of this loop.
+ * As soon as a pass like this is performed and only needs to do one merge,
+ * the algorithm terminates, and the output list L is sorted. Otherwise,
+ * double the value of K, and go back to the beginning.
+ *
+ * This procedure only uses forward links, so it doesn't need a doubly linked
+ * list. If it does have to deal with a doubly linked list, the only place
+ * this matters is when adding another item to L.
+ *
+ * Dealing with a circularly linked list is also possible. You just have to
+ * be * careful when stepping along the list. To deal with the ambiguity
+ * between p==head meaning you've just stepped off the end of the list,
+ * and p==head  meaning you've only just started, I usually use an
+ * alternative form of the "step" operation: first step p to its successor
+ * element, and then reset it to null if that step made it become equal to
+ * the head of the list.
+ * (You can quickly de-circularise a linked list by finding the second
+ * element , and then breaking the link to it from the first, but this moves
+ * the whole list round by one before the sorting process. This wouldn't
+ * matter - we are about to sort the list, after all - except that it makes
+ * the sort unstable.)
+ * Complexity
+ *
+ * Like any self-respecting sort algorithm, this has running time O(N log N).
+ * Because this is Mergesort, the worst-case running time is still
+ * O(N log N);
+ * there are no pathological cases.
+ *
+ * Auxiliary storage requirement is small and constant (i.e. a few variables
+ * within the sorting routine). Thanks to the inherently different behaviour
+ * of linked lists from arrays, this Mergesort implementation avoids the O(N)
+ * auxiliary storage cost normally associated with the algorithm.
+
  */
 static inline struct list *list_mergesort(
     struct list *list,
