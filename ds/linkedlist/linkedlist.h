@@ -714,15 +714,103 @@ static struct list *list_merge(void *priv,
  * within the sorting routine). Thanks to the inherently different behaviour
  * of linked lists from arrays, this Mergesort implementation avoids the O(N)
  * auxiliary storage cost normally associated with the algorithm.
-
  */
 static inline struct list *list_mergesort(
     struct list *list,
     int (*compare)(struct list *, struct list*, void *),
-    void *priv);
+    void *priv)
+{
+    struct list *p = NULL, *q = NULL, *key = NULL;
+    int i, listsize, nmerges, psize, qsize;
+    listsize = 1;
+    if (!compare)
+    {
+        //compare = compare_int;
+    }
+
+    //merge N(log N) passes
+    while (1)
+    {
+        //It makes log N passes along the list,(N = 2 ^ n)
+        //and in each pass it combines each adjacent pair of
+        //small sorted lists into one larger sorted list
+        p = list->next;
+        nmerges = 0;
+
+        //merged along the list
+        while (p != list)
+        {
+            //In each pass,
+            //we are merging lists of size K into lists of size 2K.
+            //(Initially K equals 1.
+            psize = qsize = listsize;
+            for (i = 0, q = p; i < listsize && q; i++, q = q->next);
+            if (!q)
+            {
+                //finished a pass of merging the lists
+                break;
+            }
+
+            /*printf("qsize: %d,x:%d,y:%d\n", qsize,*/
+            /**(int*)p->data, *(int*)q->data);*/
+
+            //merge two lists
+            for (i = 0; psize || (qsize && q); i = 0)
+            {
+                if (!psize)
+                {
+                    key = q;
+                    q = q->next;
+                    qsize--;
+                }
+                else if (!qsize || !q)
+                {
+                    key = p;
+                    p = p->next;
+                    psize--;
+                }
+                else if (compare(p, q, priv) <= 0)
+                {
+                    key = p;
+                    p = p->next;
+                    psize--;
+                }
+                else
+                {
+                    key = q;
+                    q = q->next;
+                    qsize--;
+                    i = 1;
+                }
+
+                if (i)
+                {
+                    list_move_tail(key, p);
+                    /*printf("moved:\n");*/
+                    /*list_traverse(list, NULL);*/
+                }
+            }//merge two lists
+
+            p = q;
+            nmerges++;
+        }//have done merging along the list
+
+        /*printf("after merging list with size %d: \n", listsize);*/
+        /*list_traverse(list, NULL);*/
+        if (nmerges == 1 )
+        {
+            return list;
+        }
+
+        //doublize the listsize to merge
+        listsize *= 2;
+    }//merged a pass
+    return list;
+}
 
 struct list *list_quicksort(struct list *list,
                             int (*compare)(struct list *, struct list*, void *priv));
+
 
 /**
  * list_entry - get the struct for this entry
