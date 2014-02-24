@@ -370,7 +370,13 @@ static inline struct list *list_nth_node(struct list *list, int n)
 
 static inline struct list *list_find(struct list *list,
                                      struct list *key,
-                                     int (*compare)(struct list*, struct list*));
+                                     int (*compare)(struct list*, struct list*, void *priv),
+                                     void *priv)
+{
+    struct list *p = NULL;
+    for (p = list->next; p != list && compare(p, key, priv); p = p->next);
+    return  p == list ? NULL : p;
+}
 
 /**
  * list_index - returns the index of an entry
@@ -1202,10 +1208,6 @@ struct list *list_pop_tail(struct list *list);
 
 //struct list *list_replace(struct list *list, struct list *position, struct list *key);
 
-struct list *list_insert(struct list *list, struct list *key, struct list *position);
-
-struct list *list_insert_after(struct list *list, struct list *key, struct list *position);
-
 
 
 int list_remove(struct list *list, struct list *position, void (*data_destroy)(void *));
@@ -1215,7 +1217,6 @@ int list_remove(struct list *list, struct list *position, void (*data_destroy)(v
 
 //func is a callback function dealing with struct list::data
 
-struct list *list_merge(struct list *lx, struct list *ly);
 
 #endif
 

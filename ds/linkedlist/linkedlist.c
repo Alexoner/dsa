@@ -89,15 +89,6 @@ int list_is_empty(struct list *list)
     /*return list->length == 0;*/
 }
 
-struct list *list_nth_node(struct list *list, int n)
-{
-    //n counts from 0
-    struct list *p = NULL;
-    int i = 0;
-    /*for (p = list->head; p && i < n; p = p->next, i++);*/
-    return p;
-}
-
 struct list *list_pop(struct list *list, struct list *p)
 {
     struct list *prev = NULL, *next = NULL;
@@ -176,32 +167,6 @@ struct list *list_pop_tail(struct list *list)
     /*}*/
     /*}*/
     return p;
-}
-
-struct list *list_find(struct list *list,
-                       struct list *key,
-                       int (*compare)(struct list*, struct list*))
-{
-    struct list *p = NULL;
-    /*for (p = list->head; p; p = p->next)*/
-    /*{*/
-    /*if (compare)*/
-    /*{*/
-    /*if (!compare(p, key))*/
-    /*{*/
-    /*return p;*/
-    /*}*/
-    /*}*/
-    /*else*/
-    /*{*/
-    /*//compare function is NULL pointer,compare as integers*/
-    /*if (!((*(int*)p->data) - (*(int*)key->data)))*/
-    /*{*/
-    /*return p;*/
-    /*}*/
-    /*}*/
-    /*}*/
-    return NULL;
 }
 
 /*int list_index(struct list *list, struct list *key)*/
@@ -309,48 +274,6 @@ struct list *list_insert_by_index(struct list *list, struct list *key, int n)
 /*return node;*/
 /*}*/
 
-struct list *list_push(struct list *list, struct list *key)
-{
-    return list_append(list, key);
-}
-
-//remove position from list
-/*int list_remove(struct list *list,*/
-/*struct list *position,*/
-/*void (*data_destroy)(void *))*/
-/*{*/
-/*assert(list);*/
-/*assert(position);*/
-/*struct list *prev = position->prev;*/
-/*struct list *next = position->next;*/
-
-/*if (prev)*/
-/*{*/
-/*prev->next = next;*/
-/*}*/
-/*else*/
-/*{*/
-/*list->head = next;*/
-/*}*/
-
-/*if (next)*/
-/*{*/
-/*next->prev = prev;*/
-/*}*/
-/*else*/
-/*{*/
-/*list->tail = prev;*/
-/*}*/
-
-/*if (data_destroy && position->data)*/
-/*{*/
-/*data_destroy(position->data);*/
-/*}*/
-/*free(position);*/
-/*list->length--;*/
-/*return 0;*/
-/*}*/
-
 int list_remove_by_index(struct list *list, int n, void (*data_destroy)(void *))
 {
     struct list *p = list_nth_node(list, n);
@@ -419,118 +342,111 @@ int list_remove_by_index(struct list *list, int n, void (*data_destroy)(void *))
 /*return 0;*/
 /*}*/
 
-int list_move_by_index(struct list *list, int a, int b)
-{
-    struct list *p, *q;
-    p = list_nth_node(list, a);
-    q = list_nth_node(list, b);
-    return list_move(list, p, q);
-}
 
 //swap x and y in list
-int list_swap(struct list *list, struct list *x, struct list *y)
-{
-    struct list *ynext = NULL;
-    if (y->next)
-    {
-        //struct list *y has a node next to it
-        ynext = y->next;
-    }
-    /*else*/
-    /*{*/
-    /*//struct list *y doesn't have a node next to it,the last one*/
-    /*ynext = y->prev;*/
-    /*}*/
-    list_move(list, y, x);
-    if (ynext)
-    {
-        list_move(list, x, ynext);
-    }
-    else
-    {
-        list_move(list, x, NULL);
-    }
-    return 0;
-}
+/*int list_swap(struct list *list, struct list *x, struct list *y)*/
+/*{*/
+/*struct list *ynext = NULL;*/
+/*if (y->next)*/
+/*{*/
+/*//struct list *y has a node next to it*/
+/*ynext = y->next;*/
+/*}*/
+/*else*/
+/*{*/
+/*//struct list *y doesn't have a node next to it,the last one*/
+/*ynext = y->prev;*/
+/*}*/
+/*list_move(list, y, x);*/
+/*if (ynext)*/
+/*{*/
+/*list_move(list, x, ynext);*/
+/*}*/
+/*else*/
+/*{*/
+/*list_move(list, x, NULL);*/
+/*}*/
+/*return 0;*/
+/*}*/
 
-int list_swap_by_index(struct list *list, int a, int b)
-{
-    struct list *p, *q;
-    p = list_nth_node(list, a);
-    q = list_nth_node(list, b);
-    return list_swap(list, p, q);
-}
+/*int list_swap_by_index(struct list *list, int a, int b)*/
+/*{*/
+/*struct list *p, *q;*/
+/*p = list_nth_node(list, a);*/
+/*q = list_nth_node(list, b);*/
+/*return list_swap(list, p, q);*/
+/*}*/
 
-struct list *list_traverse(struct list *list,
-                           int (*visit)(struct list*, struct list *))
-{
-    struct list *p = NULL;
-    int i;
-    for (i = 0, p = list->head; p; i++, p = p->next)
-    {
-        if (visit)
-        {
-            visit(list, p);
-        }
-        else
-        {
-            printf("%d:\t%p,%d\n", i, p, *(int*)(p->data));
-            /*printf("%d:\t%d\t", i, *(int*)(p->data));*/
-        }
-    }
-    if (!visit)
-    {
-        printf("\n\n");
-    }
-    return list;
-}
+/*struct list *list_traverse(struct list *list,*/
+/*int (*visit)(struct list*, struct list *))*/
+/*{*/
+/*struct list *p = NULL;*/
+/*int i;*/
+/*for (i = 0, p = list->head; p; i++, p = p->next)*/
+/*{*/
+/*if (visit)*/
+/*{*/
+/*visit(list, p);*/
+/*}*/
+/*else*/
+/*{*/
+/*printf("%d:\t%p,%d\n", i, p, *(int*)(p->data));*/
+/*[>printf("%d:\t%d\t", i, *(int*)(p->data));<]*/
+/*}*/
+/*}*/
+/*if (!visit)*/
+/*{*/
+/*printf("\n\n");*/
+/*}*/
+/*return list;*/
+/*}*/
 
-struct list *list_traverse_reverse(struct list *list,
-                                   int (*visit)(struct list*, struct list *))
-{
-    struct list *p = NULL;
-    int i;
-    for (i = 0, p = list->tail; p; i++, p = p->prev)
-    {
-        if (visit)
-        {
-            visit(list, p);
-        }
-        else
-        {
-            printf("%d:\t%p,%d\n", i, p, *(int*)(p->data));
-            /*printf("%d:\t%d\t", i, *(int*)(p->data));*/
-        }
-    }
-    if (!visit)
-    {
-        printf("\n\n");
-    }
-    return list;
-}
+/*struct list *list_traverse_reverse(struct list *list,*/
+/*int (*visit)(struct list*, struct list *))*/
+/*{*/
+/*struct list *p = NULL;*/
+/*int i;*/
+/*for (i = 0, p = list->tail; p; i++, p = p->prev)*/
+/*{*/
+/*if (visit)*/
+/*{*/
+/*visit(list, p);*/
+/*}*/
+/*else*/
+/*{*/
+/*printf("%d:\t%p,%d\n", i, p, *(int*)(p->data));*/
+/*[>printf("%d:\t%d\t", i, *(int*)(p->data));<]*/
+/*}*/
+/*}*/
+/*if (!visit)*/
+/*{*/
+/*printf("\n\n");*/
+/*}*/
+/*return list;*/
+/*}*/
 
 
-struct list *list_copy(struct list *lx, struct list *ly,
-                       int (*copy)(void *, void*))
-{
-    struct list *p, *q;
-    /*for (p=)*/
-    return ly;
-}
-struct list *list_revert(struct list *list)
-{
-    struct list *p, *q;
-    for (p = list->tail; p; p = q)
-    {
-        q = p->prev;
-        p->prev = p->next;
-        p->next = q;
-    }
-    p = list->head;
-    list->head = list->tail;
-    list->tail = p;
-    return list;
-}
+/*struct list *list_copy(struct list *lx, struct list *ly,*/
+/*int (*copy)(void *, void*))*/
+/*{*/
+/*struct list *p, *q;*/
+/*[>for (p=)<]*/
+/*return ly;*/
+/*}*/
+/*struct list *list_revert(struct list *list)*/
+/*{*/
+/*struct list *p, *q;*/
+/*for (p = list->tail; p; p = q)*/
+/*{*/
+/*q = p->prev;*/
+/*p->prev = p->next;*/
+/*p->next = q;*/
+/*}*/
+/*p = list->head;*/
+/*list->head = list->tail;*/
+/*list->tail = p;*/
+/*return list;*/
+/*}*/
 
 
 
@@ -610,92 +526,7 @@ struct list *list_revert(struct list *list)
 struct list *list_mergesort(struct list *list,
                             int (*compare)(void*, void*))
 {
-    struct list *p = NULL, *q = NULL, *key = NULL;
-    int i, listsize, nmerges, psize, qsize;
-    listsize = 1;
-    if (!compare)
-    {
-        compare = compare_int;
-    }
 
-    //merge N(log N) passes
-    while (1)
-    {
-        //It makes log N passes along the list,(N = 2 ^ n)
-        //and in each pass it combines each adjacent pair of
-        //small sorted lists into one larger sorted list
-        p = list->head;
-        nmerges = 0;
-
-        //merged along the list
-        while (p)
-        {
-            //In each pass,
-            //we are merging lists of size K into lists of size 2K.
-            //(Initially K equals 1.
-            psize = qsize = listsize;
-            for (i = 0, q = p; i < listsize && q; i++, q = q->next);
-            if (!q)
-            {
-                //finished a pass of merging the lists
-                break;
-            }
-
-            /*printf("qsize: %d,x:%d,y:%d\n", qsize,*/
-            /**(int*)p->data, *(int*)q->data);*/
-
-            //merge two lists
-            for (i = 0; psize || (qsize && q); i = 0)
-            {
-                if (!psize)
-                {
-                    key = q;
-                    q = q->next;
-                    qsize--;
-                    i = 1;
-                }
-                else if (!qsize || !q)
-                {
-                    key = p;
-                    p = p->next;
-                    psize--;
-                }
-                else if (compare(p->data, q->data) <= 0)
-                {
-                    key = p;
-                    p = p->next;
-                    psize--;
-                }
-                else
-                {
-                    key = q;
-                    q = q->next;
-                    qsize--;
-                    i = 1;
-                }
-
-                if (i && psize)
-                {
-                    list_move(list, key, p);
-                    /*printf("moved:\n");*/
-                    /*list_traverse(list, NULL);*/
-                }
-            }//merge two lists
-
-            p = q;
-            nmerges++;
-        }//merged along the list
-
-        /*printf("after merging list with size %d: \n", listsize);*/
-        /*list_traverse(list, NULL);*/
-        if (nmerges == 1 )
-        {
-            return list;
-        }
-
-        //doublize the listsize to merge
-        listsize *= 2;
-    }//merged a pass
 }
 
 /*quick sort the list*/
