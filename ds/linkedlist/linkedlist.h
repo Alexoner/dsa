@@ -628,10 +628,10 @@ static inline struct list *list_revert(struct list *src)
  * sentinel head node, "prev" links not maintained.The returned list does not
  * include a list head
  */
-static struct list *list_merge(void *priv,
-                               int (*cmp)(void *priv, struct list *a,
-                                       struct list *b),
-                               struct list *a, struct list *b)
+static inline struct list *list_merge(void *priv,
+                                      int (*cmp)(void *priv, struct list *a,
+                                              struct list *b),
+                                      struct list *a, struct list *b)
 {
     struct list head, *tail = &head;
 
