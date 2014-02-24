@@ -8,3 +8,8 @@ slinkedlist:slinkedlist.c slinkedmain.c
 
 liblist.so:linkedlist.c slinkedlist.c
 	$(CC) -shared -o $@ $^ $(CFLAGS)
+
+.PHONY:clean
+
+clean:
+	rm *.o linkedlist slinkedlist
