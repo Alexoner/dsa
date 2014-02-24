@@ -1,7 +1,7 @@
 C data structure and algorithm library
 
 data structure:
-    singly linked list,doubly circular linked list,set,queue,stack.
+    singly linked list,doubly circular linked list,set,queue,stack,hash table.
     binary tree.
 
     These data structures are implemented as containers to provide 
