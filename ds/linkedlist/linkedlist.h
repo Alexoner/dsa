@@ -815,8 +815,8 @@ static inline struct list *list_mergesort(
 
             p = q;
             nmerges++;
-            printf("listsize: %d,nmerges: %d,p: %p,q: %p\n",
-                   listsize, nmerges, p, q);
+            //printf("listsize: %d,nmerges: %d,p: %p,q: %p\n",
+            //listsize, nmerges, p, q);
         }//have done merging along the list
 
         //printf("after merging list with size %d: \n", listsize);
