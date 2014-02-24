@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-g -Wall -fPIC
 
-linkedlist:listmain.c
+linkedlist:listmain.c linkedlist.h
 	$(CC) -o $@ $^ $(CFLAGS)
 slinkedlist:slinkedlist.c slinkedmain.c
 	$(CC) -o $@ $^ $(CFLAGS)

@@ -374,6 +374,10 @@ static inline struct list *list_find(struct list *list,
                                      void *priv)
 {
     struct list *p = NULL;
+    if (!compare)
+    {
+        return NULL;
+    }
     for (p = list->next; p != list && compare(p, key, priv); p = p->next);
     return  p == list ? NULL : p;
 }
@@ -467,7 +471,8 @@ static inline struct list *list_append(struct list *list,
  * Insert a new entry at a list's tail.
  * This is useful for implementing stacks and queues.
  */
-static inline struct list *list_push(struct list *list, struct list *key)
+static inline struct list *list_push(struct list *list,
+                                     struct list *key)
 {
     if (!list)
     {
@@ -514,8 +519,10 @@ static inline int list_move_by_index(struct list *list_from, int a,
  * if (list == head),because __list_del() doesn't changed the deleted
  * entry's prev and next pointer,so the list entry remains the same.
  */
-static inline int list_move_tail_by_index(struct list *list_from, int a,
-        struct list *list_to, int b)
+static inline int list_move_tail_by_index(struct list *list_from,
+        int a,
+        struct list *list_to,
+        int b)
 {
     list_move_tail(list_nth_node(list_from, a), list_nth_node(list_to, b));
     return 0;
@@ -565,7 +572,7 @@ static inline int *list_traverse(struct list *list,
 {
     struct list *p = NULL;
     int i;
-    for (i = 0, p = list->next; p; i++, p = p->next)
+    for (i = 0, p = list->next; p && p != list; i++, p = p->next)
     {
         if (visit)
         {
@@ -580,7 +587,7 @@ static inline int *list_traverse_reverse(struct list *list,
         void *priv)
 {
     struct list *p = NULL;
-    for (p = list->next; p; p = p->next)
+    for (p = list->prev; p && p != list; p = p->prev)
     {
         if (visit)
         {
@@ -732,6 +739,7 @@ static inline struct list *list_mergesort(
     if (!compare)
     {
         //compare = compare_int;
+        return list;
     }
 
     //merge N(log N) passes
@@ -750,10 +758,14 @@ static inline struct list *list_mergesort(
             //we are merging lists of size K into lists of size 2K.
             //(Initially K equals 1.
             psize = qsize = listsize;
-            for (i = 0, q = p; i < listsize && q; i++, q = q->next);
-            if (!q)
+
+            //move q listsize entries after p
+            for (i = 0, q = p; i < listsize && q != list;
+                    i++, q = q->next);
+            if (!q || q == list)
             {
                 //finished a pass of merging the lists
+                //printf("finished a passs of merging along the list\n");
                 break;
             }
 
@@ -761,7 +773,7 @@ static inline struct list *list_mergesort(
             /**(int*)p->data, *(int*)q->data);*/
 
             //merge two lists
-            for (i = 0; psize || (qsize && q); i = 0)
+            for (i = 0; psize || (qsize && (q != list)); i = 0)
             {
                 if (!psize)
                 {
@@ -792,18 +804,27 @@ static inline struct list *list_mergesort(
                 if (i)
                 {
                     list_move_tail(key, p);
-                    /*printf("moved:\n");*/
-                    /*list_traverse(list, NULL);*/
+                    //printf("After moving,list = %p,p = %p,q = %p\n",
+                    //list, p, q);
                 }
+                //sleep(1);
+                //printf("listsize: %d,psize: %d,qsize: %d.%d\n",
+                //listsize, psize, qsize,
+                //psize || (qsize && q));
             }//merge two lists
 
             p = q;
             nmerges++;
+            printf("listsize: %d,nmerges: %d,p: %p,q: %p\n",
+                   listsize, nmerges, p, q);
         }//have done merging along the list
 
-        /*printf("after merging list with size %d: \n", listsize);*/
+        //printf("after merging list with size %d: \n", listsize);
         /*list_traverse(list, NULL);*/
-        if (nmerges == 1 )
+
+        //when no merges are executed,indicating that listsize >=
+        //the length of the list
+        if (nmerges == 0 )
         {
             return list;
         }
@@ -1219,7 +1240,6 @@ int list_remove(struct list *list, struct list *position, void (*data_destroy)(v
 
 
 #endif
-
 
 
 
