@@ -6,5 +6,4 @@ linkedlist.o:linkedlist.c
 	cc -c -g -o $@ $^
 linkedmain.o:linkedmain.c
 	cc -c -g -o $@ $^
-tree:tree.c treemenu.c
-	$(CC) -o $@ $^ $(CFLAGS)
+

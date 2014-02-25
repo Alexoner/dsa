@@ -15,7 +15,7 @@
  * ******************************************/
 
 /**
- * @1 Preorder,in-order,post-order traversing a tree are DEPTH-FIRST
+ * @1 pre-order,in-order,post-order traversing a tree are DEPTH-FIRST
  * algorithem,implemented with recurse ,or essentially,STACK,a first in last
  * out data structure(LIFO).In depth-first algorithm,we push nodes until no
  * more children are found.We use a pointer to tree's node to iterate in a
