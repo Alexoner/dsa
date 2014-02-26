@@ -1,11 +1,16 @@
-CFLAGS= -g -Wall
+CFLAGS= -g -Wall -std=c99 -fPIC
 CC=gcc-4.7
 #CC=c++
 #CC=g++-4.7
+
+all:gcd hanoi heapsort-main bool-infix bool \
+	calc horse split fac binmain quickmain constlist \
+	Tex accurate factory factory-list magicsquare bubsort rand
+
 gcd:gcd-main.o gcd.o
 	$(CC) $(CFLAGS) $^ -o $@
 hanoi:hanoi-stack.o
-	$(CC) hanoi-stack.o linkedlist.o -o hanoi
+	$(CC) hanoi-stack.o -o hanoi
 heapsort-main: heapsort-main.o heapsort.o 
 	$(CC)  heapsort-main.o heapsort.o -o heapsort-main
 bool-infix:bool-infix.o
@@ -14,10 +19,6 @@ bool:bool.o
 	$(CC) $(CFLAGS) bool.o -o bool
 calc:calc-main.o calc.o strlib.c
 	$(CC) $(CFLAGS) $^ -o $@
-calc.o:calc.c 
-	$(CC) $(CFLAGS) -c calc.c
-strlib.o:strlib.c
-	$(CC) $(CFLAGS) -c strlib.c
 pi:pi.o
 	$(CC) $(CFLAGS) pi.o -o pi -lm
 horse:horse.o
@@ -25,15 +26,15 @@ horse:horse.o
 split:split.o
 	$(CC) $(CFLAGS) -std=c99 split.c -o split
 fac:fac.o
-	$(CC) $(CFLAGS) fac.c linkedlist.c -o fac
+	#$(CC) $(CFLAGS) fac.c linkedlist.c -o fac
 binmain:binmain.o
 	$(CC) $(CFLAGS) binmain.c binsearch.c -o binmain
 quickmain:quickmain.o
 	$(CC) $(CFLAGS) quickmain.c quicksort.c -o quickmain
 constlist:constlist.o
 	$(CC) $(CFLAGS) -O constlist.c -o constlist
-test:test.o
-	$(CC) $(CFLAGS) -O test.c -o test
+#test:test.o
+	#$(CC) $(CFLAGS) -O test.c -o test
 Tex:Tex.o
 	$(CC) $(CFLAGS) -O Tex.c -o Tex
 accurate:accurate.o
@@ -48,5 +49,12 @@ bubsort:
 	$(CC) $(CFLAGS) bubsort.c -o bubsort
 rand:rand.o quicksort.o
 	$(CC) $(CFLAGS) -o $@ $^
+calc.o:calc.c 
+	$(CC) $(CFLAGS) -c calc.c
+strlib.o:strlib.c
+	$(CC) $(CFLAGS) -c strlib.c
 clean:
-	rm horse *.o bool
+	rm *.o gcd hanoi heapsort-main bool-infix bool \
+	calc horse split fac binmain quickmain constlist \
+	Tex accurate factory factory-list magicsquare bubsort rand
+
