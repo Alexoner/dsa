@@ -61,21 +61,23 @@ Tree *CreatebiTree(Tree **T)
     return *T;
 }
 
-Tree *pre_traverse_r(Tree *T, int (*visit)(Tree *))
+Tree *pre_traverse_r(Tree *T, int (*visit)(Tree *, void *priv),
+                     void *priv)
 {
     //recursion
-    visit(T);
+    visit(T, priv);
     if (T)
     {
-        pre_traverse_r(T->left, visit);
-        pre_traverse_r(T->right, visit);
+        pre_traverse_r(T->left, visit, priv);
+        pre_traverse_r(T->right, visit, priv);
     }
     return T;
 }
 
-Tree *pre_traverse_s(Tree *T, int (*visit)(Tree*))
+Tree *pre_traverse_s(Tree *T, int (*visit)(Tree*, void *priv),
+                     void *priv)
 {
-    visit(T);
+    visit(T, priv);
     stack[++top] = T;
     T = T->left;
     while (top >= 0 || T)
@@ -83,7 +85,7 @@ Tree *pre_traverse_s(Tree *T, int (*visit)(Tree*))
         while (T)
         {
             //push
-            visit(T);
+            visit(T, priv);
             stack[++top] = T;
             T = T->left;
         }
@@ -94,17 +96,19 @@ Tree *pre_traverse_s(Tree *T, int (*visit)(Tree*))
     return T;
 }
 
-Tree *in_traverse_r(Tree *T, int (*visit)(Tree *))
+Tree *in_traverse_r(Tree *T, int (*visit)(Tree *, void *priv),
+                    void *priv)
 {
     if (T)
-        in_traverse_r(T->left, visit);
-    visit(T);
+        in_traverse_r(T->left, visit, priv);
+    visit(T, priv);
     if (T)
-        in_traverse_r(T->right, visit);
+        in_traverse_r(T->right, visit, priv);
     return T;
 }
 
-Tree *in_traverse_s(Tree *T, int (*visit)(Tree *))
+Tree *in_traverse_s(Tree *T, int (*visit)(Tree *, void *priv),
+                    void *priv)
 {
     stack[++top] = T;
     T = T->left;
@@ -116,7 +120,7 @@ Tree *in_traverse_s(Tree *T, int (*visit)(Tree *))
             stack[++top] = T;
             T = T->left;
         }//left child into the stack
-        visit(stack[top]);
+        visit(stack[top], priv);
         T = stack[top]->right;
         //maybe it's a root node with only right child
 
@@ -126,19 +130,20 @@ Tree *in_traverse_s(Tree *T, int (*visit)(Tree *))
     return T;
 }
 
-Tree *post_traverse_r(Tree *T, int (*visit)(Tree *))
+Tree *post_traverse_r(Tree *T, int (*visit)(Tree *, void *priv), void *priv)
 {
     if (T)
     {
-        post_traverse_r(T->left, visit);
-        post_traverse_r(T->right, visit);
+        post_traverse_r(T->left, visit, priv);
+        post_traverse_r(T->right, visit, priv);
     }
-    visit(T);
+    visit(T, priv);
     return T;
 }
 
 
-Tree *post_traverse_s(Tree *T, int (*visit)(Tree *))
+Tree *post_traverse_s(Tree *T, int (*visit)(Tree *, void *priv),
+                      void *priv)
 {
     stack[++top] = T;
     T = T->left;
@@ -163,11 +168,11 @@ Tree *post_traverse_s(Tree *T, int (*visit)(Tree *))
                 //right child visited,pop
                 while (top >= 1 && stack[top - 1]->right == stack[top])
                 {
-                    visit(stack[top]);
+                    visit(stack[top], priv);
                     top--;
                 }           //if(top==0)
             }
-            visit(stack[top]);
+            visit(stack[top], priv);
             top--;
             if (top >= 0)
                 T = stack[top]->right;
@@ -177,7 +182,7 @@ Tree *post_traverse_s(Tree *T, int (*visit)(Tree *))
     return NULL;
 }
 
-int leaf_numberr(Tree *T)
+int leaf_number_r(Tree *T)
 {
     if (!T)
     {
@@ -186,10 +191,10 @@ int leaf_numberr(Tree *T)
     else if (!(T->left || T->right)) //a leaf
         return 1;
     else
-        return leaf_numberr(T->left) + leaf_numberr(T->right);
+        return leaf_number_r(T->left) + leaf_number_r(T->right);
 }
 
-int leaf_numbers(Tree *T)
+int leaf_number_s(Tree *T)
 {
     int result = 0;
     if (!T)
@@ -221,7 +226,8 @@ int leaf_numbers(Tree *T)
     return result;
 }
 
-Tree *Traverse(Tree *T, int (*visit)(Tree*))
+Tree *Traverse(Tree *T, int (*visit)(Tree*, void *priv),
+               void *priv)
 {
     //breadth-first traversing a tree
     if (!T)
@@ -233,7 +239,7 @@ Tree *Traverse(Tree *T, int (*visit)(Tree*))
         if (stack[bottom])
         {
             //a queue
-            visit(stack[bottom]);
+            visit(stack[bottom], priv);
             stack[++top] = stack[bottom]->left;
             stack[++top] = stack[bottom]->right;
         }
@@ -243,17 +249,17 @@ Tree *Traverse(Tree *T, int (*visit)(Tree*))
     return T;
 }
 
-int TreeHightr(Tree *T)
+int tree_height_r(Tree *T)
 {
     int a, b;
     if (!(T && (T->left || T->right)))
         return 0;
-    a = TreeHightr(T->left);
-    b = TreeHightr(T->right);
+    a = tree_height_r(T->left);
+    b = tree_height_r(T->right);
     return (1 + ((a > b) ? a : b)); //watch the priority
 }
 
-int TreeHights(Tree *T)
+int tree_height_s(Tree *T)
 {
     int result = 0, tmp = 0;
     stack[++top] = T;
@@ -291,7 +297,7 @@ int TreeHights(Tree *T)
 }
 
 
-int visit(Tree *T)
+int visit(Tree *T, void *priv)
 {
     if (T)
         printf("%p ", T->data);
@@ -315,37 +321,37 @@ int main()
             CreatebiTree(&T);
             break;
         case 2:
-            pre_traverse_r(T, visit);
+            pre_traverse_r(T, visit, NULL);
             break;
         case 3:
-            pre_traverse_s(T, visit);
+            pre_traverse_s(T, visit, NULL);
             break;
         case 4:
-            in_traverse_r(T, visit);
+            in_traverse_r(T, visit, NULL);
             break;
         case 5:
-            in_traverse_s(T, visit);
+            in_traverse_s(T, visit, NULL);
             break;
         case 6:
-            post_traverse_r(T, visit);
+            post_traverse_r(T, visit, NULL);
             break;
         case 7:
-            post_traverse_s(T, visit);
+            post_traverse_s(T, visit, NULL);
             break;
         case 8:
-            printf("The tree's leaves:%d\n", leaf_numberr(T));
+            printf("The tree's leaves:%d\n", leaf_number_r(T));
             break;
         case 9:
-            printf("The tree's leaves:%d\n", leaf_numbers(T));
+            printf("The tree's leaves:%d\n", leaf_number_s(T));
             break;
         case 10:
-            Traverse(T, visit);
+            Traverse(T, visit, NULL);
             break;
         case 11:
-            printf("Hight:%d\n", TreeHightr(T));
+            printf("Hight:%d\n", tree_height_r(T));
             break;
         case 12:
-            printf("Hight:%d\n", TreeHights(T));
+            printf("Hight:%d\n", tree_height_s(T));
             break;
         default:
             break;

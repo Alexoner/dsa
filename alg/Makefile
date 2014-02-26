@@ -1,5 +1,5 @@
 CFLAGS= -g -Wall -std=c99 -fPIC
-CC=gcc-4.7
+CC=gcc
 #CC=c++
 #CC=g++-4.7
 
