@@ -33,6 +33,7 @@
 typedef struct tree
 {
     void *data;
+    struct tree *parent;
     struct tree *left, *right;
 } Tree;
 
