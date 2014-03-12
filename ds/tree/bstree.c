@@ -29,3 +29,20 @@ Bstree *bstree_predecessor(Bstree *x)
 {
     return x;
 }
+
+Bstree *bstree_insert(Bstree *t, Bstree *x)
+{
+    return x;
+}
+
+Bstree *bstree_transplant(Bstree *t, Bstree *x)
+{
+    return x;
+}
+
+Bstree *bstree_delete(Bstree *t, Bstree *x)
+{
+    return x;
+}
+
+
