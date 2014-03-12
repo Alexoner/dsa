@@ -16,7 +16,7 @@
 
 /**
  * @1 pre-order,in-order,post-order traversing a tree are DEPTH-FIRST
- * algorithem,implemented with recurse ,or essentially,STACK,a first in last
+ * algorithem,implemented with RECURSION ,or essentially,STACK,a first in last
  * out data structure(LIFO).In depth-first algorithm,we push nodes until no
  * more children are found.We use a pointer to tree's node to iterate in a
  * loop,update its value to its left child and right child
@@ -30,11 +30,11 @@
  * 3)
  */
 
-typedef struct tree
+typedef struct btree
 {
     void *data;
-    struct tree *parent;
-    struct tree *left, *right;
+    struct btree *parent;
+    struct btree *left, *right;
 } Tree;
 
 Tree *stack[MAX];
@@ -304,6 +304,10 @@ int visit(Tree *T, void *priv)
         printf("%p ", T->data);
     return 1;
 }
+
+/**
+ * Binary tree manipulation
+ */
 
 int main()
 {
