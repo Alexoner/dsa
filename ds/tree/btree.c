@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "btree.h"
 
 #define MAX 30
 /**********************************************
@@ -30,12 +31,8 @@
  * 3)
  */
 
-typedef struct btree
-{
-    void *data;
-    struct btree *parent;
-    struct btree *left, *right;
-} Tree;
+typedef struct btree Tree;
+
 
 Tree *stack[MAX];
 int top = -1, bottom = -1;
