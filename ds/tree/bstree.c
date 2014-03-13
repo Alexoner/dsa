@@ -87,8 +87,32 @@ Bstree *bstree_predecessor(Bstree *x)
     return y;
 }
 
-Bstree *bstree_insert(Bstree *t, Bstree *x)
+Bstree *bstree_insert(Bstree **root, Bstree *z,
+                      int (compare)(Bstree *, Bstree *, void *priv),
+                      void *priv)
 {
+    Bstree *x = *root, *y = NULL;
+    while (x)
+    {
+        y = x;
+        if (compare(x, z, priv) < 0)
+            x = x->right;
+        else
+            x = x->left;
+    }
+    z->parent = y;
+    if (y == NULL)
+    {
+        *root = y;
+    }
+    else if (compare(y, z, priv) < 0)
+    {
+        y->right = z;
+    }
+    else
+    {
+        y->left = z;
+    }
     return x;
 }
 
