@@ -141,7 +141,7 @@ Bstree *bstree_transplant(Bstree **root, Bstree *u, Bstree *v)
 
 Bstree *bstree_delete(Bstree **root, Bstree *z)
 {
-    Bstree *y;
+    Bstree *y = NULL;
     if (z->left == NULL)
     {
         bstree_transplant(root, z, z->right);
