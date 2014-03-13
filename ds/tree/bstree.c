@@ -116,14 +116,28 @@ Bstree *bstree_insert(Bstree **root, Bstree *z,
     return x;
 }
 
-Bstree *bstree_transplant(Bstree *t, Bstree *x)
+Bstree *bstree_transplant(Bstree **root, Bstree *u, Bstree *v)
 {
-    return x;
+    if (u->parent == NULL)
+    {
+        *root = v;
+    }
+    else if (u == u->parent->left )
+    {
+        u->parent->left = v ;
+    }
+    else
+    {
+        u->parent->right = v;
+    }
+    if (v != NULL)
+    {
+        v->parent = u->parent;
+    }
+    return v;
 }
 
 Bstree *bstree_delete(Bstree *t, Bstree *x)
 {
     return x;
 }
-
-
