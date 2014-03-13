@@ -6,5 +6,6 @@ struct btree
     struct btree *parent;
     struct btree *left, *right;
 };
+typedef stuct btree Btree;
 
 #endif

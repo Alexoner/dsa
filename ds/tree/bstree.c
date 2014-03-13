@@ -1,13 +1,42 @@
+#include <stdlib.h>
 #include "bstree.h"
 
-Bstree *bstree_search(Bstree *x)
+Bstree *bstree_search(Bstree *x,
+                      Bstree *y,
+                      int (*compare)(Bstree *, Bstree *, void *priv),
+                      void *priv)
 {
-    return x;
+    if (compare(x, y, priv) < 0 && x->right)
+    {
+        return bstree_search(x->right, y, compare, priv);
+    }
+    else if (compare(x, y, priv) > 0 && x->left )
+    {
+        return bstree_search(x->left, y, compare, priv);
+    }
+    else
+    {
+        return x;
+    }
+
+    return NULL;
 }
 
-Bstree *bstree_search_iteration(Bstree *x)
+Bstree *bstree_search_iteration(Bstree *x,
+                                Bstree *y,
+                                int (*compare)(Bstree *, Bstree *, void *prvi),
+                                void *priv)
 {
-    return x;
+    while (x)
+    {
+        if (compare(x, y, priv) < 0 && x->right)
+            x = x->right;
+        else if (compare(x, y, priv) > 0 && x->left)
+            x = x->left;
+        else
+            return x;
+    }
+    return NULL;
 }
 
 Bstree *bstree_minimun(Bstree *x)
