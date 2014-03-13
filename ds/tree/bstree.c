@@ -6,20 +6,18 @@ Bstree *bstree_search(Bstree *x,
                       int (*compare)(Bstree *, Bstree *, void *priv),
                       void *priv)
 {
-    if (compare(x, y, priv) < 0 && x->right)
-    {
-        return bstree_search(x->right, y, compare, priv);
-    }
-    else if (compare(x, y, priv) > 0 && x->left )
-    {
-        return bstree_search(x->left, y, compare, priv);
-    }
-    else
+    if ( !x || !compare(x, y, priv))
     {
         return x;
     }
-
-    return NULL;
+    else if (compare(x, y, priv) < 0 && x->right)
+    {
+        return bstree_search(x->right, y, compare, priv);
+    }
+    else
+    {
+        return bstree_search(x->left, y, compare, priv);
+    }
 }
 
 Bstree *bstree_search_iteration(Bstree *x,
@@ -41,6 +39,10 @@ Bstree *bstree_search_iteration(Bstree *x,
 
 Bstree *bstree_minimun(Bstree *x)
 {
+    while (x->left)
+    {
+        x = x->left;
+    }
     return x;
 }
 
