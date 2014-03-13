@@ -37,7 +37,7 @@ Bstree *bstree_search_iteration(Bstree *x,
     return NULL;
 }
 
-Bstree *bstree_minimun(Bstree *x)
+Bstree *bstree_minimum(Bstree *x)
 {
     while (x->left)
     {
@@ -60,7 +60,7 @@ Bstree *bstree_successor(Bstree *x)
     Bstree *y;
     if ( x->right )
     {
-        return bstree_maximum(x->right);
+        return bstree_minimum(x->right);
     }
     y = x->parent;
     while (y && x == y->right)
@@ -73,7 +73,18 @@ Bstree *bstree_successor(Bstree *x)
 
 Bstree *bstree_predecessor(Bstree *x)
 {
-    return x;
+    Bstree *y = NULL;
+    if (x->left)
+    {
+        return bstree_maximum(x->left);
+    }
+    y = x->parent;
+    while (y && y->left == x)
+    {
+        x = y;
+        y = x->parent;
+    }
+    return y;
 }
 
 Bstree *bstree_insert(Bstree *t, Bstree *x)
