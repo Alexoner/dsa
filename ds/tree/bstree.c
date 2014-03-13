@@ -48,12 +48,27 @@ Bstree *bstree_minimun(Bstree *x)
 
 Bstree *bstree_maximum(Bstree *x)
 {
+    while (x->right)
+    {
+        x = x->right;
+    }
     return x;
 }
 
 Bstree *bstree_successor(Bstree *x)
 {
-    return x;
+    Bstree *y;
+    if ( x->right )
+    {
+        return bstree_maximum(x->right);
+    }
+    y = x->parent;
+    while (y && x == y->right)
+    {
+        x = y;
+        y = x->parent;
+    }
+    return y;
 }
 
 Bstree *bstree_predecessor(Bstree *x)
