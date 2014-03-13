@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include "bstree.h"
 
+/**
+ */
 Bstree *bstree_search(Bstree *x,
                       Bstree *y,
                       int (*compare)(Bstree *, Bstree *, void *priv),
@@ -137,7 +139,29 @@ Bstree *bstree_transplant(Bstree **root, Bstree *u, Bstree *v)
     return v;
 }
 
-Bstree *bstree_delete(Bstree *t, Bstree *x)
+Bstree *bstree_delete(Bstree **root, Bstree *z)
 {
-    return x;
+    Bstree *y;
+    if (z->left == NULL)
+    {
+        bstree_transplant(root, z, z->right);
+    }
+    else if (z->right == NULL)
+    {
+        bstree_transplant(root, z, z->left);
+    }
+    else
+    {
+        y = bstree_minimum(*root);
+        if (y->parent != z)
+        {
+            bstree_transplant(root, y, y->right);
+            y->right = z->right;
+            y->right->parent = y;
+        }
+        bstree_transplant(root, z, y);
+        y->left = z->left;
+        z->left->parent = y;
+    }
+    return y;
 }
