@@ -1,9 +1,8 @@
 /*************************************************************************
     > File Name: tree.c
-    > Author: hao
+    > Author: onerhao
     > Mail: onerhao@gmail.com
     > Created Time: Thu 01 Nov 2012 11:29:15 PM CST
-    r: RECURSION.s:STACK
  ************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,6 +20,7 @@
  * out data structure(LIFO).In depth-first algorithm,we push nodes until no
  * more children are found.We use a pointer to tree's node to iterate in a
  * loop,update its value to its left child and right child
+ * r: RECURSION.s:STACK
  *
  * @2 BREADTH-FIRST search is a algorithm must be implemented with QUEUE,a first
  * in first out(FIFO) list data structure
