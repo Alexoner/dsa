@@ -7,4 +7,13 @@
 #define BLACK 0
 #define RED   0
 
+struct rbtree
+{
+    int color: 1;
+
+    struct btree btree;
+};
+
+typedef struct rbtree RBtree;
+
 #endif
