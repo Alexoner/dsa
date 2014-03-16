@@ -77,3 +77,19 @@ int rbtree_right_rotate(struct rbtree *root, struct rbtree *x)
 {
     return 0;
 }
+
+/**
+ * We can insert a node into an n-node red-black tree in
+ * O(lgn) time.
+ *
+ * To do so, we use a slightly modified version of the
+ * TREE-INSERT procedure (Section 12.3,binary search tree) to
+ * insert node z into the tree T as if it were an ordinary binary
+ * search tree, and then we color z red.
+ *
+ * To guarantee that the red-black properties are preserved, we
+ * then call an auxiliary procedure RB-INSERT-FIXUP to recolor
+ * nodes and perform rotations. The call RB-INSERT(T,z) inserts
+ * node z, whose key is assumed to have already been filled in,
+ * into the red-black tree T.
+ */
