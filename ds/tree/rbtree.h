@@ -28,5 +28,6 @@ typedef struct rbtree RBtree;
 
 #define rb_entry(ptr,type,member) container_of(ptr,type,member)
 
+typedef int (*rb_compare_t)(struct rbtree *, struct rbtree *, void *);
 
 #endif
