@@ -47,6 +47,27 @@ struct rbtree *predecessor(struct rbtree *x)
     return x;
 }
 
+/**
+ * The search-tree operations TREE-INSERT and TREE-DELETE ,
+ * when run on a red-black tree with n keys, take O(lgn) time.
+ *
+ * Because they modify the tree, the result may violate the
+ * red-black properties enumerated in Section 13.1. To restore
+ * these properties, we must change the colors of some of the
+ * nodes in the tree and also change the pointer structure.
+ *
+ * We change the pointer structure through rotation, which is a
+ * local operation in a search tree that preserves the
+ * binary-search-tree property.
+ *
+ *              |       LEFT-ROTATE(T,x)        |
+ *              Y       -------------->         X
+ *             / \      <--------------        / \
+ *            X   γ     RIGHT-ROTATE(T,y)     α   Y
+ *           / \                                 / \
+ *          α   β                                β  γ
+ */
+
 int rbtree_left_rotate(struct rbtree *root, struct rbtree *x)
 {
     return 0;
