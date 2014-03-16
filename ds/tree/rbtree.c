@@ -1,5 +1,16 @@
 #include "rbtree.h"
 
+/**
+ * Implementation is based on 'Introduction to Algorithms,Third Edition'
+ * and Linux kernel
+ */
+
+/**
+ * lemma 13.1:
+ * A red-black tree with n internal nodes has height at most
+ * 2lg(n + 1).
+ */
+
 struct rbtree *rbtree_search(struct rbtree *x,
                              struct rbtree *y,
                              rb_compare_t compare,
