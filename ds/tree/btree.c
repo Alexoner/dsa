@@ -33,6 +33,7 @@
 
 typedef struct btree Bitree;
 
+typedef int (*visit_t)(struct btree *, void *priv);
 
 struct btree *btree_stack[MAX];
 int top = -1, bottom = -1;
@@ -59,7 +60,8 @@ Bitree *CreatebiBitree(Bitree **T)
     return *T;
 }
 
-struct btree *pre_traverse_r(struct btree *T, int (*visit)(struct btree *, void *priv),
+struct btree *pre_traverse_r(struct btree *T,
+                             visit_t visit,
                              void *priv)
 {
     //recursion
@@ -72,7 +74,8 @@ struct btree *pre_traverse_r(struct btree *T, int (*visit)(struct btree *, void 
     return T;
 }
 
-struct btree *pre_traverse_s(struct btree *T, int (*visit)(struct btree*, void *priv),
+struct btree *pre_traverse_s(struct btree *T,
+                             visit_t visit,
                              void *priv)
 {
     visit(T, priv);
@@ -94,7 +97,8 @@ struct btree *pre_traverse_s(struct btree *T, int (*visit)(struct btree*, void *
     return T;
 }
 
-struct btree *in_traverse_r(struct btree *T, int (*visit)(struct btree *, void *priv),
+struct btree *in_traverse_r(struct btree *T,
+                            visit_t visit,
                             void *priv)
 {
     if (T)
@@ -105,7 +109,8 @@ struct btree *in_traverse_r(struct btree *T, int (*visit)(struct btree *, void *
     return T;
 }
 
-struct btree *in_traverse_s(struct btree *T, int (*visit)(struct btree *, void *priv),
+struct btree *in_traverse_s(struct btree *T,
+                            visit_t visit,
                             void *priv)
 {
     btree_stack[++top] = T;
@@ -128,7 +133,9 @@ struct btree *in_traverse_s(struct btree *T, int (*visit)(struct btree *, void *
     return T;
 }
 
-struct btree *post_traverse_r(struct btree *T, int (*visit)(struct btree *, void *priv), void *priv)
+struct btree *post_traverse_r(struct btree *T,
+                              visit_t visit,
+                              void *priv)
 {
     if (T)
     {
@@ -140,7 +147,8 @@ struct btree *post_traverse_r(struct btree *T, int (*visit)(struct btree *, void
 }
 
 
-struct btree *post_traverse_s(struct btree *T, int (*visit)(struct btree *, void *priv),
+struct btree *post_traverse_s(struct btree *T,
+                              visit_t visit,
                               void *priv)
 {
     btree_stack[++top] = T;
@@ -224,7 +232,8 @@ int leaf_number_s(struct btree *T)
     return result;
 }
 
-struct btree *Traverse(struct btree *T, int (*visit)(struct btree*, void *priv),
+struct btree *traverse(struct btree *T,
+                       visit_t visit,
                        void *priv)
 {
     //breadth-first traversing a tree
@@ -347,7 +356,7 @@ int main()
             printf("The tree's leaves:%d\n", leaf_number_s(T));
             break;
         case 10:
-            Traverse(T, visit, NULL);
+            traverse(T, visit, NULL);
             break;
         case 11:
             printf("Hight:%d\n", tree_height_r(T));
