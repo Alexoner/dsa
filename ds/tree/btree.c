@@ -34,7 +34,7 @@
 typedef struct btree Tree;
 
 
-Tree *stack[MAX];
+struct btree *btree_stack[MAX];
 int top = -1, bottom = -1;
 
 extern void treemenu();
@@ -59,8 +59,8 @@ Tree *CreatebiTree(Tree **T)
     return *T;
 }
 
-Tree *pre_traverse_r(Tree *T, int (*visit)(Tree *, void *priv),
-                     void *priv)
+struct btree *pre_traverse_r(struct btree *T, int (*visit)(struct btree *, void *priv),
+                             void *priv)
 {
     //recursion
     visit(T, priv);
@@ -72,11 +72,11 @@ Tree *pre_traverse_r(Tree *T, int (*visit)(Tree *, void *priv),
     return T;
 }
 
-Tree *pre_traverse_s(Tree *T, int (*visit)(Tree*, void *priv),
-                     void *priv)
+struct btree *pre_traverse_s(struct btree *T, int (*visit)(struct btree*, void *priv),
+                             void *priv)
 {
     visit(T, priv);
-    stack[++top] = T;
+    btree_stack[++top] = T;
     T = T->left;
     while (top >= 0 || T)
     {
@@ -84,18 +84,18 @@ Tree *pre_traverse_s(Tree *T, int (*visit)(Tree*, void *priv),
         {
             //push
             visit(T, priv);
-            stack[++top] = T;
+            btree_stack[++top] = T;
             T = T->left;
         }
-        T = stack[top]->right; //push right child
+        T = btree_stack[top]->right; //push right child
         top--;//pop
     }
     top = -1;
     return T;
 }
 
-Tree *in_traverse_r(Tree *T, int (*visit)(Tree *, void *priv),
-                    void *priv)
+struct btree *in_traverse_r(struct btree *T, int (*visit)(struct btree *, void *priv),
+                            void *priv)
 {
     if (T)
         in_traverse_r(T->left, visit, priv);
@@ -105,21 +105,21 @@ Tree *in_traverse_r(Tree *T, int (*visit)(Tree *, void *priv),
     return T;
 }
 
-Tree *in_traverse_s(Tree *T, int (*visit)(Tree *, void *priv),
-                    void *priv)
+struct btree *in_traverse_s(struct btree *T, int (*visit)(struct btree *, void *priv),
+                            void *priv)
 {
-    stack[++top] = T;
+    btree_stack[++top] = T;
     T = T->left;
     while (top >= 0 || T)
     {
         while (T)
         {
             //pushing is the same as preorder
-            stack[++top] = T;
+            btree_stack[++top] = T;
             T = T->left;
         }//left child into the stack
-        visit(stack[top], priv);
-        T = stack[top]->right;
+        visit(btree_stack[top], priv);
+        T = btree_stack[top]->right;
         //maybe it's a root node with only right child
 
         top--;
@@ -128,7 +128,7 @@ Tree *in_traverse_s(Tree *T, int (*visit)(Tree *, void *priv),
     return T;
 }
 
-Tree *post_traverse_r(Tree *T, int (*visit)(Tree *, void *priv), void *priv)
+struct btree *post_traverse_r(struct btree *T, int (*visit)(struct btree *, void *priv), void *priv)
 {
     if (T)
     {
@@ -140,47 +140,47 @@ Tree *post_traverse_r(Tree *T, int (*visit)(Tree *, void *priv), void *priv)
 }
 
 
-Tree *post_traverse_s(Tree *T, int (*visit)(Tree *, void *priv),
-                      void *priv)
+struct btree *post_traverse_s(struct btree *T, int (*visit)(struct btree *, void *priv),
+                              void *priv)
 {
-    stack[++top] = T;
+    btree_stack[++top] = T;
     T = T->left;
     while (top >= 0)
     {
         //stop at empty stack
         while (T)
         {
-            stack[++top] = T;
+            btree_stack[++top] = T;
             T = T->left;
         }//push
-        if (stack[top]->right)
+        if (btree_stack[top]->right)
         {
             //root node without left child
-            T = stack[top]->right; //push right child tree
+            T = btree_stack[top]->right; //push right child tree
         }
         else
         {
             //leaf
-            if (top >= 1 && stack[top - 1]->right == stack[top])
+            if (top >= 1 && btree_stack[top - 1]->right == btree_stack[top])
             {
                 //right child visited,pop
-                while (top >= 1 && stack[top - 1]->right == stack[top])
+                while (top >= 1 && btree_stack[top - 1]->right == btree_stack[top])
                 {
-                    visit(stack[top], priv);
+                    visit(btree_stack[top], priv);
                     top--;
                 }           //if(top==0)
             }
-            visit(stack[top], priv);
+            visit(btree_stack[top], priv);
             top--;
             if (top >= 0)
-                T = stack[top]->right;
+                T = btree_stack[top]->right;
         }
     }//while(top>=0)
     top = -1;
     return NULL;
 }
 
-int leaf_number_r(Tree *T)
+int leaf_number_r(struct btree *T)
 {
     if (!T)
     {
@@ -192,25 +192,25 @@ int leaf_number_r(Tree *T)
         return leaf_number_r(T->left) + leaf_number_r(T->right);
 }
 
-int leaf_number_s(Tree *T)
+int leaf_number_s(struct btree *T)
 {
     int result = 0;
     if (!T)
         return 0;
-    stack[++top] = T;
+    btree_stack[++top] = T;
     T = T->left;
     while (top >= 0)
     {
         while (T)
         {
             //push into stack
-            stack[++top] = T;
+            btree_stack[++top] = T;
             T = T->left;
         }
-        if (!stack[top]->right)
+        if (!btree_stack[top]->right)
         {
             //a leaf
-            while (top >= 1 && stack[top - 1]->right == stack[top])
+            while (top >= 1 && btree_stack[top - 1]->right == btree_stack[top])
             {
                 top--;
             }
@@ -218,28 +218,28 @@ int leaf_number_s(Tree *T)
             result++;
         }
         if (top >= 0)
-            T = stack[top]->right;
+            T = btree_stack[top]->right;
         //top--;
     }
     return result;
 }
 
-Tree *Traverse(Tree *T, int (*visit)(Tree*, void *priv),
-               void *priv)
+struct btree *Traverse(struct btree *T, int (*visit)(struct btree*, void *priv),
+                       void *priv)
 {
     //breadth-first traversing a tree
     if (!T)
         return NULL;
-    stack[++top] = T;
+    btree_stack[++top] = T;
     bottom++;
     while (bottom <= top)
     {
-        if (stack[bottom])
+        if (btree_stack[bottom])
         {
             //a queue
-            visit(stack[bottom], priv);
-            stack[++top] = stack[bottom]->left;
-            stack[++top] = stack[bottom]->right;
+            visit(btree_stack[bottom], priv);
+            btree_stack[++top] = btree_stack[bottom]->left;
+            btree_stack[++top] = btree_stack[bottom]->right;
         }
         bottom++;
     }
@@ -247,7 +247,7 @@ Tree *Traverse(Tree *T, int (*visit)(Tree*, void *priv),
     return T;
 }
 
-int tree_height_r(Tree *T)
+int tree_height_r(struct btree *T)
 {
     int a, b;
     if (!(T && (T->left || T->right)))
@@ -257,29 +257,29 @@ int tree_height_r(Tree *T)
     return (1 + ((a > b) ? a : b)); //watch the priority
 }
 
-int tree_height_s(Tree *T)
+int tree_height_s(struct btree *T)
 {
     int result = 0, tmp = 0;
-    stack[++top] = T;
+    btree_stack[++top] = T;
     T = T->left;
     while (top >= 0)
     {
         while (T)
         {
-            stack[++top] = T;
+            btree_stack[++top] = T;
             tmp++;
             T = T->left;
         }//push
         //top--;
         //tmp--;
-        if (!stack[top]->right)
+        if (!btree_stack[top]->right)
         {
             //leaf
             if (tmp > result)
                 result = tmp;
-            if (top >= 1 && stack[top - 1]->right == stack[top])
+            if (top >= 1 && btree_stack[top - 1]->right == btree_stack[top])
             {
-                while (top >= 1 && stack[top - 1]->right == stack[top])
+                while (top >= 1 && btree_stack[top - 1]->right == btree_stack[top])
                 {
                     tmp--;
                     top--;//pop
@@ -289,13 +289,13 @@ int tree_height_s(Tree *T)
             tmp--;
         }
         if (top >= 0)
-            T = stack[top]->right;
+            T = btree_stack[top]->right;
     }
     return result;
 }
 
 
-int visit(Tree *T, void *priv)
+int visit(struct btree *T, void *priv)
 {
     if (T)
         printf("%p ", T->data);
@@ -308,7 +308,7 @@ int visit(Tree *T, void *priv)
 
 int main()
 {
-    Tree *T = NULL;
+    struct btree *T = NULL;
     char option[20];
     while (1)
     {
