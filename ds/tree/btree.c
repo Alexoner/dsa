@@ -204,7 +204,7 @@ int __leaf_number_recursion(struct btree *T)
     else if (!(T->left || T->right)) //a leaf
         return 1;
     else
-        return __leaf_number_recursion(T->left) + leaf_number_recursion(T->right);
+        return __leaf_number_recursion(T->left) + __leaf_number_recursion(T->right);
 }
 
 int __leaf_number_stack(struct btree *T)
@@ -339,37 +339,37 @@ int main()
             CreatebiBitree(&T);
             break;
         case 2:
-            pre_traverse_recursion(T, visit, NULL);
+            __pre_traverse_recursion(T, visit, NULL);
             break;
         case 3:
-            pre_traverse_stack(T, visit, NULL);
+            __pre_traverse_stack(T, visit, NULL);
             break;
         case 4:
-            in_traverse_recursion(T, visit, NULL);
+            __in_traverse_recursion(T, visit, NULL);
             break;
         case 5:
-            in_traverse_stack(T, visit, NULL);
+            __in_traverse_stack(T, visit, NULL);
             break;
         case 6:
-            post_traverse_recursion(T, visit, NULL);
+            __post_traverse_recursion(T, visit, NULL);
             break;
         case 7:
-            post_traverse_stack(T, visit, NULL);
+            __post_traverse_stack(T, visit, NULL);
             break;
         case 8:
-            printf("The tree's leaves:%d\n", leaf_number_recursion(T));
+            printf("The tree's leaves:%d\n", __leaf_number_recursion(T));
             break;
         case 9:
-            printf("The tree's leaves:%d\n", leaf_number_stack(T));
+            printf("The tree's leaves:%d\n", __leaf_number_stack(T));
             break;
         case 10:
-            traverse(T, visit, NULL);
+            __traverse(T, visit, NULL);
             break;
         case 11:
-            printf("Hight:%d\n", tree_height_recursion(T));
+            printf("Hight:%d\n", __tree_height_recursion(T));
             break;
         case 12:
-            printf("Hight:%d\n", tree_height_stack(T));
+            printf("Hight:%d\n", __tree_height_stack(T));
             break;
         default:
             break;
