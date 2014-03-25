@@ -35,7 +35,7 @@ typedef struct btree Bitree;
 
 typedef int (*visit_t)(struct btree *, void *priv);
 
-struct btree *btree_stack[MAX];
+struct btree *btree_stacktack[MAX];
 int top = -1, bottom = -1;
 
 extern void treemenu();
@@ -60,26 +60,26 @@ Bitree *CreatebiBitree(Bitree **T)
     return *T;
 }
 
-struct btree *pre_traverse_r(struct btree *T,
-                             visit_t visit,
-                             void *priv)
+struct btree *__pre_traverse_recursion(struct btree *T,
+                                       visit_t visit,
+                                       void *priv)
 {
     //recursion
     visit(T, priv);
     if (T)
     {
-        pre_traverse_r(T->left, visit, priv);
-        pre_traverse_r(T->right, visit, priv);
+        __pre_traverse_recursion(T->left, visit, priv);
+        __pre_traverse_recursion(T->right, visit, priv);
     }
     return T;
 }
 
-struct btree *pre_traverse_s(struct btree *T,
-                             visit_t visit,
-                             void *priv)
+struct btree *__pre_traverse_stack(struct btree *T,
+                                   visit_t visit,
+                                   void *priv)
 {
     visit(T, priv);
-    btree_stack[++top] = T;
+    btree_stacktack[++top] = T;
     T = T->left;
     while (top >= 0 || T)
     {
@@ -87,44 +87,51 @@ struct btree *pre_traverse_s(struct btree *T,
         {
             //push
             visit(T, priv);
-            btree_stack[++top] = T;
+            btree_stacktack[++top] = T;
             T = T->left;
         }
-        T = btree_stack[top]->right; //push right child
+        T = btree_stacktack[top]->right; //push right child
         top--;//pop
     }
     top = -1;
     return T;
 }
 
-struct btree *in_traverse_r(struct btree *T,
-                            visit_t visit,
-                            void *priv)
+Bitree *pre_traverse(Bitree *t,
+                     visit_t visit,
+                     void *priv)
+{
+    return __pre_traverse_stack(t, visit, priv);
+}
+
+struct btree *__in_traverse_recursion(struct btree *T,
+                                      visit_t visit,
+                                      void *priv)
 {
     if (T)
-        in_traverse_r(T->left, visit, priv);
+        __in_traverse_recursion(T->left, visit, priv);
     visit(T, priv);
     if (T)
-        in_traverse_r(T->right, visit, priv);
+        __in_traverse_recursion(T->right, visit, priv);
     return T;
 }
 
-struct btree *in_traverse_s(struct btree *T,
-                            visit_t visit,
-                            void *priv)
+struct btree *__in_traverse_stack(struct btree *T,
+                                  visit_t visit,
+                                  void *priv)
 {
-    btree_stack[++top] = T;
+    btree_stacktack[++top] = T;
     T = T->left;
     while (top >= 0 || T)
     {
         while (T)
         {
             //pushing is the same as preorder
-            btree_stack[++top] = T;
+            btree_stacktack[++top] = T;
             T = T->left;
         }//left child into the stack
-        visit(btree_stack[top], priv);
-        T = btree_stack[top]->right;
+        visit(btree_stacktack[top], priv);
+        T = btree_stacktack[top]->right;
         //maybe it's a root node with only right child
 
         top--;
@@ -133,62 +140,62 @@ struct btree *in_traverse_s(struct btree *T,
     return T;
 }
 
-struct btree *post_traverse_r(struct btree *T,
-                              visit_t visit,
-                              void *priv)
+struct btree *__post_traverse_recursion(struct btree *T,
+                                        visit_t visit,
+                                        void *priv)
 {
     if (T)
     {
-        post_traverse_r(T->left, visit, priv);
-        post_traverse_r(T->right, visit, priv);
+        __post_traverse_recursion(T->left, visit, priv);
+        __post_traverse_recursion(T->right, visit, priv);
     }
     visit(T, priv);
     return T;
 }
 
 
-struct btree *post_traverse_s(struct btree *T,
-                              visit_t visit,
-                              void *priv)
+struct btree *__post_traverse_stack(struct btree *T,
+                                    visit_t visit,
+                                    void *priv)
 {
-    btree_stack[++top] = T;
+    btree_stacktack[++top] = T;
     T = T->left;
     while (top >= 0)
     {
         //stop at empty stack
         while (T)
         {
-            btree_stack[++top] = T;
+            btree_stacktack[++top] = T;
             T = T->left;
         }//push
-        if (btree_stack[top]->right)
+        if (btree_stacktack[top]->right)
         {
             //root node without left child
-            T = btree_stack[top]->right; //push right child tree
+            T = btree_stacktack[top]->right; //push right child tree
         }
         else
         {
             //leaf
-            if (top >= 1 && btree_stack[top - 1]->right == btree_stack[top])
+            if (top >= 1 && btree_stacktack[top - 1]->right == btree_stacktack[top])
             {
                 //right child visited,pop
-                while (top >= 1 && btree_stack[top - 1]->right == btree_stack[top])
+                while (top >= 1 && btree_stacktack[top - 1]->right == btree_stacktack[top])
                 {
-                    visit(btree_stack[top], priv);
+                    visit(btree_stacktack[top], priv);
                     top--;
                 }           //if(top==0)
             }
-            visit(btree_stack[top], priv);
+            visit(btree_stacktack[top], priv);
             top--;
             if (top >= 0)
-                T = btree_stack[top]->right;
+                T = btree_stacktack[top]->right;
         }
     }//while(top>=0)
     top = -1;
     return NULL;
 }
 
-int leaf_number_r(struct btree *T)
+int __leaf_number_recursion(struct btree *T)
 {
     if (!T)
     {
@@ -197,28 +204,28 @@ int leaf_number_r(struct btree *T)
     else if (!(T->left || T->right)) //a leaf
         return 1;
     else
-        return leaf_number_r(T->left) + leaf_number_r(T->right);
+        return __leaf_number_recursion(T->left) + leaf_number_recursion(T->right);
 }
 
-int leaf_number_s(struct btree *T)
+int __leaf_number_stack(struct btree *T)
 {
     int result = 0;
     if (!T)
         return 0;
-    btree_stack[++top] = T;
+    btree_stacktack[++top] = T;
     T = T->left;
     while (top >= 0)
     {
         while (T)
         {
             //push into stack
-            btree_stack[++top] = T;
+            btree_stacktack[++top] = T;
             T = T->left;
         }
-        if (!btree_stack[top]->right)
+        if (!btree_stacktack[top]->right)
         {
             //a leaf
-            while (top >= 1 && btree_stack[top - 1]->right == btree_stack[top])
+            while (top >= 1 && btree_stacktack[top - 1]->right == btree_stacktack[top])
             {
                 top--;
             }
@@ -226,29 +233,29 @@ int leaf_number_s(struct btree *T)
             result++;
         }
         if (top >= 0)
-            T = btree_stack[top]->right;
+            T = btree_stacktack[top]->right;
         //top--;
     }
     return result;
 }
 
-struct btree *traverse(struct btree *T,
-                       visit_t visit,
-                       void *priv)
+struct btree *__traverse(struct btree *T,
+                         visit_t visit,
+                         void *priv)
 {
     //breadth-first traversing a tree
     if (!T)
         return NULL;
-    btree_stack[++top] = T;
+    btree_stacktack[++top] = T;
     bottom++;
     while (bottom <= top)
     {
-        if (btree_stack[bottom])
+        if (btree_stacktack[bottom])
         {
             //a queue
-            visit(btree_stack[bottom], priv);
-            btree_stack[++top] = btree_stack[bottom]->left;
-            btree_stack[++top] = btree_stack[bottom]->right;
+            visit(btree_stacktack[bottom], priv);
+            btree_stacktack[++top] = btree_stacktack[bottom]->left;
+            btree_stacktack[++top] = btree_stacktack[bottom]->right;
         }
         bottom++;
     }
@@ -256,39 +263,39 @@ struct btree *traverse(struct btree *T,
     return T;
 }
 
-int tree_height_r(struct btree *T)
+int __tree_height_recursion(struct btree *T)
 {
     int a, b;
     if (!(T && (T->left || T->right)))
         return 0;
-    a = tree_height_r(T->left);
-    b = tree_height_r(T->right);
+    a = __tree_height_recursion(T->left);
+    b = __tree_height_recursion(T->right);
     return (1 + ((a > b) ? a : b)); //watch the priority
 }
 
-int tree_height_s(struct btree *T)
+int __tree_height_stack(struct btree *T)
 {
     int result = 0, tmp = 0;
-    btree_stack[++top] = T;
+    btree_stacktack[++top] = T;
     T = T->left;
     while (top >= 0)
     {
         while (T)
         {
-            btree_stack[++top] = T;
+            btree_stacktack[++top] = T;
             tmp++;
             T = T->left;
         }//push
         //top--;
         //tmp--;
-        if (!btree_stack[top]->right)
+        if (!btree_stacktack[top]->right)
         {
             //leaf
             if (tmp > result)
                 result = tmp;
-            if (top >= 1 && btree_stack[top - 1]->right == btree_stack[top])
+            if (top >= 1 && btree_stacktack[top - 1]->right == btree_stacktack[top])
             {
-                while (top >= 1 && btree_stack[top - 1]->right == btree_stack[top])
+                while (top >= 1 && btree_stacktack[top - 1]->right == btree_stacktack[top])
                 {
                     tmp--;
                     top--;//pop
@@ -298,7 +305,7 @@ int tree_height_s(struct btree *T)
             tmp--;
         }
         if (top >= 0)
-            T = btree_stack[top]->right;
+            T = btree_stacktack[top]->right;
     }
     return result;
 }
@@ -332,37 +339,37 @@ int main()
             CreatebiBitree(&T);
             break;
         case 2:
-            pre_traverse_r(T, visit, NULL);
+            pre_traverse_recursion(T, visit, NULL);
             break;
         case 3:
-            pre_traverse_s(T, visit, NULL);
+            pre_traverse_stack(T, visit, NULL);
             break;
         case 4:
-            in_traverse_r(T, visit, NULL);
+            in_traverse_recursion(T, visit, NULL);
             break;
         case 5:
-            in_traverse_s(T, visit, NULL);
+            in_traverse_stack(T, visit, NULL);
             break;
         case 6:
-            post_traverse_r(T, visit, NULL);
+            post_traverse_recursion(T, visit, NULL);
             break;
         case 7:
-            post_traverse_s(T, visit, NULL);
+            post_traverse_stack(T, visit, NULL);
             break;
         case 8:
-            printf("The tree's leaves:%d\n", leaf_number_r(T));
+            printf("The tree's leaves:%d\n", leaf_number_recursion(T));
             break;
         case 9:
-            printf("The tree's leaves:%d\n", leaf_number_s(T));
+            printf("The tree's leaves:%d\n", leaf_number_stack(T));
             break;
         case 10:
             traverse(T, visit, NULL);
             break;
         case 11:
-            printf("Hight:%d\n", tree_height_r(T));
+            printf("Hight:%d\n", tree_height_recursion(T));
             break;
         case 12:
-            printf("Hight:%d\n", tree_height_s(T));
+            printf("Hight:%d\n", tree_height_stack(T));
             break;
         default:
             break;
