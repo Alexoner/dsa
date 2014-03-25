@@ -6,10 +6,10 @@ typedef btree_compare_t bstree_compare_t;
 
 /**
  */
-Bstree *bstree_search(Bstree *x,
-                      Bstree *y,
-                      bstree_compare_t compare,
-                      void *priv)
+struct btree *__bstree_search(struct btree *x,
+                              struct btree *y,
+                              bstree_compare_t compare,
+                              void *priv)
 {
     if ( !x || !compare(x, y, priv))
     {
@@ -17,18 +17,18 @@ Bstree *bstree_search(Bstree *x,
     }
     else if (compare(x, y, priv) < 0 && x->right)
     {
-        return bstree_search(x->right, y, compare, priv);
+        return __bstree_search(x->right, y, compare, priv);
     }
     else
     {
-        return bstree_search(x->left, y, compare, priv);
+        return __bstree_search(x->left, y, compare, priv);
     }
 }
 
-Bstree *bstree_search_iteration(Bstree *x,
-                                Bstree *y,
-                                bstree_compare_t compare,
-                                void *priv)
+struct btree *__bstree_search_iteration(struct btree *x,
+                                        struct btree *y,
+                                        bstree_compare_t compare,
+                                        void *priv)
 {
     while (x)
     {
@@ -42,7 +42,7 @@ Bstree *bstree_search_iteration(Bstree *x,
     return NULL;
 }
 
-Bstree *bstree_minimum(Bstree *x)
+struct btree *__bstree_minimum(struct btree *x)
 {
     while (x->left)
     {
@@ -51,7 +51,7 @@ Bstree *bstree_minimum(Bstree *x)
     return x;
 }
 
-Bstree *bstree_maximum(Bstree *x)
+struct btree *__bstree_maximum(struct btree *x)
 {
     while (x->right)
     {
@@ -60,12 +60,12 @@ Bstree *bstree_maximum(Bstree *x)
     return x;
 }
 
-Bstree *bstree_successor(Bstree *x)
+struct btree *__bstree_successor(struct btree *x)
 {
-    Bstree *y;
+    struct btree *y;
     if ( x->right )
     {
-        return bstree_minimum(x->right);
+        return __bstree_minimum(x->right);
     }
     y = x->parent;
     while (y && x == y->right)
@@ -76,12 +76,12 @@ Bstree *bstree_successor(Bstree *x)
     return y;
 }
 
-Bstree *bstree_predecessor(Bstree *x)
+struct btree *__bstree_predecessor(struct btree *x)
 {
-    Bstree *y = NULL;
+    struct btree *y = NULL;
     if (x->left)
     {
-        return bstree_maximum(x->left);
+        return __bstree_maximum(x->left);
     }
     y = x->parent;
     while (y && y->left == x)
@@ -92,11 +92,12 @@ Bstree *bstree_predecessor(Bstree *x)
     return y;
 }
 
-Bstree *bstree_insert(Bstree **root, Bstree *z,
-                      int (compare)(Bstree *, Bstree *, void *priv),
-                      void *priv)
+struct btree *__bstree_insert(struct btree **root,
+                              struct btree *z,
+                              btree_compare_t compare,
+                              void *priv)
 {
-    Bstree *x = *root, *y = NULL;
+    struct btree *x = *root, *y = NULL;
     while (x)
     {
         y = x;
@@ -121,7 +122,7 @@ Bstree *bstree_insert(Bstree **root, Bstree *z,
     return x;
 }
 
-Bstree *bstree_transplant(Bstree **root, Bstree *u, Bstree *v)
+struct btree *__bstree_transplant(struct btree **root, struct btree *u, struct btree *v)
 {
     if (u->parent == NULL)
     {
@@ -142,27 +143,27 @@ Bstree *bstree_transplant(Bstree **root, Bstree *u, Bstree *v)
     return v;
 }
 
-Bstree *bstree_delete(Bstree **root, Bstree *z)
+struct btree *__bstree_delete(struct btree **root, struct btree *z)
 {
-    Bstree *y = NULL;
+    struct btree *y = NULL;
     if (z->left == NULL)
     {
-        bstree_transplant(root, z, z->right);
+        __bstree_transplant(root, z, z->right);
     }
     else if (z->right == NULL)
     {
-        bstree_transplant(root, z, z->left);
+        __bstree_transplant(root, z, z->left);
     }
     else
     {
-        y = bstree_minimum(*root);
+        y = __bstree_minimum(*root);
         if (y->parent != z)
         {
-            bstree_transplant(root, y, y->right);
+            __bstree_transplant(root, y, y->right);
             y->right = z->right;
             y->right->parent = y;
         }
-        bstree_transplant(root, z, y);
+        __bstree_transplant(root, z, y);
         y->left = z->left;
         z->left->parent = y;
     }
