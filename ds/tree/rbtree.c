@@ -6,6 +6,13 @@
  */
 
 /**
+ *
+ * We call the number of black nodes on any simple path from, but not including, a
+ * node x down to a leaf the black-height of the node, denoted bh(x). By property 5,
+ * the notion of black-height is well defined, since all descending simple paths from
+ * the node have the same number of black nodes. We define the black-height of a
+ * red-black tree to be the black-height of its root
+ *
  * lemma 13.1:
  * A red-black tree with n internal nodes has height at most
  * 2lg(n + 1).
@@ -61,8 +68,8 @@ struct rbtree *predecessor(struct rbtree *x)
  * binary-search-tree property.
  *
  *              |       LEFT-ROTATE(T,x)        |
- *              Y       -------------->         X
- *             / \      <--------------        / \
+ *              Y       <--------------         X
+ *             / \      -------------->        / \
  *            X   γ     RIGHT-ROTATE(T,y)     α   Y
  *           / \                                 / \
  *          α   β                                β  γ
@@ -93,3 +100,16 @@ int rbtree_right_rotate(struct rbtree *root, struct rbtree *x)
  * node z, whose key is assumed to have already been filled in,
  * into the red-black tree T.
  */
+
+struct rbtree *rbtree_insert(struct rbtree *root, struct rbtree *z,
+                             rb_compare_t compare,
+                             void *priv)
+{
+    return z;
+}
+
+int rbtree_insert_fixup(struct rbtree *root,
+                        struct rbtree *z)
+{
+    return 0;
+}

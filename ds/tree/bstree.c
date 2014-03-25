@@ -1,11 +1,14 @@
 #include <stdlib.h>
 #include "bstree.h"
 
+typedef btree_compare_t bstree_compare_t;
+
+
 /**
  */
 Bstree *bstree_search(Bstree *x,
                       Bstree *y,
-                      int (*compare)(Bstree *, Bstree *, void *priv),
+                      bstree_compare_t compare,
                       void *priv)
 {
     if ( !x || !compare(x, y, priv))
@@ -24,7 +27,7 @@ Bstree *bstree_search(Bstree *x,
 
 Bstree *bstree_search_iteration(Bstree *x,
                                 Bstree *y,
-                                int (*compare)(Bstree *, Bstree *, void *prvi),
+                                bstree_compare_t compare,
                                 void *priv)
 {
     while (x)
