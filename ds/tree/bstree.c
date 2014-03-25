@@ -42,6 +42,14 @@ struct btree *__bstree_search_iteration(struct btree *x,
     return NULL;
 }
 
+Bstree *bstree_search(Bstree *x,
+                      Bstree *y,
+                      bstree_compare_t compare,
+                      void *priv)
+{
+    return __bstree_search_iteration(x, y, compare, priv);
+}
+
 struct btree *__bstree_minimum(struct btree *x)
 {
     while (x->left)
@@ -51,6 +59,11 @@ struct btree *__bstree_minimum(struct btree *x)
     return x;
 }
 
+Bstree *bstree_minimum(Bstree *x)
+{
+    return __bstree_minimum(x);
+}
+
 struct btree *__bstree_maximum(struct btree *x)
 {
     while (x->right)
@@ -58,6 +71,11 @@ struct btree *__bstree_maximum(struct btree *x)
         x = x->right;
     }
     return x;
+}
+
+Bstree *bstree_maximum(Bstree *x)
+{
+    return __bstree_maximum(x);
 }
 
 struct btree *__bstree_successor(struct btree *x)
@@ -76,6 +94,11 @@ struct btree *__bstree_successor(struct btree *x)
     return y;
 }
 
+Bstree *bstree_successor(Bstree *x)
+{
+    return __bstree_successor(x);
+}
+
 struct btree *__bstree_predecessor(struct btree *x)
 {
     struct btree *y = NULL;
@@ -90,6 +113,11 @@ struct btree *__bstree_predecessor(struct btree *x)
         y = x->parent;
     }
     return y;
+}
+
+Bstree *bstree_predecessor(Bstree *x)
+{
+    return __bstree_predecessor(x);
 }
 
 struct btree *__bstree_insert(struct btree **root,
@@ -122,7 +150,16 @@ struct btree *__bstree_insert(struct btree **root,
     return x;
 }
 
-struct btree *__bstree_transplant(struct btree **root, struct btree *u, struct btree *v)
+Bstree *bstree_insert(Bstree **root,
+                      Bstree *z,
+                      bstree_compare_t compare,
+                      void *priv)
+{
+    return __bstree_insert(root, z, compare, priv);
+}
+
+struct btree *__bstree_transplant(struct btree **root,
+                                  struct btree *u, struct btree *v)
 {
     if (u->parent == NULL)
     {
@@ -141,6 +178,11 @@ struct btree *__bstree_transplant(struct btree **root, struct btree *u, struct b
         v->parent = u->parent;
     }
     return v;
+}
+
+Bstree *bstree_transplant(Bstree **root, Bstree *u, Bstree *v)
+{
+    return __bstree_transplant(root, u, v);
 }
 
 struct btree *__bstree_delete(struct btree **root, struct btree *z)
@@ -168,4 +210,9 @@ struct btree *__bstree_delete(struct btree **root, struct btree *z)
         z->left->parent = y;
     }
     return y;
+}
+
+Bstree *bstree_delete(Bstree **root, Bstree *z)
+{
+    return __bstree_delete(root, z);
 }
