@@ -31,7 +31,7 @@
  * 3)
  */
 
-typedef struct btree Tree;
+typedef struct btree Bitree;
 
 
 struct btree *btree_stack[MAX];
@@ -39,7 +39,7 @@ int top = -1, bottom = -1;
 
 extern void treemenu();
 
-Tree *CreatebiTree(Tree **T)
+Bitree *CreatebiBitree(Bitree **T)
 {
     int num;
     scanf("%d", &num);
@@ -47,14 +47,14 @@ Tree *CreatebiTree(Tree **T)
         *T = NULL;
     else
     {
-        if (!(*T = (Tree*)malloc(sizeof(Tree))))
+        if (!(*T = (Bitree*)malloc(sizeof(Bitree))))
             return NULL;
-        memset(*T, 0, sizeof(Tree));
+        memset(*T, 0, sizeof(Bitree));
         (*T)->data = (void*)num;
         printf("Enter the left child value of node %p\n", (*T)->data);
-        CreatebiTree(&(*T)->left);
+        CreatebiBitree(&(*T)->left);
         printf("Enter the right child value of node %p\n", (*T)->data);
-        CreatebiTree(&(*T)->right);
+        CreatebiBitree(&(*T)->right);
     }
     return *T;
 }
@@ -320,7 +320,7 @@ int main()
         {
         case 1:
             printf("Please enter the root node\n");
-            CreatebiTree(&T);
+            CreatebiBitree(&T);
             break;
         case 2:
             pre_traverse_r(T, visit, NULL);
