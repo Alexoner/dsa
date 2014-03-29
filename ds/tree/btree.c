@@ -176,10 +176,12 @@ struct btree *__post_traverse_stack(struct btree *T,
         else
         {
             //leaf
-            if (top >= 1 && btree_stacktack[top - 1]->right == btree_stacktack[top])
+            if (top >= 1 &&
+                    btree_stacktack[top - 1]->right == btree_stacktack[top])
             {
                 //right child visited,pop
-                while (top >= 1 && btree_stacktack[top - 1]->right == btree_stacktack[top])
+                while (top >= 1 &&
+                        btree_stacktack[top - 1]->right == btree_stacktack[top])
                 {
                     visit(btree_stacktack[top], priv);
                     top--;
@@ -293,9 +295,11 @@ int __tree_height_stack(struct btree *T)
             //leaf
             if (tmp > result)
                 result = tmp;
-            if (top >= 1 && btree_stacktack[top - 1]->right == btree_stacktack[top])
+            if (top >= 1 &&
+                    btree_stacktack[top - 1]->right == btree_stacktack[top])
             {
-                while (top >= 1 && btree_stacktack[top - 1]->right == btree_stacktack[top])
+                while (top >= 1 &&
+                        btree_stacktack[top - 1]->right == btree_stacktack[top])
                 {
                     tmp--;
                     top--;//pop

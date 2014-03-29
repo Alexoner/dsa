@@ -18,40 +18,40 @@
  * 2lg(n + 1).
  */
 
-struct rbtree *rbtree_search(struct rbtree *x,
-                             struct rbtree *y,
-                             rb_compare_t compare,
-                             void *priv)
+struct btree *__rbtree_search(struct btree *x,
+                              struct btree *y,
+                              rb_compare_t compare,
+                              void *priv)
 {
-    return y;
+    return __bstree_search(x, y, compare, priv);
 }
 
-struct rbtree *rbtree_search_recursion(struct rbtree *x,
-                                       struct rbtree *y,
-                                       rb_compare_t compare,
-                                       void priv)
+struct btree *__rbtree_search_recursion(struct btree *x,
+                                        struct btree *y,
+                                        rb_compare_t compare,
+                                        void priv)
 {
-    return y;
+    return __bstree_search_recursion(x, y, compare, priv);
 }
 
-struct rbtree *rbtree_minimum(struct rbtree *root)
+struct btree *__rbtree_minimum(struct btree *root)
 {
-    return root;
+    return __bstree_minimum(root);
 }
 
-struct rbtree *rbtree_maximum(struct rbtree *root)
+struct btree *__rbtree_maximum(struct btree *root)
 {
-    return root;
+    return __bstree_maximum(root);
 }
 
-struct rbtree *successor(struct rbtree *x)
+struct btree *__successor(struct btree *x)
 {
-    return x;
+    return __bstree_successor(x);
 }
 
-struct rbtree *predecessor(struct rbtree *x)
+struct btree *__predecessor(struct btree *x)
 {
-    return x;
+    return __bstree_predecessor(x);
 }
 
 /**
@@ -75,12 +75,12 @@ struct rbtree *predecessor(struct rbtree *x)
  *          α   β                                β  γ
  */
 
-int rbtree_left_rotate(struct rbtree *root, struct rbtree *x)
+int __rbtree_left_rotate(struct btree *root, struct btree *x)
 {
     return 0;
 }
 
-int rbtree_right_rotate(struct rbtree *root, struct rbtree *x)
+int __rbtree_right_rotate(struct btree *root, struct btree *x)
 {
     return 0;
 }
@@ -101,15 +101,16 @@ int rbtree_right_rotate(struct rbtree *root, struct rbtree *x)
  * into the red-black tree T.
  */
 
-struct rbtree *rbtree_insert(struct rbtree *root, struct rbtree *z,
-                             rb_compare_t compare,
-                             void *priv)
+struct rbtree *__rbtree_insert(struct rbtree *root,
+                               struct rbtree *z,
+                               rb_compare_t compare,
+                               void *priv)
 {
     return z;
 }
 
-int rbtree_insert_fixup(struct rbtree *root,
-                        struct rbtree *z)
+int __rbtree_insert_fixup(struct rbtree *root,
+                          struct rbtree *z)
 {
     return 0;
 }
