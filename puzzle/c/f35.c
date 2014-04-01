@@ -2,11 +2,16 @@
 
 long long times;
 
-int foo(int n)
+/**
+ * Utilizing method of induction:
+ * run time of n is 2^n.
+ * When n == 35,it takes more than 3mins to run the program
+ */
+long long foo(int n)
 {
-    int s = 0;
+    long long s = 0;
     times++;
-    printf("times: %lld\n", times);
+    /*printf("times: %lld\n", times);*/
     while (n--)
     {
         s += foo(n);
@@ -17,5 +22,7 @@ int foo(int n)
 
 int main()
 {
-    printf("result of foo(35) is %d,which has run %lld times\n", foo(35), times);
+    printf("result of foo(35) is %lld\n", foo(35));
+    printf("foo has run %lld times\n", times);
+    return 0;
 }
