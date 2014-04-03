@@ -1,7 +1,7 @@
 CFLAGS=-g -Wall -fPIC
 CC=gcc
 
-all:bubsort heapsort qsort-apple qsort-glibc quicksort
+all:bubsort heapsort quicksort
 
 bubsort:bubsort.c
 	$(CC) -o $@ $^ $(CFLAGS)
