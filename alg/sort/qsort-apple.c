@@ -66,7 +66,7 @@
 #include <sys/types.h>
 //#include <stdlib.h>
 
-__private_extern__
+/*__private_extern__*/
 void
 qsort(void *a, size_t n, size_t es, int (*cmp)(const void *, const void *));
 
@@ -119,7 +119,7 @@ med3(char *a, char *b, char *c, int (*cmp)(const void *, const void *))
                : (cmp(b, c) > 0 ? b : (cmp(a, c) < 0 ? a : c ));
 }
 
-__private_extern__
+/*__private_extern__*/
 void
 qsort(void *a, size_t n, size_t es, int (*cmp)(const void *, const void *))
 {

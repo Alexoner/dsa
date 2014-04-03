@@ -1,5 +1,5 @@
+#include "../define.h"
 #include <stdio.h>
-#include "define.h"
 /*****************************************************
  * DIVIDE:RECURSE,STACK.
  * CONQUER:SWAP

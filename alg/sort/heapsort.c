@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "utils.h"
-#include "define.h"
+#include "../utils.h"
+#include "../define.h"
 #define left(x) (2*(i))
 #define right(x) (2*(i)+1)
 #define parent(x) ((i)/2)
