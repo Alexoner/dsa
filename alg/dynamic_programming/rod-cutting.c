@@ -1,3 +1,17 @@
+
+/*
+ * Rod cutting
+ * Serling Enterprises buys long steel rods and cuts them
+ * into shorter rods, which it then sells. Each cut is free. The management of Serling
+ * Enterprises wants to know the best way to cut up the rods.
+ * We assume that we know, for i D 1; 2; : : :, the price p i in dollars that Serling
+ * Enterprises charges for a rod of length i inches. Rod lengths are always an integral
+ * number of inches.
+ *
+ * price table:
+ * length i    1  2  3  4  5  6  7  8  9  10
+ * price p(i)  1  5  8  9  10 17 17 20 24 30
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #define MAX(x,y) (x>y)?(x):(y)
