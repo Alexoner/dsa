@@ -20,9 +20,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void print_lcs()
+void print_lcs(int *pc, int m, int n)
 {
-
+    int (*c)[n] = pc;
 }
 
 int lcs_length(char *x, int lx, char *y, int ly)
