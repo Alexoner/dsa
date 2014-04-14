@@ -17,4 +17,5 @@ algorithms:
 search:
 
 
-dynamic programming
+dynamic programming:
+rod cutting problem,matrix chain order,longest common subsequence.
