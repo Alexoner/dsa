@@ -3,13 +3,12 @@
 
 typedef btree_compare_t bstree_compare_t;
 
-
 /**
  */
-struct btree *__bstree_search(struct btree *x,
-                              struct btree *y,
-                              bstree_compare_t compare,
-                              void *priv)
+struct btree *__bstree_search_recursion(struct btree *x,
+                                        struct btree *y,
+                                        bstree_compare_t compare,
+                                        void *priv)
 {
     if ( !x || !compare(x, y, priv))
     {
@@ -17,11 +16,11 @@ struct btree *__bstree_search(struct btree *x,
     }
     else if (compare(x, y, priv) < 0 && x->right)
     {
-        return __bstree_search(x->right, y, compare, priv);
+        return __bstree_search_recursion(x->right, y, compare, priv);
     }
     else
     {
-        return __bstree_search(x->left, y, compare, priv);
+        return __bstree_search_recursion(x->left, y, compare, priv);
     }
 }
 

@@ -26,13 +26,13 @@ struct btree *__rbtree_search(struct btree *x,
     return __bstree_search(x, y, compare, priv);
 }
 
-struct btree *__rbtree_search_recursion(struct btree *x,
-                                        struct btree *y,
-                                        rb_compare_t compare,
-                                        void priv)
-{
-    return __bstree_search_recursion(x, y, compare, priv);
-}
+/*struct btree *__rbtree_search_recursion(struct btree *x,*/
+/*struct btree *y,*/
+/*rb_compare_t compare,*/
+/*void priv)*/
+/*{*/
+/*return __bstree_search_recursion(x, y, compare, priv);*/
+/*}*/
 
 struct btree *__rbtree_minimum(struct btree *root)
 {

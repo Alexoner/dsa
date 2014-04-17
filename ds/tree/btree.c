@@ -60,6 +60,87 @@ Bitree *CreatebiBitree(Bitree **T)
     return *T;
 }
 
+/**
+ * The search-tree operations TREE-INSERT and TREE-DELETE ,
+ * when run on a red-black tree with n keys, take O(lgn) time.
+ *
+ * Because they modify the tree, the result may violate the
+ * red-black properties enumerated in Section 13.1. To restore
+ * these properties, we must change the colors of some of the
+ * nodes in the tree and also change the pointer structure.
+ *
+ * We change the pointer structure through rotation, which is a
+ * local operation in a search tree that preserves the
+ * binary-search-tree property.
+ *
+ *              |       LEFT-ROTATE(T,x)        |
+ *              Y       <--------------         X
+ *             / \      -------------->        / \
+ *            X   γ     RIGHT-ROTATE(T,y)     α   Y
+ *           / \                                 / \
+ *          α   β                                β  γ
+ */
+struct btree *__btree_left_rotate(struct btree **root, struct btree *x)
+{
+    struct btree *y = x->right; // set y
+
+    x->right = y->left;         // turn y's left subtree into x's right subtree
+    if (y->left)
+    {
+        y->left->parent = x;
+    }
+
+    y->parent = x->parent; //link x's parent to y
+    if (x->parent == NULL)
+    {
+        *root = y;
+    }
+    else if (x == x->parent->left)
+    {
+        x->parent->left = y;
+    }
+    else
+    {
+        x->parent->right = y;
+    }
+
+    y->left = x; //put x on y's left
+    x->parent = y;
+
+    return x;
+}
+
+struct btree *__btreee_right_rotate(struct btree **root,
+                                    struct btree *y)
+{
+    struct btree *x = y->left;
+    y->left = x->right;
+    if (x->right)
+    {
+        x->right->parent = y;
+    }
+
+    x->parent = y->parent;
+    if (y->parent == NULL)
+    {
+        *root = x;
+    }
+    else if (y == y->parent->left)
+    {
+        y->parent->left = x;
+    }
+    else
+    {
+        y->parent->right = x;
+    }
+
+    x->right = y;
+    y->parent = x;
+
+    return x;
+}
+
+
 struct btree *__pre_traverse_recursion(struct btree *T,
                                        visit_t visit,
                                        void *priv)
