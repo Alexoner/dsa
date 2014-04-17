@@ -75,14 +75,16 @@ struct btree *__predecessor(struct btree *x)
  *          α   β                                β  γ
  */
 
-int __rbtree_left_rotate(struct btree *root, struct btree *x)
+struct rbtree *__rbtree_left_rotate(struct rbtree **root, struct rbtree *x)
 {
-    return 0;
+    return rb_entry(__btree_left_rotate(&(*root->btree), x->btree),
+                    struct rbtree, btree);
 }
 
-int __rbtree_right_rotate(struct btree *root, struct btree *x)
+struct btree *__rbtree_right_rotate(struct btree **root, struct btree *x)
 {
-    return 0;
+    return rb_entry(__btree_right_rotate(&(*root->btree), x->btree),
+                    struct rbtree, btree);
 }
 
 /**
