@@ -108,11 +108,22 @@ struct rbtree *__rbtree_insert(struct rbtree *root,
                                rb_compare_t compare,
                                void *priv)
 {
+    /*struct rbtree **/
+    bstree_insert(&root->btree, z->btree, compare, priv);
+    z->btree.left = z->btree.right = NULL;
+    z->color = RB_RED;
+
+    __rbtree_insert_fixup(root, z);
     return z;
 }
 
 int __rbtree_insert_fixup(struct rbtree *root,
                           struct rbtree *z)
 {
+    while (z->btree &&
+            rb_entry(z->btree, struct rbtree, btree)->color == RB_RED)
+    {
+
+    }
     return 0;
 }

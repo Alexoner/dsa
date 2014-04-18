@@ -42,14 +42,20 @@ struct rbtree
 
 typedef struct rbtree RBtree;
 
-#define rb_parent(r)
-#define rb_color(r)
-#define rb_is_red(r)
-#define rb_is_black(r)
-#define rb_set_red(r) do {;} while(0)
-#define rb_set_black(r) do {;} while(0)
-
 #define rb_entry(ptr,type,member) container_of(ptr,type,member)
+
+#define rb_parent(r) rb_entry(r,struct rbtree,rbtree)
+#define rb_left_child(r) \
+    rb_entry(r->btree.left,struct rbtree,btree)
+#define rb_right_child(r) \
+    rb_entry(r->btree.right,struct rbtree,btree)
+
+#define rb_color(r) ((r)->color)
+#define rb_is_red(r) ((rb_color(r))==RB_RED)
+#define rb_is_black(r) ((rb_color(r)) == RB_BLACK))
+#define rb_set_red(r) do {rb_color(r) = RB_RED;} while(0)
+#define rb_set_black(r) do {rb_color(r)= RB_BLACK;} while(0)
+
 
 typedef btree_compare_t rb_compare_t;
 
