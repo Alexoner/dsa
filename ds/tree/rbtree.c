@@ -117,13 +117,61 @@ struct rbtree *__rbtree_insert(struct rbtree *root,
     return z;
 }
 
-int __rbtree_insert_fixup(struct rbtree *root,
+int __rbtree_insert_fixup(struct rbtree **root,
                           struct rbtree *z)
 {
-    while (rb_parent(z) &&
+    struct btree *y = NULL;
+    while (z->btree &&
             rb_color(rb_parent(z)) == RB_RED)
     {
-        if (rb_parent(z) == rb_parent(rb_parent(z)))
+        /*if (rb_parent(z) == rb_parent(rb_parent(z)))*/
+        if (z->btree.parent == z->btree.parent->parent->left))
+        {
+            y = z->btree.parent->parent->right;
+            if (rb_btree_entry(y)->color = RB_RED)           //case 1
+            {
+                rb_btree_entry(z.btree.parent)->color = RB_BLACK;
+                rb_btree_entry(y)->color = RB_BLACK;
+                rb_btree_entry(z->btree.parent->parent)->color = RB_RED;
+                z = z->btree.parent->parent;
+            }
+            else
+            {
+                if (z == z->btree.parent->right)        //case 2
+                {
+                    z = z->btree.parent;
+                    __rbtree_left_rotate(root, z);
+                }
+                rb_color(z->btree.parent) = RB_BLACK;       //case 3
+                rb_color(z->btree.parent->parent) = RB_RED; //case 3
+                __rbtree_right_rotate(root, rb_entry(z->btree.parent->parent));
+            }
         }
+        else
+        {
+            y = z->btree.parent->parent->left;
+            if (rb_btree_entry(y)->color == RB_RED) //case 1
+            {
+                rb_btree_entry(z.btree.parent)->color = RB_BLACK;
+                rb_btree_entry(y)->color = RB_BLACK;
+                rb_btree_entry(z->btree.parent->parent)->color = RB_RED;
+                z = z->btree.parent->parent;
+            }
+            else
+            {
+                if (z == z->btree.parent->right)    //case 2
+                {
+                    z = z->btree.parent;
+                    __rbtree_left_rotate(root, z);
+                }
+
+                rb_entry(z->btree.parent)->color = RB_BLACK;
+                rb_entry(z->btree.parent->parent)->color = RB_RED;
+                __rbtree_right_rotate(root, rb_entry(z->btree.parent->parent));
+            }
+        }
+    }
+
+    (*root)->color = RB_BLACK;
     return 0;
 }
