@@ -120,10 +120,10 @@ struct rbtree *__rbtree_insert(struct rbtree *root,
 int __rbtree_insert_fixup(struct rbtree *root,
                           struct rbtree *z)
 {
-    while (z->btree &&
-            rb_entry(z->btree, struct rbtree, btree)->color == RB_RED)
+    while (rb_parent(z) &&
+            rb_color(rb_parent(z)) == RB_RED)
     {
-
-    }
+        if (rb_parent(z) == rb_parent(rb_parent(z)))
+        }
     return 0;
 }
