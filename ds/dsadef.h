@@ -1,6 +1,8 @@
 #ifndef DSADEF_H
 #define DSADEF_H
 
+#include <stdio.h>
+
 #undef offsetof
 #define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 
