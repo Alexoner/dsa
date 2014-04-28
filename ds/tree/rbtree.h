@@ -46,7 +46,7 @@ typedef struct rbtree RBtree;
 #define rb_btree_entry(ptr) container_of(ptr,struct rbtree,btree)
 
 #define rb_parent(r) \
-    rb_entry(r->btree.parent,struct rbtree,rbtree)
+    rb_entry(r->btree.parent,struct rbtree,btree)
 #define rb_left_child(r) \
     rb_entry(r->btree.left,struct rbtree,btree)
 #define rb_right_child(r) \

@@ -163,7 +163,7 @@ int __rbtree_insert_fixup(struct rbtree **root,
 {
     struct btree *broot = &(*root)->btree;
     struct btree *y = NULL;
-    while (z->btree &&
+    while (z &&
             rb_color(rb_parent(z)) == RB_RED)
     {
         /*if (rb_parent(z) == rb_parent(rb_parent(z)))*/
