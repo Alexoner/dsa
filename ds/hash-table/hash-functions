@@ -2,4 +2,8 @@ Universal Hashing,Perfect Hashing,Cuckoo Hashing,Tabulation Hashing,...
 
 Hash function for a class whose object is uniquely identified by a k-tuple of integers,
 (a1,a2,...,ak).HashMap in Java has c CRC-style Hash function to map integer to bins.
+
 h(a1,a2,...,ak)= a1 + a2 * p + a3 * p^2 + a4 * p^3+ ... + ak * p^(k-1).
+
+There is an implicit module operation due to potential integer overflow. 
+Also, it seems people often choose a Mersenne prime for p, such as 31.
