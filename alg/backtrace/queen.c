@@ -40,6 +40,7 @@ void place(int max, int n)
     int i;
     if (n == max)
     {
+        sum++;
         show(queen, max);
         return;
     }
@@ -62,57 +63,40 @@ void dfs_place(int n)
     int stack[n];
     memset(stack, 0, sizeof(stack));
     int top = -1;
-    int i, j;
+    int i, j, start = 0;
     stack[++top] = 0;
-    while (top >= 0)
+    while (1)
     {
         //new placement
         if (top < n - 1)
         {
-            for (i = 0; i < n; i++)
+            for (i = start; i < n; i++)
             {
                 if (check(stack, top + 1, i))
                 {
                     stack[++top] = i;
+                    start = 0;
                     break;
                 }
+            }
+
+            //no new placement,no solution for such a stack,backtracking now!
+            if (i == n)
+            {
+                if (top == -1)
+                {
+                    return;
+                }
+                start = stack[top--] + 1;
             }
         }
         else
         {
-            //new placement for another solution
-            for (i = stack[top] + 1; i < n; i++)
-            {
-                if (check(stack, top, i))
-                {
-                    stack[top] = i;
-                    /*show(stack, n);*/
-                    break;
-                }
-            }
-        }
+            sum++;
+            show(stack, n);
+            //got a new solution,move stack[top] to next to get another one
 
-        //no new placement,backtracking now!
-        while (i == n)
-        {
-            if (top == 0)
-            {
-                /*show(stack, n);*/
-                return;
-            }
-            stack[top] = 0;
-            top--;
-            printf("top: %d\n", top);
-            for (i = stack[top] + 1; i < n; i++)
-            {
-                if (check(stack, top, i))
-                {
-                    stack[top] = i;
-                    show(stack, n);
-                    getchar();
-                    break;
-                }
-            }
+            start = stack[top--] + 1;
         }
     }
     return;
@@ -123,7 +107,6 @@ void dfs_place(int n)
  */
 void show(int *queen, int n)
 {
-    sum++;
     int i, j;
     for (i = 0; i < n; i++)
     {
@@ -143,8 +126,8 @@ int main(int argc, char **argv)
     {
         N = atoi(argv[1]);
     }
-    place(N, 0);
-    /*dfs_place(N);*/
+    /*place(N, 0);*/
+    dfs_place(N);
     printf("there are %d solutions\n", sum);
     return 0;
 }
