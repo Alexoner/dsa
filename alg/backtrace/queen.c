@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#define MAX 14
+#define MAX 100
 /*#define MAX 4*/
 
 int sum = 0;
