@@ -1,11 +1,66 @@
 #include "../define.h"
+#include "../utils.h"
 #include <stdio.h>
+#include <time.h>
+
 /*****************************************************
  * DIVIDE:RECURSE,STACK.
  * CONQUER:SWAP
  * COMBINE:DONE
  * **************************************************/
+
+//basic quick sort with recursion
+int partition(int *a, int p, int r)
+{
+    int pivot = a[r];
+    int i, j;
+    int q;
+    for (i = p - 1, j = p; j < r; j++)
+    {
+        if (a[j] < pivot)
+        {
+            i++;
+            SWAP(a[i], a[j], int);
+        }
+    }
+    q = i + 1;
+    SWAP(a[r], a[q], int);
+    return q;
+}
+
 void quicksort(int *a, int p, int r)
+{
+    if (p < r)
+    {
+        int q = partition(a, p, r);
+        quicksort(a, p, q - 1);
+        quicksort(a, q + 1, r);
+    }
+}
+
+//quick sort with randomization
+int randomized_partition(int *a, int p, int r)
+{
+    srand(time(NULL));
+    int i = rand() % (r - p + 1);
+    SWAP(a[r], a[i], int);
+    return partition(a, p, r);
+}
+
+void randomized_quicksort(int *a, int p, int r)
+{
+    if (p < r)
+    {
+        int q = randomized_partition(a, p, r);
+        randomized_quicksort(a, p, q - 1);
+        randomized_quicksort(a, q + 1, r);
+    }
+}
+
+//quick sort with stack instead of recursion
+
+
+void quicksort2(int *a, int p, int r)
 {
     int i, j, key, tmp;
     key = a[p];
@@ -35,3 +90,37 @@ void quicksort(int *a, int p, int r)
     quicksort(a, p, j - 1);
     quicksort(a, j + 1, r);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -5,6 +5,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+#define SWAP(x,y,type) \
+    register type  __tmp = x; \
+    x = y;               \
+    y = __tmp;          \
+
+
+
 static inline void * mem_swap(void *x, void *y, size_t size)
 {
     void *p = malloc(size);
@@ -20,3 +28,7 @@ static inline void * mem_swap(void *x, void *y, size_t size)
 }
 
 #endif
+
+
+
+

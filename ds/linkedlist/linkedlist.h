@@ -7,17 +7,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "../../dsadef.h"
-
-//struct list
-//{
-//int datasize;
-//int length;
-////int empty;
-//struct list *head;
-//struct list *tail;
-//pthread_mutex_t lock; //mutex lock for thread safe
-//};
+#include "../dsadef.h"
 
 
 
@@ -34,7 +24,7 @@
 
 struct list
 {
-    struct list  *prev;
+    struct list *prev;
     struct list *next;
 };
 
@@ -1240,6 +1230,9 @@ int list_remove(struct list *list, struct list *position, void (*data_destroy)(v
 
 
 #endif
+
+
+
 
 
 
