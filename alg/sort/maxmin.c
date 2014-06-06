@@ -4,7 +4,7 @@
 int max_min(int *a, int n,
             int *max, int *min)
 {
-    int i, j;
+    int i;
     if (n == 0)
     {
         return -1;
@@ -47,6 +47,11 @@ int max_min(int *a, int n,
 
     return 0;
 }
+
+
+
+
+
 
 
 
