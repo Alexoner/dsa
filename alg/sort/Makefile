@@ -15,3 +15,5 @@ quicksort:quicksort.c quickmain.c
 	$(CC) -o $@ $^ $(CFLAGS)
 maxmin:maxmin.c maxmin-main.c
 	$(CC) -o $@ $^ -std=c99 $(CFLAGS)
+quickselect:quickselect.c quicksort.c quickselect-main.c
+	$(CC) -o $@ $^ -std=c99 $(CFLAGS)
