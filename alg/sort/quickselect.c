@@ -28,23 +28,3 @@ int quickselect(int *a, int p, int r, int i)
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
