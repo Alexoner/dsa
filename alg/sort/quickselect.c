@@ -11,8 +11,8 @@ int quickselect(int *a, int p, int r, int i)
         return p;
     }
     int q, k;
-    /*q = randomized_partition(a, p, r);*/
-    q = partition(a, p, r);
+    q = randomized_partition(a, p, r);
+    /*q = partition(a, p, r);*/
     k = q - p + 1;
     if (k == i)
     {
@@ -27,6 +27,10 @@ int quickselect(int *a, int p, int r, int i)
         return quickselect(a, q + 1, r, i - k);
     }
 }
+
+
+
+
 
 
 

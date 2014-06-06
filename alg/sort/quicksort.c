@@ -41,9 +41,9 @@ void quicksort(int *a, int p, int r)
 //quick sort with randomization
 int randomized_partition(int *a, int p, int r)
 {
-    srand(time(NULL));
+    /*srand(time(NULL));*/
     int i = rand() % (r - p + 1);
-    SWAP(a[r], a[i], int);
+    SWAP(a[r], a[p + i], int);
     return partition(a, p, r);
 }
 
@@ -90,6 +90,10 @@ void quicksort2(int *a, int p, int r)
     quicksort(a, p, j - 1);
     quicksort(a, j + 1, r);
 }
+
+
+
+
 
 
 
