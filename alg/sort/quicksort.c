@@ -60,6 +60,8 @@ void randomized_quicksort(int *a, int p, int r)
 //quick sort with stack instead of recursion
 
 
+//original version of quicksort,which scans from two ends
+//instead of  one end
 void quicksort2(int *a, int p, int r)
 {
     int i, j, key, tmp;
@@ -90,6 +92,7 @@ void quicksort2(int *a, int p, int r)
     quicksort(a, p, j - 1);
     quicksort(a, j + 1, r);
 }
+
 
 
 
