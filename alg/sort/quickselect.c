@@ -4,6 +4,8 @@
 
 #include "../utils.h"
 
+//divide and conquer:
+//similar algorithm  with quicksort
 int quickselect(int *a, int p, int r, int i)
 {
     if (p == r)
@@ -27,4 +29,25 @@ int quickselect(int *a, int p, int r, int i)
         return quickselect(a, q + 1, r, i - k);
     }
 }
+
+//median algorithm
+float median(int *a, int p, int r)
+{
+    if ((r - p) % 2 == 0)
+    {
+        return a[quickselect(a, p, r, (p + r) / 2)];
+    }
+    else
+    {
+        int x = quickselect(a, p, r, (p + r - 1) / 2);
+        int y = quickselect(a, p, r, (p + r + 1) / 2);
+        return (x + y) / 2;
+    }
+    return -1.0f;
+}
+
+
+
+
+
 

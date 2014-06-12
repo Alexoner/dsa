@@ -61,7 +61,7 @@ void randomized_quicksort(int *a, int p, int r)
 
 
 //original version of quicksort,which scans from two ends
-//instead of  one end
+//instead of one end
 void quicksort2(int *a, int p, int r)
 {
     int i, j, key, tmp;
@@ -94,40 +94,5 @@ void quicksort2(int *a, int p, int r)
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//tail recursion quicksort
 
