@@ -27,9 +27,11 @@ int main()
     srand(time(NULL));
     for (i = 0; i < n; i++)
     {
-        a[i] = rand() % 1000000;
+        /*a[i] = rand() % 1000000;*/
+        a[i] = rand() % 1000;
     }
-    randomized_quicksort(a, 0, n - 1);
+    /*randomized_quicksort(a, 0, n - 1);*/
+    quicksort_equal(a, 0, n - 1);
     for (i = 0; i < n; i++)
     {
         printf("%d\t", a[i]);
@@ -37,6 +39,11 @@ int main()
     printf("\n");
     return 0;
 }
+
+
+
+
+
 
 
 

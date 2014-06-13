@@ -57,6 +57,47 @@ void randomized_quicksort(int *a, int p, int r)
     }
 }
 
+//partition with equal elements
+int partition_equal(int *a, int p, int r)
+{
+    int i = p - 1, j = p, k;
+    int pivot = a[r];
+    int q;
+    for (; j < r; j++)
+    {
+        if ( a[j] < pivot)
+        {
+            i++;
+            SWAP(a[j], a[i], int);
+            for (k = i - 1; k > p && a[k] == pivot; k--)
+            {
+                SWAP(a[k + 1], a[k], int);
+            }
+        }
+        else if (a[j] == pivot)
+        {
+            i++;
+            SWAP(a[j], a[i], int);
+        }
+    }
+
+    q = i + 1;
+    SWAP(a[r], a[q], int);
+    return q;
+}
+
+void quicksort_equal(int *a, int p, int r)
+{
+    int i;
+    if (p < r)
+    {
+        int q = partition_equal(a, p, r);
+        for (i = q; i >= p && a[i] == a[q]; i--);
+        quicksort_equal(a, p, i - 1);
+        quicksort_equal(a, q + 1, r);
+    }
+}
+
 //quick sort with stack instead of recursion
 
 
@@ -95,4 +136,15 @@ void quicksort2(int *a, int p, int r)
 
 
 //tail recursion quicksort
+
+
+
+
+
+
+
+
+
+
+
 

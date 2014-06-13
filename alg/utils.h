@@ -29,6 +29,3 @@ static inline void * mem_swap(void *x, void *y, size_t size)
 
 #endif
 
-
-
-
