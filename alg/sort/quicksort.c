@@ -136,6 +136,22 @@ void quicksort2(int *a, int p, int r)
 
 
 //tail recursion quicksort
+void quicksort_tail_recursion(int *a, int p, int r)
+{
+    int q;
+    while (p < r)
+    {
+        q = partition(a, p, r);
+        quicksort_tail_recursion(a, p, q - 1);
+        p = q + 1;
+    }
+}
+
+
+
+
+
+
 
 
 
