@@ -5,7 +5,8 @@
 #include <string.h>
 
 //prototype for hash functions
-typedef int (*hash_func_t)(int , int);
+typedef int (*hash_func_t)(int key);
+typedef int (*hash_openaddr_t) (int key, int probe);
 
 int chained_hash_insert(int *t, int x);
 int chained_hash_search(int *t, int k);
@@ -23,11 +24,5 @@ static inline int  hash_interpret_string(char *s)
 }
 
 #endif
-
-
-
-
-
-
 
 
