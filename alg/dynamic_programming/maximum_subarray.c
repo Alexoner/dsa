@@ -1,11 +1,17 @@
+/*
+ * Maximum Subarray Problem
+ * Dynamic Programming Solution
+ */
+
 #include <stdio.h>
 
 int sequence(int *numbers, int n)
 {
     // Initialize variables here
-    int max_so_far  = numbers[0], max_ending_here = numbers[0];
+    int max_so_far = numbers[0], max_ending_here = numbers[0];
 
-    // OPTIONAL: These variables can be added in to track the position of the subarray
+    // OPTIONAL: These variables can be added in to track the position of the
+    // subarray
     // size_t begin = 0;
     // size_t begin_temp = 0;
     // size_t end = 0;
@@ -26,13 +32,13 @@ int sequence(int *numbers, int n)
         }
 
         // calculate max_so_far
-        if (max_ending_here >= max_so_far )
+        if (max_ending_here >= max_so_far)
         {
-            max_so_far  = max_ending_here;
+            max_so_far = max_ending_here;
 
             // begin = begin_temp;
             // end = i;
         }
     }
-    return max_so_far ;
+    return max_so_far;
 }
