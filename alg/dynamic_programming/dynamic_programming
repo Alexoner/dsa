@@ -23,3 +23,9 @@ four steps:
 Steps 1–3 form the basis of a dynamic-programming solution to a problem. If we
 need only the value of an optimal solution, and not the solution itself, then we
 can omit step 4. When we do perform step 4, we sometimes maintain additi
+
+
+The RECURRENCE(or DIFFERENCE EQUATION or OPTIMAL SUBSTRUCTURE) comes in 
+these forms:
+    @1:F(n) and F(n-1)
+    @2:Split the problem.

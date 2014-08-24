@@ -1,27 +1,29 @@
-
 /*
  * Rod cutting
  * Serling Enterprises buys long steel rods and cuts them
- * into shorter rods, which it then sells. Each cut is free. The management of Serling
+ * into shorter rods, which it then sells. Each cut is free. The management of
+ *Serling
  * Enterprises wants to know the best way to cut up the rods.
- * We assume that we know, for i D 1; 2; : : :, the price p i in dollars that Serling
- * Enterprises charges for a rod of length i inches. Rod lengths are always an integral
+ * We assume that we know, for i D 1; 2; : : :, the price p i in dollars that
+ *Serling
+ * Enterprises charges for a rod of length i inches. Rod lengths are always an
+ *integral
  * number of inches.
  *
  * price table:
  * length i    1  2  3  4  5  6  7  8  9  10
  * price p(i)  1  5  8  9  10 17 17 20 24 30
  */
+
 #include <stdio.h>
 #include <stdlib.h>
-#define MAX(x,y) (x>y)?(x):(y)
+#define MAX(x, y) (x > y) ? (x) : (y)
 #define MAXIN 128
 int bottom_up_cut_rod(int *p, int n);
 int memoized_cut_rod(int *p, int n, int *r);
 int n_prices = 11;
-int p[11] = {0, 1, 5, 8, 9, 10, 17, 17, 20, 24, 30};
+int p[11] = { 0, 1, 5, 8, 9, 10, 17, 17, 20, 24, 30 };
 int r[MAXIN];
-
 
 int cut_rod(int *p, int n)
 {
@@ -57,25 +59,24 @@ int cut_rod(int *p, int n)
 int memoized_cut_rod(int *p, int n, int *r)
 {
     int q = -1, i;
-    if (r[n] >= 0) //already memoized
+    if (r[n] >= 0) // already memoized
         return r[n];
     if (n == 0)
     {
         q = 0;
-        //stop recursion
+        // stop recursion
     }
     else
     {
         for (i = 1; i <= n; i++)
         {
             q = MAX(q, p[i] + memoized_cut_rod(p, n - i, r));
-            //top-down,recursion
+            // top-down,recursion
         }
     }
     r[n] = q;
     return q;
 }
-
 
 /*
  * The second approach is the bottom-up method.
@@ -104,9 +105,9 @@ int bottom_up_cut_rod(int *p, int n)
     r[0] = 0;
     for (j = 1; j <= n; j++)
     {
-        //solve the subproblems
+        // solve the subproblems
         q = -1;
-        for (i = 1; i <= j; i++) //loop for the cutting method
+        for (i = 1; i <= j; i++) // loop for the cutting method
         {
             q = MAX(q, p[i] + r[j - i]);
         }
@@ -135,7 +136,7 @@ int extended_bottom_up_cut_rod(int *p, int n)
         for (i = 1; i <= j; i++)
         {
             /*q=MAX(q,p[j]+r[n-j]);*/
-            if ( i > n_prices - 1)
+            if (i > n_prices - 1)
             {
                 break;
             }
@@ -153,7 +154,6 @@ int extended_bottom_up_cut_rod(int *p, int n)
     return r[n];
 }
 
-
 int main()
 {
     int n;
@@ -166,4 +166,3 @@ int main()
            extended_bottom_up_cut_rod(p, n));
     return 0;
 }
-
