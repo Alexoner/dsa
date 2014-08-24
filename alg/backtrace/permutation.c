@@ -10,10 +10,14 @@
 /*
  * Solution:
  * @1:Backtracking.
+ * 对于包含n个元素的数组,先确定第一位置的元素，第一个位置有n中可能(每次把
+ * 后面的元素和第一个元素交换)，然后求子数组[2…n]的全排列。由于一个数列的
+ * 总共有n！个排列，因此时间复杂度为O（n！）
  * @1:Dynamic Programming.
  */
 
 #include <stdio.h>
+#include <string.h>
 
 /*Function to swap values at two pointers*/
 void swap(char *x, char *y)
@@ -47,10 +51,48 @@ void permute(char *a, int i, int n)
     }
 }
 
+/*
+ * Variation:a string may contain duplicate elements
+ * 当我们枚举第i个位置的元素时，若要把后面第j个元素和i交换，则先要保证
+ * [i…j-1]范围内没有和位置j相同的元素
+ */
+
+int findDup(char *a, int start, int target)
+{
+    int i;
+    for (i = start; i < target; i++)
+        if (a[i] == a[target])
+            return 1;
+    return 0;
+}
+
+void permute_nodup(char *a, int start, int end)
+{
+    int j;
+    char *p;
+    if (start == end)
+    {
+        printf("%s\n", a);
+    }
+    else
+    {
+        for (j = start; j <= end; j++)
+        {
+            p = a + j;
+            if (!findDup(a, start, j))
+            {
+                swap(p, a + start);
+                permute_nodup(a, start + 1, end);
+                swap(p, a + start);
+            }
+        }
+    }
+}
+
 // Driver program
 int main()
 {
-    char a[] = "ABC";
-    permute(a, 0, 2);
+    char a[] = "ABAC";
+    permute_nodup(a, 0, strlen(a) - 1);
     return 0;
 }
