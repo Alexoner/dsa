@@ -110,8 +110,7 @@ int minPalPartition_opt(const char *str)
     int n = strlen(str), i, j, l;
     int(*table)[n] = malloc(sizeof(int) * n * n);
 
-    // declare large two-dimensional array in stack will cause stack
-    // overflow,resulting in segment fault
+    // declare large two-dimensional array in bss will cause segment fault
     /*int table[n][n];*/
 
     memset(table, 0, sizeof(int) * n * n);
