@@ -109,22 +109,34 @@ int minPalPartition_opt(const char *str)
 {
     int n = strlen(str), i, j, l;
     int(*table)[n] = malloc(sizeof(int) * n * n);
+
+    // declare large two-dimensional array in stack will cause stack
+    // overflow,resulting in segment fault
+    /*int table[n][n];*/
+
     memset(table, 0, sizeof(int) * n * n);
     int mincuts[n];
     for (i = 0; i < n; i++)
     {
         mincuts[i] = i;
     }
-    // bottom-up dynamic programming.From the recurrence,we can see that
-    // i must go in decreasing order and j must go in increasing order.
-    // Or in stead,we can let a variable l,which is the substring length
-    // to go in increasing order,as with Matrix Chain Multiplication.
+    // bottom-up dynamic programming.
+    // This optimized algorithm reduces the dimension from two to one,and it
+    // requires the proper approach for DP.That's to increase or decrease index
+    // in the right order
+
+    // wrong approach for bottom-up
     /*for (l = 1; l <= n; l++)*/
     /*for (i = 0; i <= n - l; i++)*/
     /*{*/
     /*j = i + l - 1;*/
+
+    // right APPROACH FOR BOTTOM-UP DYNAMIC PROGRAMMING,to make variables change
+    // in order
+    // j is the last element's index in the string given.
     for (j = 0; j < n; j++)
-        for (i = j; i >= 0; i--)
+        for (i = 0; i <= j; i++)
+        /*for (i = j; i >= 0; i--)*/
         {
             if (str[i] == str[j] && (j - i < 2 || table[i + 1][j - 1]))
             {
