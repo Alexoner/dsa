@@ -109,7 +109,8 @@ int minPalPartition_opt(const char *str)
 {
     int n = strlen(str), i, j, l;
     int(*table)[n] = malloc(sizeof(int) * n * n);
-    int mincuts[n + 1];
+    memset(table, 0, sizeof(int) * n * n);
+    int mincuts[n];
     for (i = 0; i < n; i++)
     {
         mincuts[i] = i;
@@ -118,13 +119,16 @@ int minPalPartition_opt(const char *str)
     // i must go in decreasing order and j must go in increasing order.
     // Or in stead,we can let a variable l,which is the substring length
     // to go in increasing order,as with Matrix Chain Multiplication.
-    for (l = 1; l <= n; l++)
-        for (i = 0; i <= n - l; i++)
+    /*for (l = 1; l <= n; l++)*/
+    /*for (i = 0; i <= n - l; i++)*/
+    /*{*/
+    /*j = i + l - 1;*/
+    for (j = 0; j < n; j++)
+        for (i = j; i >= 0; i--)
         {
-            j = i + l - 1;
             if (str[i] == str[j] && (j - i < 2 || table[i + 1][j - 1]))
             {
-                table[i][j] = true;
+                table[i][j] = 1;
                 mincuts[j] = min(mincuts[j], i ? (mincuts[i - 1] + 1) : 0);
             }
         }
@@ -134,6 +138,7 @@ int minPalPartition_opt(const char *str)
 int main()
 {
     /*char str[] = "ababbbabbababa";*/
+    /*char *str = "abaa";*/
     char *str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
@@ -161,7 +166,7 @@ int main()
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     printf("Min cuts needed for Palindrome Partitioning is %d",
-           /*minPalPartition_opt(str));*/
-           minPalPartition(str));
+           minPalPartition_opt(str));
+    /*minPalPartition(str));*/
     return 0;
 }
