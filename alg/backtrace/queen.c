@@ -23,8 +23,7 @@ int check(int *queen, int row, int col)
     int i;
     for (i = 0; i < row; i++)
     {
-        if (queen[i] == col ||
-                abs(queen[i] - col) == row - i)
+        if (queen[i] == col || abs(queen[i] - col) == row - i)
             return 0;
     }
     return 1;
@@ -63,11 +62,11 @@ void dfs_place(int n)
     int stack[n];
     memset(stack, 0, sizeof(stack));
     int top = -1;
-    int i, j, start = 0;
+    int i, start = 0;
     stack[++top] = 0;
     while (1)
     {
-        //new placement
+        // new placement
         if (top < n - 1)
         {
             for (i = start; i < n; i++)
@@ -80,7 +79,7 @@ void dfs_place(int n)
                 }
             }
 
-            //no new placement,no solution for such a stack,backtracking now!
+            // no new placement,no solution for such a stack,backtracking now!
             if (i == n)
             {
                 if (top == -1)
@@ -94,7 +93,7 @@ void dfs_place(int n)
         {
             sum++;
             show(stack, n);
-            //got a new solution,move stack[top] to next to get another one
+            // got a new solution,move stack[top] to next to get another one
 
             start = stack[top--] + 1;
         }
