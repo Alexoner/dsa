@@ -29,3 +29,19 @@ The RECURRENCE(or DIFFERENCE EQUATION or OPTIMAL SUBSTRUCTURE) comes in
 these forms:
     @1:F(n) and F(n-1)
     @2:Split the problem.
+
+
+Dynamic Programming Optimizations
+Name            Original        Sufficient      Original    Optimized
+                Recurrence      Condition       Complexity  Complexity
+=========            ==========
+Convex Hull-1
+
+
+Convex Hull-2
+
+
+Divide and Conquer
+
+
+Knuth

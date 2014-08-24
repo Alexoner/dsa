@@ -27,6 +27,11 @@ substructure property.
 
 #define min(x, y) (x) < (y) ? (x) : (y)
 
+/*
+ * Treat it as a variation of Matrix Chain Multiplication problem.
+ * Divide the string into two.
+ * Time Complexity:O(N^3).
+ */
 int minPalPartition(char *str)
 {
     if (str == NULL)
@@ -81,6 +86,10 @@ int minPalPartition(char *str)
     }
     return mincuts[0][n - 1];
 }
+
+/*
+ * Optimize the Dynamic Programming
+ */
 
 int main()
 {
