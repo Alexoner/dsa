@@ -31,6 +31,12 @@ substructure property.
  * Treat it as a variation of Matrix Chain Multiplication problem.
  * Divide the string into two.
  * Time Complexity:O(N^3).
+ * Recurrence:
+ *
+ *                  | 0,if str[i:j+1] is palindrome
+ *  mincuts[i][j] = |
+ *                  | min(mincuts[i][k] + mincuts[k + 1][j] + 1),where
+ *                  k varies from i to j-1
  */
 int minPalPartition(char *str)
 {
@@ -47,11 +53,7 @@ int minPalPartition(char *str)
 
     // use array pointer to allocate memory for large two-dimensional array.
     int(*mincuts)[n] = malloc(sizeof(int) * n * n);
-    /*int **mincuts = (int **)malloc(sizeof(int *) * n);*/
-    /*for (i = 0; i < n; i++)*/
-    /*mincuts[i] = (int *)malloc(sizeof(int) * n);*/
-    /*memset(mincuts, INT_MAX, sizeof(mincuts));*/
-    /*memset(mincuts, n, sizeof(mincuts));*/
+
     for (i = 0; i < n; i++)
         for (j = i; j < n; j++)
             mincuts[i][j] = n;
@@ -76,7 +78,7 @@ int minPalPartition(char *str)
             }
             else
             {
-                for (k = i; k <= j; k++)
+                for (k = i; k < j; k++)
                 {
                     mincuts[i][j] = min(mincuts[i][j],
                                         mincuts[i][k] + mincuts[k + 1][j] + 1);
@@ -89,7 +91,45 @@ int minPalPartition(char *str)
 
 /*
  * Optimize the Dynamic Programming
+ * Recurrence:
+ *
+ * palindrome[i][j]:str[i:j+1](index from i to j,inclusive) is or isn't
+ * palindrome
+ *                        | 1,if str[i] == str[j] && palindrome[i+1][j-1]
+ * palindrome[i][j] =     |
+ *                        | 0,otherwise
+ *
+ * mincuts[i]:minimum cuts of str[0:i+1]
+ *                  | 0,if str[0:i+1] is palindrome
+ *  mincuts[i] =    |
+ *                  | min(mincuts[j] 1),where
+ *                      str[j+1:i+1] is palindrome
  */
+int minPalPartition_opt(const char *str)
+{
+    int n = strlen(str), i, j, l;
+    int(*table)[n] = malloc(sizeof(int) * n * n);
+    int mincuts[n + 1];
+    for (i = 0; i < n; i++)
+    {
+        mincuts[i] = i;
+    }
+    // bottom-up dynamic programming.From the recurrence,we can see that
+    // i must go in decreasing order and j must go in increasing order.
+    // Or in stead,we can let a variable l,which is the substring length
+    // to go in increasing order,as with Matrix Chain Multiplication.
+    for (l = 1; l <= n; l++)
+        for (i = 0; i <= n - l; i++)
+        {
+            j = i + l - 1;
+            if (str[i] == str[j] && (j - i < 2 || table[i + 1][j - 1]))
+            {
+                table[i][j] = true;
+                mincuts[j] = min(mincuts[j], i ? (mincuts[i - 1] + 1) : 0);
+            }
+        }
+    return mincuts[n - 1];
+}
 
 int main()
 {
@@ -121,6 +161,7 @@ int main()
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     printf("Min cuts needed for Palindrome Partitioning is %d",
+           /*minPalPartition_opt(str));*/
            minPalPartition(str));
     return 0;
 }
