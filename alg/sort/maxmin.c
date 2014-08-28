@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int max_min(int *a, int n,
-            int *max, int *min)
+int max_min(int *a, int n, int *max, int *min)
 {
     int i;
     if (n == 0)
@@ -11,7 +10,7 @@ int max_min(int *a, int n,
     }
     if (n % 2 == 0)
     {
-        //length of the array is even
+        // length of the array is even
         if (a[0] > a[1])
         {
             *max = a[0];
@@ -26,7 +25,7 @@ int max_min(int *a, int n,
     }
     else
     {
-        //length is odd
+        // length is odd
         *max = *min = a[0];
         i = 1;
     }
@@ -47,21 +46,3 @@ int max_min(int *a, int n,
 
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

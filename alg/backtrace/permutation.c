@@ -92,7 +92,8 @@ void permute_nodup(char *a, int start, int end)
 // Driver program
 int main()
 {
-    char a[] = "ABAC";
+    /*char a[] = "ABAC";*/
+    char a[] = "112";
     permute_nodup(a, 0, strlen(a) - 1);
     return 0;
 }
