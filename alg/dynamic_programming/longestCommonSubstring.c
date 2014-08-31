@@ -59,11 +59,21 @@ int LCSubstring(char *x, char *y, int m, int n)
             else if (x[i - 1] == y[j - 1])
             {
                 LCSuff[i][j] = LCSuff[i - 1][j - 1] + 1;
-                length = MAX(length, LCSuff[i][j]);
+                /*length = MAX(length, LCSuff[i][j]);*/
+                if (length < LCSuff[i][j])
+                {
+                    length = LCSuff[i][j];
+                    end = i;
+                }
             }
             else
                 LCSuff[i][j] = 0;
         }
+
+    char substring[m];
+    strncpy(substring, x + end - length, length);
+    printf("Longest Common Substring of \"%s\" and \"%s\" \nis: \"%s\"\n", x, y,
+           substring);
     return length;
 }
 
