@@ -77,11 +77,11 @@ int lis_print_solution(int *a, int n)
     for (i = end, j = max_length - 1; i + 1 && j + 1; j--)
     {
         is[j] = i;
-        printf("%d ", a[i]);
+        /*printf("%d ", a[i]);*/
         for (; i + 1 && length[i] != length[is[j]] - 1; i--)
             ;
     }
-    printf("\n");
+    /*printf("\n");*/
     for (i = 0; i < max_length; i++)
         printf("%d ", a[is[i]]);
     printf("\n");
