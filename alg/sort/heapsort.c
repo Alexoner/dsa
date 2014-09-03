@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include "../utils.h"
 #include "../define.h"
-#define left(x) (2*(i))
-#define right(x) (2*(i)+1)
-#define parent(x) ((i)/2)
+#define left(x) (2 * (i))
+#define right(x) (2 * (i) + 1)
+#define parent(x) ((i) / 2)
 
-void max_heapify_recursion_int(int *a, int i) //array and the node index
+void max_heapify_recursion_int(int *a, int i) // array and the node index
 {
-    //to maintain the property of the max_heap (tree)
+    // to maintain the property of the max_heap (tree)
     int l, r, largest, tmp;
     l = left(i);
     r = right(i);
@@ -15,11 +15,12 @@ void max_heapify_recursion_int(int *a, int i) //array and the node index
         largest = l;
     else
         largest = i;
-    if (r <= heap_size && a[r - 1] > a[largest - 1]) //to select the biggest number
+    if (r <= heap_size &&
+        a[r - 1] > a[largest - 1]) // to select the biggest number
         largest = r;
     if (largest != i)
     {
-        //swap(a+i,a+largest);
+        // swap(a+i,a+largest);
         tmp = *(a + i - 1);
         *(a + i - 1) = *(a + largest - 1);
         *(a + largest - 1) = tmp;
@@ -44,7 +45,8 @@ void max_heapify_recursion_int(int *a, int i) //array and the node index
 /*largest = l;*/
 /*else*/
 /*largest = i;*/
-/*if (r <= nmemb && compare(base + r - 1 , base + largest - 1, priv) > 0) //to select the biggest number*/
+/*if (r <= nmemb && compare(base + r - 1 , base + largest - 1, priv) > 0) //to
+ * select the biggest number*/
 /*largest = r;*/
 /*if (largest != i)*/
 /*{*/
@@ -90,5 +92,3 @@ void heapsort_int(int *a)
         max_heapify_int(a, 1);
     }
 }
-
-
