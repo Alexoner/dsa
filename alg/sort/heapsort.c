@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include "../utils.h"
 #include "../define.h"
-#define left(x) (2 * (i))
-#define right(x) (2 * (i) + 1)
-#define parent(x) ((i) / 2)
+#define left(x) ((i) << 1)
+#define right(x) (((i) << 1) + 1)
+#define parent(x) ((i) >> 1)
 
 void max_heapify_recursion_int(int *a, int i) // array and the node index
 {
