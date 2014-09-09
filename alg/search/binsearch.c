@@ -1,6 +1,9 @@
 #include <stdio.h>
 /*#include "define.h"*/
 
+/*
+ * Time Complexity:O(log(N))
+ */
 int binsearch(int *a, int n, int key)
 {
     int low, high, mid;

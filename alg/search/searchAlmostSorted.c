@@ -1,5 +1,3 @@
-
-
 /*
  * Search in an almost sorted array
  *
