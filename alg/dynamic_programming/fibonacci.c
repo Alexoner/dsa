@@ -4,8 +4,8 @@
  *0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 141, ……..
  *In mathematical terms, the sequence Fn of Fibonacci numbers is defined by
  *the recurrence relation:
-    F(n) = F(n-1) + F(n-2)
-    with seed value F(0)=0,F(1)=1.
+ *   F(n) = F(n-1) + F(n-2)
+ *  with seed value F(0)=0,F(1)=1.
  */
 
 #include <stdio.h>
@@ -138,7 +138,7 @@ void power_opt(int F[2][2], int n)
 
     int M[2][2] = { { 1, 1 }, { 1, 0 } };
 
-    power(F, n / 2);
+    power_opt(F, n / 2);
     multiply(F, F);
 
     if (n % 2 != 0)
@@ -148,7 +148,7 @@ void power_opt(int F[2][2], int n)
 /*Driver Program to test above function*/
 int main(int argc, char **argv)
 {
-    int n = 9;
+    int n = 46;
     if (argc > 1)
         n = atoi(argv[1]);
     printf("%d", fib_matrix_opt(n));
