@@ -61,7 +61,7 @@ int binary_search_char(char *arr, int l, int r, char ch)
         else
             l = mid + 1;
     }
-    return -1;
+    return l - 1;
 }
 
 int reverse_chars(char *arr, int l, int r)
@@ -79,7 +79,10 @@ void findNext(char number[], int n)
     for (i = n - 2; i + 1 && number[i] >= number[i + 1]; i--)
         ;
     if (i == -1)
+    {
         printf("NO\n");
+        return;
+    }
     j = binary_search_char(number, i, n - 1, number[i]);
     swap(number + i, number + j);
     reverse_chars(number, i + 1, n - 1);
@@ -91,7 +94,8 @@ void findNext(char number[], int n)
 
 int main(int argc, char **argv)
 {
-    char digits[] = "534976";
+    /*char digits[] = "534976";*/
+    char digits[] = "4321";
     int n = strlen(digits);
     findNext(digits, n);
 
