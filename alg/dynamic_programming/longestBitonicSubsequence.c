@@ -131,13 +131,14 @@ int lbs_print_solution(int arr[], int n)
 
     for (i = 0; i < n; i++)
         printf("%d ", lis[i]);
-    printf("\npeak: %d,end: %d\n", peak, end);
+    printf("\n");
+    /*printf("\npeak: %d,end: %d\n", peak, end);*/
 
     int bs[max_lbs];
     bs[max_lbs - 1] = end;
-    /*for (i = max_lbs - 2; i + 1; i--)*/
-    /*{*/
     i = max_lbs - 2;
+
+    // navigate from end to peak to fill decreasing subsequence
     for (j = end - 1; j >= peak; j--)
     {
         if (lbs[j] == lbs[bs[i + 1]] - 1 && arr[j] > arr[bs[i + 1]])
@@ -148,7 +149,8 @@ int lbs_print_solution(int arr[], int n)
     }
 
     // j == peak - 1
-    printf("j: %d,lis[j]: %d\n", j, lis[j]);
+    /*printf("j: %d,lis[j]: %d\n", j, lis[j]);*/
+    // navigate from peak - 1 to fill increasing subsequence
     for (; i + 1 && j + 1; i--)
     {
         for (; j + 1 && lis[j] != lis[bs[i + 1]] - 1; j--)
@@ -174,9 +176,9 @@ int lbs_print_solution(int arr[], int n)
 
 int main(int argc, char **argv)
 {
-    int arr[] = { 0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15 };
+    /*int arr[] = { 0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15 };*/
     /*int arr[] = { 80, 60, 30, 40, 20, 10 };*/
-    /*int arr[] = { 1, -1, 3, 2 };*/
+    int arr[] = { 1, -1, 3, 2, -3 };
     /*int arr[] = { 1, 2, 3, 4, 5, 6 };*/
     int n = sizeof(arr) / sizeof(arr[0]);
     printf("Length of LBS is %d\n", lbs_print_solution(arr, n));
