@@ -36,7 +36,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX(a, b) (a) >= (b) ? (a) : (b)
+#define MAX(a, b) (a) > (b) ? (a) : (b)
 
 /* lbs() returns the length of the Longest Bitonic Subsequence in
     arr[] of size n. The function mainly creates two temporary arrays
@@ -68,8 +68,8 @@ int lbs(int arr[], int n)
         {
             if (arr[i] > arr[j])
             {
-                lis[i] = MAX(lis[j] + 1, lis[i]);
-                lbs[i] = MAX(lis[j] + 1, lbs[i]);
+                lis[i] = MAX(lis[i], lis[j] + 1);
+                lbs[i] = MAX(lbs[i], lis[j] + 1);
             }
             else if (arr[i] < arr[j])
             {
@@ -84,6 +84,86 @@ int lbs(int arr[], int n)
     return max_lbs;
 }
 
+int lbs_print_solution(int arr[], int n)
+{
+    int i, j;
+    int lis[n], lbs[n];
+    int max_lbs = 1, peak, end;
+    if (n == 0)
+    {
+        return 0;
+    }
+    /*lis[0] = lbs[0] = 1;*/
+    for (i = 0, peak = 0, end = 0; i < n; i++)
+    {
+        lis[i] = 1;
+        lbs[i] = 1;
+        for (j = 0; j < i; j++)
+        {
+            if (arr[i] > arr[j])
+            {
+                lis[i] = MAX(lis[j] + 1, lis[i]);
+                lbs[i] = MAX(lis[j] + 1, lbs[i]);
+
+                if (lbs[i] > max_lbs)
+                {
+                    max_lbs = lbs[i];
+                    /*printf("max_lbs: %d,j: %d,i: %d\n", max_lbs, j, i);*/
+                    end = i;
+                    peak = i;
+                }
+            }
+            else if (arr[i] < arr[j])
+            {
+                lbs[i] = MAX(lbs[j] + 1, lbs[i]);
+
+                if (lbs[i] > max_lbs)
+                {
+                    max_lbs = lbs[i];
+                    /*printf("max_lbs: %d,j: %d,i: %d\n", max_lbs, j, i);*/
+                    end = i;
+                    if (arr[peak] < arr[j])
+                        peak = j;
+                }
+            }
+        }
+    }
+
+    for (i = 0; i < n; i++)
+        printf("%d ", lis[i]);
+    printf("\npeak: %d,end: %d\n", peak, end);
+
+    int bs[max_lbs];
+    bs[max_lbs - 1] = end;
+    /*for (i = max_lbs - 2; i + 1; i--)*/
+    /*{*/
+    i = max_lbs - 2;
+    for (j = end - 1; j >= peak; j--)
+    {
+        if (lbs[j] == lbs[bs[i + 1]] - 1 && arr[j] > arr[bs[i + 1]])
+        {
+            bs[i] = j;
+            i--;
+        }
+    }
+
+    // j == peak - 1
+    printf("j: %d,lis[j]: %d\n", j, lis[j]);
+    for (; i + 1 && j + 1; i--)
+    {
+        for (; j + 1 && lis[j] != lis[bs[i + 1]] - 1; j--)
+            ;
+        bs[i] = j;
+    }
+
+    for (i = 0; i < max_lbs; i++)
+        printf("%d ", arr[bs[i]]);
+    printf("\n");
+    /*}*/
+
+    return max_lbs;
+}
+
 /* lbs() returns the length of the Longest Bitonic Subsequence in
     arr[] of size n. The function mainly creates two temporary arrays
     lis[] and lds[] and returns the maximum lis[i] + lds[i] - 1.
@@ -94,9 +174,11 @@ int lbs(int arr[], int n)
 
 int main(int argc, char **argv)
 {
-    /*int arr[] = { 0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15 };*/
-    int arr[] = { 80, 60, 30, 40, 20, 10 };
+    int arr[] = { 0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15 };
+    /*int arr[] = { 80, 60, 30, 40, 20, 10 };*/
+    /*int arr[] = { 1, -1, 3, 2 };*/
+    /*int arr[] = { 1, 2, 3, 4, 5, 6 };*/
     int n = sizeof(arr) / sizeof(arr[0]);
-    printf("Length of LBS is %d\n", lbs(arr, n));
+    printf("Length of LBS is %d\n", lbs_print_solution(arr, n));
     return 0;
 }
