@@ -19,14 +19,14 @@
 
 int counting_sort(int A[], int B[], int n, int k)
 {
-    int C[k];
+    int C[k + 1];
     int i, j;
-    for (i = 0; i < k; i++)
+    for (i = 0; i <= k; i++)
         C[i] = 0;
     for (j = 0; j < n; j++)
         C[A[j]] = C[A[j]] + 1;
     // C[i] now contains the number of elements equal to i.
-    for (i = 1; i < n; i++)
+    for (i = 1; i <= k; i++)
         C[i] = C[i] + C[i - 1];
     for (j = n - 1; j + 1; j--)
     {
