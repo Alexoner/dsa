@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 
+// Time Complexity:O(n)
 int counting_sort(int A[], int B[], int n, int k)
 {
     int C[k + 1];
@@ -28,6 +29,7 @@ int counting_sort(int A[], int B[], int n, int k)
     // C[i] now contains the number of elements equal to i.
     for (i = 1; i <= k; i++)
         C[i] = C[i] + C[i - 1];
+    // C[i] now contains the number of elements less than or equal to i.
     for (j = n - 1; j + 1; j--)
     {
         B[C[A[j]] - 1] = A[j];
