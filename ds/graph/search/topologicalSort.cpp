@@ -48,7 +48,7 @@ class Graph
 {
     int V; // No. of vertices
 
-    // Pointer to an array containg adjacency lists List
+    // Pointer to an array containing adjacency lists List
     list<int> *adj;
 
     // A function used by topologicalSort
