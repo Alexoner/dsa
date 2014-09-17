@@ -37,6 +37,7 @@ int oneInThrees2(int arr[], int n)
     int i;
     for (i = 0; i < n; i++)
     {
+        // both XOR and OR will do
         /*twos ^= ones & arr[i];*/
         twos |= ones & arr[i];
         ones ^= arr[i];
@@ -46,6 +47,24 @@ int oneInThrees2(int arr[], int n)
         twos &= mask;
     }
     return ones;
+}
+
+/*
+ *Following is another O(n) time complexity and O(1) extra space method
+suggested by aj. We can sum the bits in same positions for all the numbers and
+take modulo with 3. The bits for which sum is not multiple of 3, are the bits of
+number with single occurrence.
+Let us consider the example array {5, 5, 5, 8}. The 101, 101, 101, 1000
+Sum of first bits%3 = (1 + 1 + 1 + 0)%3 = 0;
+Sum of second bits%3 = (0 + 0 + 0 + 0)%0 = 0;
+Sum of third bits%3 = (1 + 1 + 1 + 0)%3 = 0;
+Sum of fourth bits%3 = (1)%3 = 1;
+Hence number which appears once is 1000
+*/
+int oneInThrees3(int arr[], int n)
+{
+    int result = 0;
+    return 0;
 }
 
 int main(int argc, char **argv)
