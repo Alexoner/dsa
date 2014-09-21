@@ -7,4 +7,13 @@
  * it. "BBBBB" and "BBCBB" are also palindromic subsequences of the given
  * sequence, but not the longest ones.
  *
+ * Algorithm:
+ * Dynamic Programming.
+ * Method 1:
+ * Maintain a table[i][j] to indicate the length of palindromic subsequence
+ * of string[i...j].
+ *
+ * Method 2:
+ * Reverse the string,find the longest common subsequence.
+ *
  */
