@@ -73,7 +73,7 @@ bool findPartiion(int arr[], int n)
 // Create a 2D array part[][] of size (sum/2 + 1)*(n+1),construct the
 // solution in bottom-up manner such that every filled entry has
 // following property :
-// part[i][j] = true if a subset arr[0...j-1] has sum equal to i/2,
+// part[i][j] = true if a subset arr[0...j-1] has sum equal to i,
 // otherwise false.
 // recurrence:
 //
