@@ -34,6 +34,8 @@
  * print contents of stack. Note that a vertex is pushed to stack only when
  * all of its adjacent vertices (and their adjacent vertices and so on)
  * are already in stack.
+ *
+ * Topological Sorting:Sorting by DFS finishing time stamp!
 */
 
 // A C++ program to print topological sorting of a DAG
