@@ -23,7 +23,7 @@ int ones2(int v)
     int num = 0;
     while ((unsigned int)v)
     {
-        v = v & (v - 1);
+        v &= (v - 1);
         num++;
     }
     return num;
@@ -31,7 +31,7 @@ int ones2(int v)
 
 int main(int argc, char **argv)
 {
-    int n = 6;
+    int n = -1;
     printf("number of 1s in binary representation of %d is: %d\n", n, ones2(n));
     return 0;
 }
