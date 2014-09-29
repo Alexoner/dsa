@@ -28,7 +28,7 @@ struct node
 
 int detectAndRemoveLoop(struct node *head)
 {
-    int k = 0;
+    int k = 0, i = 0;
     struct node *slow_p = NULL, *fast_p = NULL;
 
     // detect loop
@@ -43,6 +43,7 @@ int detectAndRemoveLoop(struct node *head)
         }
     }
 
+    // count the length of loop
     if (slow_p == fast_p)
     {
         // loop exists
@@ -57,7 +58,51 @@ int detectAndRemoveLoop(struct node *head)
     {
         return 0;
     }
+
+    // traverse to the start of the loop
+    slow_p = head;
+    for (i = 0, fast_p = head; i < k; i++)
+        fast_p = fast_p->next;
+    while (slow_p != fast_p)
+    {
+        slow_p = slow_p->next;
+        fast_p = fast_p->next;
+    }
+    // fast_p==slow_p== start of the loop
+    while (fast_p->next != slow_p)
+    {
+        fast_p = fast_p->next;
+    }
+    fast_p->next = NULL;
     return 1;
+}
+
+/* UTILITY FUNCTIONS */
+/* Given a reference (pointer to pointer) to the head
+  of a list and an int, pushes a new node on the front
+  of the list. */
+void push(struct node **head_ref, int new_data)
+{
+    /* allocate node */
+    struct node *new_node = (struct node *)malloc(sizeof(struct node));
+
+    /* put in the data  */
+    new_node->data = new_data;
+
+    /* link the old list off the new node */
+    new_node->next = (*head_ref);
+
+    /* move the head to point to the new node */
+    (*head_ref) = new_node;
+}
+
+void printList(struct node *node)
+{
+    while (node)
+    {
+        printf("%d ", node->data);
+        node = node->next;
+    }
 }
 
 // driver program
@@ -72,7 +117,7 @@ int main(int argc, char **argv)
     push(&head, 50);
 
     // create a loop
-    head->next->next->next->next = head->next->next;
+    head->next->next->next->next->next = head->next->next;
 
     detectAndRemoveLoop(head);
 
