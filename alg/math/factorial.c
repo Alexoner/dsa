@@ -1,4 +1,6 @@
-/* Trailing zeroes in a factorial of a number
+/* Problem 1
+ *
+ * Trailing zeroes in a factorial of a number
  *
  * Given an integer n,write a function that returns count of trailing
  * zeroes in n!.
@@ -31,6 +33,15 @@
  *
  *  Then trailing 0s in n! = count of 5s in prime factors of n!
  *                         = floor(n/5)+floor(n/25)+floor(n/125)+...
+ *
+ *
+ *
+ * Problem 2
+ * The position of the least significant 1 in binary representation
+ * Algorithm:
+ * Method 1:bit operation
+ * Method 2:
+ *  Number of 2s as prime factors,f(n!) = k + f(k!),k = n / 5
  */
 
 #include <stdio.h>
@@ -46,6 +57,17 @@ int trailingZerosInFactorial(int n)
     return count;
 }
 
+int lowestOne(int n)
+{
+    int count = 0;
+    while (n)
+    {
+        n /= 2;
+        count += n;
+    }
+    return count + 1;
+}
+
 int main(int argc, char **argv)
 {
     int n = 100;
@@ -53,6 +75,7 @@ int main(int argc, char **argv)
         n = atoi(argv[1]);
     printf("Count of trailing 0s in %d is %d \n", n,
            trailingZerosInFactorial(n));
+    printf("Lowest 1's position is: %d\n", lowestOne(100));
 
     return 0;
 }
