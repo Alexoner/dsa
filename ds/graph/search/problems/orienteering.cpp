@@ -77,3 +77,65 @@ Each row contains exactly the same number of letters as the width.
  * Output
  * Output the standard output,and put a return.
  */
+
+#include <stdio.h>
+#include <iostream>
+#include <string.h>
+
+class Orienteering
+{
+  public:
+    int nrows, ncols;
+    char (*map)[];
+    int ret;
+    int BFS(int x, int y); // x row,y col
+    void main();
+};
+
+// int Orienteering::BFS(int x, int y) { int visit[] ;return 0; }
+
+void Orienteering::main()
+{
+    // TODO: Implement this function
+    int W = 0, H = 0;
+    int i, j;
+    scanf("%d%d", &W, &H);
+    if (W <= 0 || H <= 0)
+    {
+        this->ret = -1;
+        return;
+    }
+
+    this->nrows = H;
+    this->ncols = W;
+    char map[H][W];
+    // this->map = map;
+
+    std::cout << H << "," << W << std::endl;
+    for (i = 0; i < H; i++)
+    {
+        for (j = 0; j < W; j++)
+        {
+            scanf("%s", &map[i][j]);
+            // printf("%d,%d:%c ", i, j, map[i][j]);
+        }
+    }
+
+    std::cout << map << std::endl;
+    for (i = 0; i < H; i++)
+    {
+        for (j = 0; j < W; j++)
+        {
+            printf("%c ", map[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+int main(int argc, char **argv)
+{
+    Orienteering o;
+    o.main();
+
+    return o.ret;
+}
