@@ -7,12 +7,19 @@ import Queue
 class Graph:
 
     def __init__(self, vertices, edges):
-        self.V = []     # list of vertex
-        self.E = []     # list of edge,
+        self.V = []     # list of vertex,iterable
+        self.E = []     # list of edge,iterable
 
         self.adj_mat = []   # adjacency matrix
+        self.adj = dict()       # adjacency-list representation
 
-        self.adj = []       # adjacency-list representation
+        # construct a graph from vertices and edges
+        self.V = vertices
+        self.edges = edges
+
+        for edge in edges:
+            self.adj.setdefault(edge[0], set())
+            self.adj[edge[0]].add(edge[1])
 
 
 time = 0
