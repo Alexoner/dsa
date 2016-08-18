@@ -63,6 +63,9 @@ void updateValueRecursion(int* st, int ss, int se, int si, int idx, int diff)
 
 void updateValue(int* arr, int* st, int n, int idx, int value)
 {
+    if( idx < 0 || idx >= n) {
+        return ;
+    }
     // the diff of segment sum
     int diff = value - arr[idx];
     updateValueRecursion(st, 0, n - 1, 0, idx, diff);
