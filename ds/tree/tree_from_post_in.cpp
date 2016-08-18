@@ -12,6 +12,52 @@ struct Node {
 
 /*
  *
+ *Given inorder and postorder traversals of a Binary Tree, construct the tree
+
+For example, if given inorder and postorder traversals are {4, 8, 2, 5, 1, 6, 3, 7} and {8, 4, 5, 2, 6, 7, 3, 1}  respectively, then your function should construct below tree.
+
+          1
+       /      \
+     2         3
+   /   \      /  \
+  4     5    6    7
+    \
+      8
+
+
+
+Input:
+The task is to complete the method which takes three arguments, one is an array that has inorder traversal, second is another array that has postorder traversal, third is size of two arrays (You may assume that both arrays are of same size).
+
+There are multiple test cases. For each test case, this method will be called individually.
+
+Output:
+The function should return root of constructed tree.
+
+Constraints:
+1 <=T<= 30
+1 <= Size of arrays <= 100
+1 <= Values in arrays <= 1000
+
+Example:
+Input:
+1
+8
+4 8 2 5 1 6 3 7
+8 4 5 2 6 7 3 1
+
+
+Output:
+1 2 4 8 5 3 6 7
+
+
+
+There is one test case.  The first line of input is number of elements in tree. Second and third lines are inorder and postorder traversals respectively.  Output is Preorder traversal.
+ *
+ */
+
+/*
+ *
  * ALGORITHM:
  *  1. Start from the root node which is explict in both pre-order and post-order
  *  traversal.
@@ -37,6 +83,7 @@ Node* buildTreeRecursive(int in[], int post[], int n)
     //(Node*)0
     //};
     //Node* root = &node;
+    // NOTE: need to allocate memory on heap instead of stack
     Node* root = node(rootData, (Node*)0, (Node*)0);
     int i = 0;
     for (i = 0; i < n && in[i] != rootData; ++i)
@@ -51,7 +98,7 @@ Node* buildTreeRecursive(int in[], int post[], int n)
     return root;
 }
 
-void traversePre(Node* tree)
+void preorder(Node* tree)
 {
     static int isRoot = 1;
     if (tree) {
@@ -62,12 +109,12 @@ void traversePre(Node* tree)
             std::cout << tree->data << " ";
         }
         isRoot = 0;
-        traversePre(tree->left);
-        traversePre(tree->right);
+        preorder(tree->left);
+        preorder(tree->right);
     }
 }
 
-// TODO: non-recursive algorithm heee
+// TODO: non-recursive (iterative) algorithm here
 
 Node* buildTree(int in[], int post[], int n)
 {
@@ -82,7 +129,7 @@ Node* buildTree(int in[], int post[], int n)
     std::cout << "\n";
 
     Node* tree = buildTreeRecursive(in, post, n);
-    traversePre(tree);
+    preorder(tree);
     std::cout << "\n";
     return tree;
 }

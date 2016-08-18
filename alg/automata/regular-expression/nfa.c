@@ -7,7 +7,7 @@
  * See also http://swtch.com/~rsc/regexp/ and
  * Thompson, Ken.  Regular Expression Search Algorithm,
  * Communications of the ACM 11(6) (June 1968), pp. 419-422.
- * 
+ *
  * Copyright (c) 2007 Russ Cox.
  * Can be distributed under the MIT license, see bottom of file.
  */
@@ -31,7 +31,7 @@ re2post(char *re)
 		int nalt;
 		int natom;
 	} paren[100], *p;
-	
+
 	p = paren;
 	dst = buf;
 	nalt = 0;
@@ -46,6 +46,7 @@ re2post(char *re)
 				*dst++ = '.';
 			}
 			if(p >= paren+100)
+                // maximum regular expression length
 				return NULL;
 			p->nalt = nalt;
 			p->natom = natom;
@@ -128,7 +129,7 @@ State*
 state(int c, State *out, State *out1)
 {
 	State *s;
-	
+
 	nstate++;
 	s = malloc(sizeof *s);
 	s->lastlist = 0;
@@ -161,7 +162,7 @@ frag(State *start, Ptrlist *out)
 }
 
 /*
- * Since the out pointers in the list are always 
+ * Since the out pointers in the list are always
  * uninitialized, we use the pointers themselves
  * as storage for the Ptrlists.
  */
@@ -176,7 +177,7 @@ Ptrlist*
 list1(State **outp)
 {
 	Ptrlist *l;
-	
+
 	l = (Ptrlist*)outp;
 	l->next = NULL;
 	return l;
@@ -187,7 +188,7 @@ void
 patch(Ptrlist *l, State *s)
 {
 	Ptrlist *next;
-	
+
 	for(; l; l=next){
 		next = l->next;
 		l->s = s;
@@ -199,7 +200,7 @@ Ptrlist*
 append(Ptrlist *l1, Ptrlist *l2)
 {
 	Ptrlist *oldl1;
-	
+
 	oldl1 = l1;
 	while(l1->next)
 		l1 = l1->next;
@@ -217,7 +218,7 @@ post2nfa(char *postfix)
 	char *p;
 	Frag stack[1000], *stackp, e1, e2, e;
 	State *s;
-	
+
 	// fprintf(stderr, "postfix: %s\n", postfix);
 
 	if(postfix == NULL)
@@ -373,7 +374,7 @@ main(int argc, char **argv)
 		fprintf(stderr, "usage: nfa regexp string...\n");
 		return 1;
 	}
-	
+
 	post = re2post(argv[1]);
 	if(post == NULL){
 		fprintf(stderr, "bad regexp %s\n", argv[1]);
@@ -385,7 +386,7 @@ main(int argc, char **argv)
 		fprintf(stderr, "error in post2nfa %s\n", post);
 		return 1;
 	}
-	
+
 	l1.s = malloc(nstate*sizeof l1.s[0]);
 	l2.s = malloc(nstate*sizeof l2.s[0]);
 	for(i=2; i<argc; i++)
@@ -403,11 +404,11 @@ main(int argc, char **argv)
  * sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so,
  * subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall
  * be included in all copies or substantial portions of the
  * Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
  * KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
  * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
