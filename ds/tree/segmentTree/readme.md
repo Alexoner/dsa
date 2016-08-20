@@ -2,7 +2,8 @@
 1. Leaf Nodes are the elements of the input array.
 2. Each internal node represents some merging of the leaf nodes. The merging may be different for different problems. For this problem, merging is sum of leaves under a node.
 
-An ARRAY REPRESENTATION of tree is used to represent Segment Trees. For each node at index i, the left child is at index 2*i+1, right child at 2*i+2 and the parent is at floor((i-1) / 2).
+An ARRAY REPRESENTATION of tree is used to represent Segment Trees. Recursive relation between parent and child indexes must be maintained. 
+For each node at index i, the left child is at index 2*i+1, right child at 2*i+2 and the parent is at floor((i-1) / 2).
 
 
 A Full Binary Tree with n leaves has n-1 internal nodes.

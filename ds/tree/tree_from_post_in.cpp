@@ -119,14 +119,15 @@ void preorder(Node* tree)
 Node* buildTree(int in[], int post[], int n)
 {
     // Your code here
-    for (int i = 0; i < n; ++i) {
-        std::cout << in[i] << " ";
-    }
-    std::cout << "\n";
-    for (int i = 0; i < n; ++i) {
-        std::cout << post[i] << " ";
-    }
-    std::cout << "\n";
+    // DEBUG:
+    //for (int i = 0; i < n; ++i) {
+        //std::cout << in[i] << " ";
+    //}
+    //std::cout << "\n";
+    //for (int i = 0; i < n; ++i) {
+        //std::cout << post[i] << " ";
+    //}
+    //std::cout << "\n";
 
     Node* tree = buildTreeRecursive(in, post, n);
     preorder(tree);
