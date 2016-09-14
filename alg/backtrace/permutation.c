@@ -9,11 +9,12 @@
 
 /*
  * Solution:
- * @1:Backtracking.
+ * @1:Backtracking & recursion.
  * 对于包含n个元素的数组,先确定第一位置的元素，第一个位置有n中可能(每次把
  * 后面的元素和第一个元素交换)，然后求子数组[2…n]的全排列。由于一个数列的
  * 总共有n！个排列，因此时间复杂度为O（n！）
- * @1:Dynamic Programming.
+ *
+ * @2:Dynamic Programming.
  */
 
 #include <stdio.h>
