@@ -51,8 +51,10 @@ Preprocessing can be done with dynamic programming procedure.
 // extra space and O(n*n) preprocessing time.
 //#include<bits/stdc++.h>
 #include <iostream>
+#include <math.h>
+
 using namespace std;
-#define MAX 500
+#define MAX 20
 #define min(x, y) (x) <= (y) ? (x) : (y)
 
 // lookup[i][j] is going to store index of minimum value in
@@ -79,7 +81,7 @@ void preprocess_lookup_table(int arr[], int n)
     }
 }
 
-int query(int arr[], int left, int right)
+int query_lookup_table(int arr[], int left, int right)
 {
     return lookup[left][right];
 }
@@ -98,12 +100,52 @@ int RMQ_lookup_table(int arr[], int n, Query *queries, int m)
         } else {
             // Print sum of current query range
             cout << "Minimum of [" << left << ", "
-                 << right << "] is "  << query(arr, left, right) << endl;
+                 << right << "] is "  << query_lookup_table(arr, left, right) << endl;
         }
     }
     return 0;
 }
 
+void preprocess_sparse_table(int arr[], int n)
+{
+    for (int i = 0; i < n; i++) {
+        lookup[i][0] = arr[i];
+    }
+    for(int j = 1; (1 << j) <= n; ++j) {
+        for (int i = 0; i + (1 << j) - 1 < n; i++) {
+            lookup[i][j] = min(lookup[i][j - 1],
+                    lookup[i + (1 << (j - 1))][j - 1]);
+        }
+    }
+}
+
+int query_sparse_table(int arr[], int left, int right)
+{
+    // log length
+    int l = (int)log2(right - left + 1);
+    //cout << left << right<< l << right - ( 1 << l) + 1 << endl;
+    return min(lookup[left][l],
+            lookup[right - (1 << l) + 1][l]);
+}
+
+int RMQ_sparse_table(int arr[], int n, Query *queries, int m)
+{
+    // Fill lookup table for all possible input queries
+    preprocess_sparse_table(arr, n);
+    // One by one compute sum of all queries
+    for (int i = 0; i < m; ++i) {
+        // Left and right boundaries of current range
+        int left = queries[i].L, right = queries[i].R;
+        if (!(left >= 0 && left <= right && right < n)) {
+            return -1;
+        } else {
+            // Print sum of current query range
+            cout << "Minimum of [" << left << ", "
+                 << right << "] is "  << query_sparse_table(arr, left, right) << endl;
+        }
+    }
+    return 0;
+}
 
 // Driver program
 int main()
@@ -113,5 +155,6 @@ int main()
     Query q[] = {{0, 4}, {4, 7}, {7, 8}};
     int m = sizeof(q)/sizeof(q[0]);
     RMQ_lookup_table(a, n, q, m);
+    RMQ_sparse_table(a, n, q, m);
     return 0;
 }
