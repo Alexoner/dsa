@@ -4,10 +4,6 @@ data structure:
     singly linked list,doubly circular linked list,set,queue,stack,hash table.
     binary tree.
 
-    These data structures are implemented as containers to provide 
-a library for C.
-
-
 algorithms:
 
 1 sort:

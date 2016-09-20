@@ -35,3 +35,9 @@ The following picture explains construction of trie using keys given in the exam
 In the picture, every character is of type trie_node_t. For example, the root is of type trie_node_t, and it’s children a, b and t are filled, all other nodes of root will be NULL. Similarly, “a” at the next level is having only one child (“n”), all other children are NULL. The leaf nodes are in blue.
 
 Insert and search costs O(key_length), however the memory requirements of trie is O(ALPHABET_SIZE * key_length * N) where N is number of keys in trie. There are efficient representation of trie nodes (e.g. compressed trie, ternary search tree, etc.) to minimize memory requirements of trie.
+
+During delete operation we delete the key in bottom up manner using recursion. The following are possible conditions when deleting key from trie,
+    1. Key may not be there in trie. Delete operation should not modify trie.
+    2. Key present as unique key (no part of key contains another key (prefix), nor the key itself is prefix of another key in trie). Delete all the nodes.
+    3. Key is prefix key of another long key in trie. Unmark the leaf node.
+    4. Key present in trie, having atleast one other key as prefix key. Delete nodes from end of key until first leaf node of longest prefix key.
