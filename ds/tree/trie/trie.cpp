@@ -80,6 +80,7 @@ void insert(TrieNode* root, const char* key)
     int index;
 
     TrieNode* pCrawl = root;
+    printf("INSERT %s\n", key);
     for (level = 0; level < length; ++level) {
         index = CHAR_TO_INDEX(key[level]);
         if (!pCrawl->children[index]) {
@@ -112,20 +113,28 @@ bool search(TrieNode* root, const char* key)
     return (level == length && pCrawl && pCrawl->isLeaf);
 }
 
-bool hasBranches(struct TrieNode *trieNode)
+bool hasChild(struct TrieNode *trieNode, char ch)
+{
+    return trieNode && trieNode->children[CHAR_TO_INDEX(ch)];
+}
+
+int numberOfChildren(struct TrieNode *trieNode)
 {
     if (!trieNode) {
         return false;
     }
-    int i;
-    for (i = 0; i < ALPHABET_SIZE && !trieNode->children[i]; ++i);
-
-    return i != ALPHABET_SIZE;
+    int i, j;
+    for (i = 0, j = 0; i < ALPHABET_SIZE; ++i) {
+        if (trieNode->children[i]) {
+            j++;
+        }
+    }
+    return j;
 }
 
-bool hasChild(struct TrieNode *trieNode, char ch)
+bool hasBranches(struct TrieNode *trieNode)
 {
-    return trieNode && trieNode->children[CHAR_TO_INDEX(ch)];
+    return numberOfChildren(trieNode);
 }
 
 bool deleteRecursion(struct TrieNode *pCrawl, const char key[], int level)
@@ -140,6 +149,8 @@ bool deleteRecursion(struct TrieNode *pCrawl, const char key[], int level)
      * bool, indicates whether the child node can be deleted in the key removing
      * process
      */
+
+    // key doesn't exist, so this child pointer to node is NULL
     if (!pCrawl) {
         return false;
     }
@@ -149,22 +160,23 @@ bool deleteRecursion(struct TrieNode *pCrawl, const char key[], int level)
 
     // base case
     if (level == len) {
-        // the leaf node has no branches, in which case it can be
-        // deleted, and it's leaf
+        // the leaf node has no branches, in which case it can be deleted
         if (pCrawl->isLeaf) {
             eligible = !hasBranches(pCrawl);
             // mark as not leaf to "softly" delete the key
             pCrawl->isLeaf = false;
         }
+        // if the node is not leaf, then the key doesn't exist in the trie tree
     } else { // recursion
-        // key doesn't exist, so this child pointer to node is NULL
         bool childEligible = deleteRecursion(pCrawl->children[index], key, level + 1);
         if (childEligible) {
             FREE(pCrawl->children[index]);
             //printf("pCrawl->child: %d, char: %c, level: %d, len: %d\n",
                     //pCrawl->children[index] != NULL,key[level], level, len);
         }
-        eligible = childEligible && !pCrawl->isLeaf;
+        // current node is eligible to delete if and only if it's not leaf and has
+        // no more children
+        eligible = childEligible && !pCrawl->isLeaf && !numberOfChildren(pCrawl);
     }
 
     return eligible;
@@ -182,7 +194,7 @@ void deleteKey(struct Trie* pTrie, const char key[])
      *
      * Method 1: RECURSION
      * A node is eligible only if its descendants are eligible and this node is not
-     * one of another key's nodes.
+     * part of another key's nodes. Being part of some key means it's a leaf or has children.
      *
      * Method 2: ITERATION
      * A pointer p to keep track of last node that contains branches (multiple valid children).
@@ -191,6 +203,7 @@ void deleteKey(struct Trie* pTrie, const char key[])
      */
     int len = strlen(key);
 
+    printf("DELETE %s\n", key);
     if (len) {
         deleteRecursion(pTrie->root, key, 0);
     }
@@ -202,7 +215,7 @@ int main()
 {
     // Input keys (use only 'a' through 'z' and lower case)
     char keys[][8] = { "the", "a", "there", "answer", "any",
-        "by", "bye", "their", "she", "sells", "sea", "shore", "sheer" };
+        "by", "bye", "their", "she", "sells", "sea", "shore", "sheer", "apple", "apply" };
     char output[][32] = { "Not present in trie", "Present in trie" };
 
     struct TrieNode *root = new TrieNode();
@@ -211,7 +224,6 @@ int main()
     unsigned long i;
     for (i = 0; i < ARRAY_SIZE(keys); i++) {
         insert(root, keys[i]);
-        printf("inserted %s\n", keys[i]);
     }
 
     // search for different keys
@@ -219,16 +231,24 @@ int main()
     printf("%s --- %s\n", "these", output[search(root, "these")]);
     printf("%s --- %s\n", "their", output[search(root, "their")]);
     printf("%s --- %s\n", "thaw", output[search(root, "thaw")]);
+    printf("%s --- %s\n", "by", output[search(root, "by")]);
+    printf("%s --- %s\n", "bye", output[search(root, "bye")]);
+    printf("%s --- %s\n", "she", output[search(root, "she")]);
+    printf("%s --- %s\n", "sheer", output[search(root, "sheer")]);
+    printf("%s --- %s\n", "apple", output[search(root, "apple")]);
+    printf("%s --- %s\n", "apply", output[search(root, "apply")]);
 
-    printf("%s %s\n", "she", search(root, "she") ? "Present in trie" : "Not present in trie");
-    deleteKey(pTrie, "sheer");
     deleteKey(pTrie, "she");
-    printf("%s %s\n", "she", search(root, "she") ? "Present in trie" : "Not present in trie");
-    printf("%s %s\n", "sheer", search(root, "sheer") ? "Present in trie" : "Not present in trie");
+    printf("%s --- %s\n", "she", output[search(root, "she")]);
+    printf("%s --- %s\n", "sheer", output[search(root, "sheer")]);
 
-    printf("%s %s\n", "by", search(root, "by") ? "Present in trie" : "Not present in trie");
-    deleteKey(pTrie, "by");
-    printf("%s %s\n", "by", search(root, "by") ? "Present in trie" : "Not present in trie");
+    deleteKey(pTrie, "bye");
+    printf("%s --- %s\n", "by", output[search(root, "by")]);
+    printf("%s --- %s\n", "bye", output[search(root, "bye")]);
+
+    deleteKey(pTrie, "apple");
+    printf("%s --- %s\n", "apple", output[search(root, "apple")]);
+    printf("%s --- %s\n", "apply", output[search(root, "apply")]);
 
     return 0;
 }
