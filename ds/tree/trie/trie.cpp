@@ -61,25 +61,39 @@ struct TrieNode {
 
 // trie tree abstract data type
 struct Trie {
+
     struct TrieNode* root;
     int count;
 
-    Trie(TrieNode* root)
+    Trie()
     {
-        this->root = root;
+        this->root = new TrieNode();
         this->count = 0;
     }
+
+    void insert(const char *key);
+    bool search(const char *key);
+    void deleteKey(const char key[]);
+    static bool deleteRecursion(struct TrieNode *pCrawl, const char key[], int level);
+    static bool deleteIteration(struct Trie *pTrie, const char key[]);
+    // TODO: keys that start with
+    char* startsWith(const char *key);
+
+    static bool hasChild(struct TrieNode *trieNode, char ch);
+    static int numberOfChildren(struct TrieNode *trieNode);
+    static bool hasBranches(struct TrieNode *trieNode);
+
 };
 
 // If not present, inserts key into trie
 // If the key is prefix of trie node, just marks leaf node
-void insert(TrieNode* root, const char* key)
+void Trie::insert(const char* key)
 {
     int level;
     int length = strlen(key);
     int index;
 
-    TrieNode* pCrawl = root;
+    TrieNode* pCrawl = this->root;
     printf("INSERT %s\n", key);
     for (level = 0; level < length; ++level) {
         index = CHAR_TO_INDEX(key[level]);
@@ -94,12 +108,12 @@ void insert(TrieNode* root, const char* key)
     pCrawl->isLeaf = true;
 }
 
-bool search(TrieNode* root, const char* key)
+bool Trie::search(const char* key)
 {
     int level;
     int length = strlen(key);
     int index;
-    TrieNode* pCrawl = root;
+    TrieNode* pCrawl = this->root;
 
     for (level = 0; level < length; ++level) {
         index = CHAR_TO_INDEX(key[level]);
@@ -113,12 +127,12 @@ bool search(TrieNode* root, const char* key)
     return (level == length && pCrawl && pCrawl->isLeaf);
 }
 
-bool hasChild(struct TrieNode *trieNode, char ch)
+bool Trie::hasChild(struct TrieNode *trieNode, char ch)
 {
     return trieNode && trieNode->children[CHAR_TO_INDEX(ch)];
 }
 
-int numberOfChildren(struct TrieNode *trieNode)
+int Trie::numberOfChildren(struct TrieNode *trieNode)
 {
     if (!trieNode) {
         return false;
@@ -132,12 +146,12 @@ int numberOfChildren(struct TrieNode *trieNode)
     return j;
 }
 
-bool hasBranches(struct TrieNode *trieNode)
+bool Trie::hasBranches(struct TrieNode *trieNode)
 {
     return numberOfChildren(trieNode);
 }
 
-bool deleteRecursion(struct TrieNode *pCrawl, const char key[], int level)
+bool Trie::deleteRecursion(struct TrieNode *pCrawl, const char key[], int level)
 {
     /*
      * params
@@ -182,12 +196,13 @@ bool deleteRecursion(struct TrieNode *pCrawl, const char key[], int level)
     return eligible;
 }
 
-void deleteIteration(struct Trie *pTrie, const char key[])
+bool Trie::deleteIteration(struct Trie *pTrie, const char key[])
 {
-    return;
+    // TODO: delete a key iteratively using stack data structure
+    return true;
 }
 
-void deleteKey(struct Trie* pTrie, const char key[])
+void Trie::deleteKey(const char key[])
 {
     /**
      * Cut the TAIL. The tail is the longest path ending with an edge and is without branches
@@ -205,7 +220,7 @@ void deleteKey(struct Trie* pTrie, const char key[])
 
     printf("DELETE %s\n", key);
     if (len) {
-        deleteRecursion(pTrie->root, key, 0);
+        deleteRecursion(this->root, key, 0);
     }
     return;
 }
@@ -218,37 +233,36 @@ int main()
         "by", "bye", "their", "she", "sells", "sea", "shore", "sheer", "apple", "apply" };
     char output[][32] = { "Not present in trie", "Present in trie" };
 
-    struct TrieNode *root = new TrieNode();
-    struct Trie *pTrie = new Trie(root);
+    struct Trie *pTrie = new Trie();
     // Construct tree
     unsigned long i;
     for (i = 0; i < ARRAY_SIZE(keys); i++) {
-        insert(root, keys[i]);
+        pTrie->insert(keys[i]);
     }
 
     // search for different keys
-    printf("%s --- %s\n", "the", output[search(root, "the")]);
-    printf("%s --- %s\n", "these", output[search(root, "these")]);
-    printf("%s --- %s\n", "their", output[search(root, "their")]);
-    printf("%s --- %s\n", "thaw", output[search(root, "thaw")]);
-    printf("%s --- %s\n", "by", output[search(root, "by")]);
-    printf("%s --- %s\n", "bye", output[search(root, "bye")]);
-    printf("%s --- %s\n", "she", output[search(root, "she")]);
-    printf("%s --- %s\n", "sheer", output[search(root, "sheer")]);
-    printf("%s --- %s\n", "apple", output[search(root, "apple")]);
-    printf("%s --- %s\n", "apply", output[search(root, "apply")]);
+    printf("%s --- %s\n", "the", output[pTrie->search("the")]);
+    printf("%s --- %s\n", "these", output[pTrie->search("these")]);
+    printf("%s --- %s\n", "their", output[pTrie->search("their")]);
+    printf("%s --- %s\n", "thaw", output[pTrie->search("thaw")]);
+    printf("%s --- %s\n", "by", output[pTrie->search("by")]);
+    printf("%s --- %s\n", "bye", output[pTrie->search("bye")]);
+    printf("%s --- %s\n", "she", output[pTrie->search("she")]);
+    printf("%s --- %s\n", "sheer", output[pTrie->search("sheer")]);
+    printf("%s --- %s\n", "apple", output[pTrie->search("apple")]);
+    printf("%s --- %s\n", "apply", output[pTrie->search("apply")]);
 
-    deleteKey(pTrie, "she");
-    printf("%s --- %s\n", "she", output[search(root, "she")]);
-    printf("%s --- %s\n", "sheer", output[search(root, "sheer")]);
+    pTrie->deleteKey("she");
+    printf("%s --- %s\n", "she", output[pTrie->search("she")]);
+    printf("%s --- %s\n", "sheer", output[pTrie->search("sheer")]);
 
-    deleteKey(pTrie, "bye");
-    printf("%s --- %s\n", "by", output[search(root, "by")]);
-    printf("%s --- %s\n", "bye", output[search(root, "bye")]);
+    pTrie->deleteKey("bye");
+    printf("%s --- %s\n", "by", output[pTrie->search("by")]);
+    printf("%s --- %s\n", "bye", output[pTrie->search("bye")]);
 
-    deleteKey(pTrie, "apple");
-    printf("%s --- %s\n", "apple", output[search(root, "apple")]);
-    printf("%s --- %s\n", "apply", output[search(root, "apply")]);
+    pTrie->deleteKey("apple");
+    printf("%s --- %s\n", "apple", output[pTrie->search("apple")]);
+    printf("%s --- %s\n", "apply", output[pTrie->search("apply")]);
 
     return 0;
 }
