@@ -1,17 +1,17 @@
-C data structure and algorithm library
+# C data structure and algorithm implementation
 
-data structure:
+## data structure:
     singly linked list,doubly circular linked list,set,queue,stack,hash table.
     binary tree.
 
-algorithms:
+## algorithms:
 
-1 sort:
+1. sort:
     array:bubble sort,quick sort,merge sort
     linked list:merge sort
 
-search:
+2. search:
 
 
-dynamic programming:
+3. dynamic programming:
 rod cutting problem,matrix chain order,longest common subsequence.

@@ -106,6 +106,8 @@ int RMQ_lookup_table(int arr[], int n, Query *queries, int m)
     return 0;
 }
 
+// C++ program to do range minimum query in O(1) time with O(n*logn)
+// extra space and O(n*logn) preprocessing time.
 void preprocess_sparse_table(int arr[], int n)
 {
     for (int i = 0; i < n; i++) {

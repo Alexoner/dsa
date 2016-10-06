@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <list>
+#include <stack>
 
 using namespace std;
 
@@ -22,11 +23,12 @@ class Graph
     int V;          // NO. of vertices
     list<int> *adj; // Pointer to an array containing adjacency lists
     void DFSVisit(int v, bool visited[]);
+    void DFSIterative(int v, bool visited[]);
 
   public:
     Graph(int V);               // Constructor
     void addEdge(int v, int w); // function to add an edge to graph
-    void DFS();                 // prints DFS traversal of the complete graph
+    void DFS(bool iterative);   // prints DFS traversal of the complete graph
 };
 
 Graph::Graph(int V) : V(V)
@@ -55,7 +57,7 @@ void Graph::DFSVisit(int v, bool visited[])
 
 // The function to do DFS traversal.It uses recursive DFSVisit()
 // Time Complexity:O(V+E)
-void Graph::DFS()
+void Graph::DFS(bool iterative)
 {
     // Mark all the vertices as not visited
     bool *visited = new bool[V];
@@ -65,8 +67,46 @@ void Graph::DFS()
     // Call the recursive helper function to print DFS traversal
     // starting from all vertices one by one
     for (int i = 0; i < V; i++)
-        if (!visited[i])
-            DFSVisit(i, visited);
+        if (!visited[i]) {
+            if (iterative) {
+                DFSIterative(i, visited);
+            } else {
+                DFSVisit(i, visited);
+            }
+        }
+}
+
+
+// iterative depth-first search all vertices reachable from 'v',
+// implemented with stack
+void Graph::DFSIterative(int v, bool visited[])
+{
+    // iteratively depth-first search
+    // initialize the stack
+    stack<int> stack;
+    stack.push(v);
+    visited[v] = true;
+
+    // 'i' will be used to get all adjacent vertices
+    // of a vertex
+    list<int>::iterator i;
+
+    while(!stack.empty()) {
+        // Pop a vertex from stack and mark it visited, print it
+        int vertex = stack.top();
+        visited[vertex] = true;
+        cout << vertex << " ";
+        stack.pop();
+
+        // Get all adjacent vertices of the popped vertex s
+        // If a adjacent has not been visited, then push it to the stack
+        for(i = adj[vertex].begin(); i != adj[vertex].end(); ++i) {
+            if (!visited[*i]) {
+                stack.push(*i);
+            }
+        }
+    }
+
 }
 
 int main()
@@ -80,8 +120,10 @@ int main()
     g.addEdge(2, 3);
     g.addEdge(3, 3);
 
-    cout << "Following is Depth First Traversal (starting from vertex 2)\n";
-    g.DFS();
+    cout << "RECURSION. Following is Depth First Traversal (starting from vertex 2)\n";
+    g.DFS(false);
+    cout << "\nITERATION. Following is Depth First Traversal (starting from vertex 2)\n";
+    g.DFS(true);
 
     return 0;
 }
