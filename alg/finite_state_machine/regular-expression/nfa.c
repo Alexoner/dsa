@@ -1,6 +1,6 @@
 /*
  * Regular expression implementation.
- * Supports only ( | ) * + ?.  No escapes.
+ * Supports only "( | ) . * + ?".  No escapes.
  * Compiles to NFA and then simulates NFA
  * using Thompson's algorithm.
  *
@@ -17,6 +17,8 @@
 #include <string.h>
 #include <assert.h>
 #include <unistd.h>
+
+#define CATENATE_SYMBOL  '\xFF'
 
 #pragma mark - convert regular expression to NFA
 
@@ -61,7 +63,7 @@ re2post(char *re)
 		case '(':
 			if(natom > 1){
 				--natom;
-				*dst++ = '.';
+				*dst++ = CATENATE_SYMBOL;
 			}
 			// maximum regular expression length
 			if(p >= paren+100)
@@ -80,7 +82,7 @@ re2post(char *re)
 			if(natom == 0)
 				return NULL;
 			while(--natom > 0)
-				*dst++ = '.';
+				*dst++ = CATENATE_SYMBOL;
 			for(; nalt > 0; nalt--)
 				*dst++ = '|';
 			// POP STACK
@@ -94,7 +96,7 @@ re2post(char *re)
 			if(natom == 0)
 				return NULL;
 			while(--natom > 0)
-				*dst++ = '.';
+				*dst++ = CATENATE_SYMBOL;
 			nalt++;
 			break;
 		case '*':
@@ -109,7 +111,7 @@ re2post(char *re)
 			//maybe insert CONCATENATION
 			if(natom > 1){
 				--natom;
-				*dst++ = '.';
+				*dst++ = CATENATE_SYMBOL;
 			}
 			*dst++ = *pre;
 			natom++;
@@ -119,7 +121,7 @@ re2post(char *re)
 	if(p != paren)
 		return NULL;
 	while(--natom > 0)
-		*dst++ = '.';
+		*dst++ = CATENATE_SYMBOL;
 	for(; nalt > 0; nalt--)
 		*dst++ = '|';
 	*dst = 0;
@@ -127,7 +129,7 @@ re2post(char *re)
 	return buf;
 }
 
-#pragma mark - REPRESENTATION
+#pragma mark - REPRESENTATION and CONSTRUCTION of NFA
 
 /*
  * Represents an NFA state plus zero or one or two arrows exiting.
@@ -137,8 +139,8 @@ re2post(char *re)
  */
 enum
 {
-	Match = 256,
-	Split = 257
+	Match = 256,	// must be greater than 255
+	Split = 0xFE,	// must be greater than 255
 };
 
 /*
@@ -283,7 +285,7 @@ post2nfa(char *postfix)
 			s = state(*p, NULL, NULL);
 			push(frag(s, list1(&s->out)));
 			break;
-		case '.':	/* catenate */
+		case CATENATE_SYMBOL:	/* catenate */
 			e2 = pop();
 			e1 = pop();
 			patch(e1.out, e2.start);
@@ -330,7 +332,7 @@ post2nfa(char *postfix)
 /* The simulation requires tracking State sets, which are stored as a simple
  * array list.
  *
- * This is a following Directed Graph process.
+ * This is following the Directed GRAPH.
  */
 
 typedef struct List List;
@@ -420,9 +422,10 @@ step(List *clist, int c, List *nlist)
 	nlist->n = 0;
 	for(i=0; i<clist->n; i++){
 		s = clist->s[i];
-		// an EVENT that character c is received triggers the STATE TRANSITION
 		/*printf("stepping s->c: %x, c: %x, %d\n", s->c, c, (s->c - c));*/
-		if(s->c == c)
+		// s->c == '.' represents any character
+		// an EVENT that character c is received triggers the STATE TRANSITION
+		if(s->c == c || s->c == '.')
 			addstate(nlist, s->out);
 	}
 }
@@ -457,6 +460,9 @@ match(State *start, char *s)
 bool
 rematch(char *re, char *s)
 {
+	/*fprintf(stdout, "%ld, %ld, %d\n", strlen(re), strlen(s), !strlen(re) && !strlen(s) );*/
+	if (!strlen(re) )
+		return !strlen(s);
 	char *post = re2post(re);
 	State *start = post2nfa(post);
 
@@ -470,17 +476,25 @@ rematch(char *re, char *s)
 
 void test()
 {
+	assert(!rematch("abc", "abx"));
+	assert(rematch(".?", ""));
+	assert(rematch(".*", ""));
+	assert(!rematch("", "asd"));
 	assert(rematch("a", "a"));
 	/*assert(rematch("你*好", "好"));*/
-	assert(!rematch("abc", "abx"));
+	assert(rematch("a*", "aa"));
+	assert(rematch("a**", "aa"));
+	assert(rematch(".*", "aa"));
+	assert(rematch(".*", "ab"));
+	assert(!rematch(".*b", "a"));
 	assert(rematch("(a)+b|aac", "aac"));
 	assert(rematch("a*(a|cd)+b|aac", "acdb"));
-	assert(rematch("a**", "a"));
 	assert(rematch("a|b|c|d|e", "d"));
+	assert(rematch("a|b|c|d|e.*", "d"));
 	assert(!rematch("(a|b)c*d", "abcd"));
 	assert(rematch("(a|b)c*d", "acd"));
 	assert(rematch("(((((((((a)))))))))", "a"));
-	assert(rematch("\xff", "\377"));
+	/*assert(rematch("\xff", "\377"));*/
 	fprintf(stdout, "self test passed!\n");
 	fflush(stdout);
 }
