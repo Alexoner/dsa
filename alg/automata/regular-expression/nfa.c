@@ -13,13 +13,31 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
+#include <assert.h>
 #include <unistd.h>
+
+#pragma mark - convert regular expression to NFA
 
 /*
  * Convert infix regexp re to postfix notation.
  * Insert . as explicit concatenation operator.
  * Cheesy parser, return static buffer.
+ *
+ * Because we have to insert explicit CONCATENATION operator into POSTFIX
+ * from implicit INFIX expression, so we have to maintain a variable to store
+ * how many ATOMIC parts there are before.
+ *
+ * 1) literal characters: just PUSH into the postfix string and append
+ *	CONCATENATION, increase the number of atomic parts
+ * 2) *, ?, +: just PUSH these post operators into the postfix string
+ * 3) (: PUSH into the STACK information, could be recursive, then do everyting
+ *	other than '()'
+ * 4) ): append CONCATENATION, ALTERNATION, POP out the STACK, increase the
+ *	number of atomic parts
+ * 5) |: weakest operator, should append when a ')' has come or at the end of
+ *	the expression.
  */
 char*
 re2post(char *re)
@@ -30,36 +48,31 @@ re2post(char *re)
 	struct {
 		int nalt;
 		int natom;
-	} paren[100], *p;
+	} paren[100], *p; // parenthesis states stack
 
 	p = paren;
 	dst = buf;
-	nalt = 0;
-	natom = 0;
+	nalt = 0;   // number of alternation
+	natom = 0;  // number of atomic parts
 	if(strlen(re) >= sizeof buf/2)
 		return NULL;
-	for(; *re; re++){
-		switch(*re){
+	for(char *pre = re; *pre; pre++){
+		switch(*pre){
 		case '(':
 			if(natom > 1){
 				--natom;
 				*dst++ = '.';
 			}
+			// maximum regular expression length
 			if(p >= paren+100)
-                // maximum regular expression length
 				return NULL;
 			p->nalt = nalt;
-			p->natom = natom;
+			p->natom = natom; // no more than 1, <2
+			// PUSH STACK
 			p++;
 			nalt = 0;
+
 			natom = 0;
-			break;
-		case '|':
-			if(natom == 0)
-				return NULL;
-			while(--natom > 0)
-				*dst++ = '.';
-			nalt++;
 			break;
 		case ')':
 			if(p == paren)
@@ -70,24 +83,35 @@ re2post(char *re)
 				*dst++ = '.';
 			for(; nalt > 0; nalt--)
 				*dst++ = '|';
+			// POP STACK
 			--p;
 			nalt = p->nalt;
-			natom = p->natom;
+			natom = p->natom; // no more than 1, <2
+			// XXX: the parenthesis subpart will be treated as an atom
 			natom++;
+			break;
+		case '|':
+			if(natom == 0)
+				return NULL;
+			while(--natom > 0)
+				*dst++ = '.';
+			nalt++;
 			break;
 		case '*':
 		case '+':
 		case '?':
+			// just append POSTFIX operator
 			if(natom == 0)
 				return NULL;
-			*dst++ = *re;
+			*dst++ = *pre;
 			break;
-		default:
+		default: // ATOMIC literal character
+			//maybe insert CONCATENATION
 			if(natom > 1){
 				--natom;
 				*dst++ = '.';
 			}
-			*dst++ = *re;
+			*dst++ = *pre;
 			natom++;
 			break;
 		}
@@ -99,8 +123,11 @@ re2post(char *re)
 	for(; nalt > 0; nalt--)
 		*dst++ = '|';
 	*dst = 0;
+	/*fprintf(stdout, "re2post: %s => %s\n", re, buf);*/
 	return buf;
 }
+
+#pragma mark - REPRESENTATION
 
 /*
  * Represents an NFA state plus zero or one or two arrows exiting.
@@ -113,14 +140,21 @@ enum
 	Match = 256,
 	Split = 257
 };
+
+/*
+ * Represent an NFA as a linked collection of State structures
+ * Each State represents one of three NFA fragments
+ * (CONCATENATE, SPLIT, MATCH), depending on the value of c.
+ */
 typedef struct State State;
 struct State
 {
-	int c;
-	State *out;
-	State *out1;
-	int lastlist;
+	int c;			// the character
+	State *out;		// a outgoing linked state
+	State *out1;	// another outgoing linked state
+	int lastlist;	// used during execution
 };
+
 State matchstate = { Match };	/* matching state */
 int nstate;
 
@@ -131,11 +165,11 @@ state(int c, State *out, State *out1)
 	State *s;
 
 	nstate++;
-	s = malloc(sizeof *s);
+	s           = malloc(sizeof *s);
 	s->lastlist = 0;
-	s->c = c;
-	s->out = out;
-	s->out1 = out1;
+	s->c        = c;
+	s->out      = out;
+	s->out1     = out1;
 	return s;
 }
 
@@ -149,8 +183,8 @@ typedef struct Frag Frag;
 typedef union Ptrlist Ptrlist;
 struct Frag
 {
-	State *start;
-	Ptrlist *out;
+	State *start;	// points at the start state
+	Ptrlist *out;	// list of dangling outgoing arrows not yet connected to anything
 };
 
 /* Initialize Frag struct. */
@@ -172,18 +206,28 @@ union Ptrlist
 	State *s;
 };
 
+#pragma mark - HELPER FUNCTIONS TO MANIPULATE POINTER LISTS
+
+/* TIP: the arrow operator p->m is just equivalent to first increase the
+ * pointer by some OFFSETS and then DEREFERENCE the pointer, i.e. (*p).m
+ */
+
 /* Create singleton list containing just outp. */
 Ptrlist*
 list1(State **outp)
 {
 	Ptrlist *l;
 
+	// take a State* pointer's address as Ptrlist* pointer's value
+	// so that l->s is exactly the same as the State* pointer
 	l = (Ptrlist*)outp;
-	l->next = NULL;
+	l->next = NULL;  // set the state* pointer's value to NULL
 	return l;
 }
 
-/* Patch the list of states at out to point to start. */
+/* Patch the list of states at out to point to start.
+ * Connects the dangling arrows in the pointer list l to state s
+ */
 void
 patch(Ptrlist *l, State *s)
 {
@@ -195,7 +239,7 @@ patch(Ptrlist *l, State *s)
 	}
 }
 
-/* Join the two lists l1 and l2, returning the combination. */
+/* Join(concatenate) the two lists l1 and l2, returning the combination. */
 Ptrlist*
 append(Ptrlist *l1, Ptrlist *l2)
 {
@@ -211,6 +255,10 @@ append(Ptrlist *l1, Ptrlist *l2)
 /*
  * Convert postfix regular expression to NFA.
  * Return start state.
+ *
+ * Given these primitives and a fragment STACK, the compiler is a simple loop
+ * over the POSTFIX expression. At the end, there is a single fragment left:
+ * patching in a matching state completes the NFA.
  */
 State*
 post2nfa(char *postfix)
@@ -230,7 +278,8 @@ post2nfa(char *postfix)
 	stackp = stack;
 	for(p=postfix; *p; p++){
 		switch(*p){
-		default:
+		default:	/* literal characters */
+			/*fprintf(stdout, "literal characters: %c, %x\n", *p, *p);*/
 			s = state(*p, NULL, NULL);
 			push(frag(s, list1(&s->out)));
 			break;
@@ -276,6 +325,14 @@ post2nfa(char *postfix)
 #undef push
 }
 
+#pragma mark - Simulating the NFA
+
+/* The simulation requires tracking State sets, which are stored as a simple
+ * array list.
+ *
+ * This is a following Directed Graph process.
+ */
+
 typedef struct List List;
 struct List
 {
@@ -288,7 +345,9 @@ static int listid;
 void addstate(List*, State*);
 void step(List*, int, List*);
 
-/* Compute initial state list */
+/* Compute initial state list
+ * Startlist creates an initial state list by adding just the start state
+ */
 List*
 startlist(State *start, List *l)
 {
@@ -298,7 +357,10 @@ startlist(State *start, List *l)
 	return l;
 }
 
-/* Check whether state list contains a match. */
+/* Check whether state list contains a match.
+ *
+ * If the final state list contains the matching state, then the string matches.
+ */
 int
 ismatch(List *l)
 {
@@ -310,7 +372,19 @@ ismatch(List *l)
 	return 0;
 }
 
-/* Add s to l, following unlabeled arrows. */
+/* Add s to l, following unlabeled arrows.
+ *
+ * Addstate adds a state to the list, but not if it is already on the list.
+ * Scanning the entire list for each add would be inefficient; instead the
+ * variable listid acts as a list generation number. When addstate adds s to
+ * a list, it records listid in s->lastlist. If the two are already equal, then
+ * s is already on the list being built. This is how we deal with *, +
+ * splitting cases.
+ *
+ * Addstate also follows unlabeled
+ * arrows : if s is a Split state with two unlabeled arrows to new states,
+ * addstate adds those states to the list instead of s.
+ */
 void
 addstate(List *l, State *s)
 {
@@ -330,6 +404,11 @@ addstate(List *l, State *s)
  * Step the NFA from the states in clist
  * past the character c,
  * to create next NFA state set nlist.
+ *
+ * Advances the NFA past a single character, using the current list clist
+ * to compute the next list nlist. When there is a split, the NFA are advanced
+ * to those "Split state's" outgoing states instead of the "Split state"
+ * itself.
  */
 void
 step(List *clist, int c, List *nlist)
@@ -341,26 +420,69 @@ step(List *clist, int c, List *nlist)
 	nlist->n = 0;
 	for(i=0; i<clist->n; i++){
 		s = clist->s[i];
+		// an EVENT that character c is received triggers the STATE TRANSITION
+		/*printf("stepping s->c: %x, c: %x, %d\n", s->c, c, (s->c - c));*/
 		if(s->c == c)
 			addstate(nlist, s->out);
 	}
 }
 
-/* Run NFA to determine whether it matches s. */
+/* Run NFA to determine whether it matches s.
+ *
+ * The simulation uses two lists: clist is the current set of states that the
+ * NFA is in, and nlist is the next set of states that the NFA will be in,
+ * after processing the current character. The execution loop initializes
+ * clist to contain just the start state and then runs the machine one step
+ * at a time.
+ */
 int
 match(State *start, char *s)
 {
-	int i, c;
+	int c;
 	List *clist, *nlist, *t;
 
+	/* l1 and l2 are preallocated globals to avoid allocation on every iteration */
 	clist = startlist(start, &l1);
 	nlist = &l2;
 	for(; *s; s++){
-		c = *s & 0xFF;
+		/*c = *s & 0xFF;*/
+		c = *s;
 		step(clist, c, nlist);
 		t = clist; clist = nlist; nlist = t;	/* swap clist, nlist */
 	}
 	return ismatch(clist);
+}
+
+// match string with a regular expression
+bool
+rematch(char *re, char *s)
+{
+	char *post = re2post(re);
+	State *start = post2nfa(post);
+
+	l1.s = malloc(nstate * sizeof l1.s[0]);
+	l2.s = malloc(nstate * sizeof l2.s[0]);
+
+	bool result = match(start, s);
+
+	return result;
+}
+
+void test()
+{
+	assert(rematch("a", "a"));
+	/*assert(rematch("你*好", "好"));*/
+	assert(!rematch("abc", "abx"));
+	assert(rematch("(a)+b|aac", "aac"));
+	assert(rematch("a*(a|cd)+b|aac", "acdb"));
+	assert(rematch("a**", "a"));
+	assert(rematch("a|b|c|d|e", "d"));
+	assert(!rematch("(a|b)c*d", "abcd"));
+	assert(rematch("(a|b)c*d", "acd"));
+	assert(rematch("(((((((((a)))))))))", "a"));
+	assert(rematch("\xff", "\377"));
+	fprintf(stdout, "self test passed!\n");
+	fflush(stdout);
 }
 
 int
@@ -369,6 +491,7 @@ main(int argc, char **argv)
 	int i;
 	char *post;
 	State *start;
+	test();
 
 	if(argc < 3){
 		fprintf(stderr, "usage: nfa regexp string...\n");
@@ -387,6 +510,7 @@ main(int argc, char **argv)
 		return 1;
 	}
 
+	// global variable nstate is increased every time a new State is initialized
 	l1.s = malloc(nstate*sizeof l1.s[0]);
 	l2.s = malloc(nstate*sizeof l2.s[0]);
 	for(i=2; i<argc; i++)
