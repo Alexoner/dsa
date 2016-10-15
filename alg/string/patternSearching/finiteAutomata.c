@@ -1,14 +1,17 @@
 /*
  * http://www.geeksforgeeks.org/searching-for-patterns-set-5-finite-automata/
+ *
  * Searching for Patterns
+ *
  * Finite Automata(FA) based pattern searching algorithm.
- * In FA based algorithm, we preprocess the pattern and build a 2D array
- * that represents a Finite Automata. Construction of the FA is the main
- * tricky part of this algorithm. Once the FA is built, the searching is
+ *
+ * In Finite State Machine based algorithm, we preprocess the pattern and build
+ * a 2D array that represents a Finite Automata. CONSTRUCTION of the FA is the
+ * main tricky part of this algorithm. Once the FA is built, the searching is
  * simple. In search, we simply need to start from the first state of the
  * automata and first character of the text. At every step, we consider
- * next character of text, look for the next state in the built FA and
- * move to new state. If we reach final state, then pattern is found in
+ * next character of text, look for the NEXT STATE in the built FA and
+ * move to new state. If we reach FINAL STATE, then pattern is found in
  * text. Time complexity of the search prcess is O(n).
  *
  * Before we discuss FA construction, let us take a look at the following FA
@@ -101,7 +104,7 @@ void search(char *pat, char *txt)
         state = TF[state][txt[i]];
         if (state == M)
         {
-            printf ("\n patterb found at index %d", i - M + 1);
+            printf ("\n pattern found at index %d", i - M + 1);
         }
     }
 }

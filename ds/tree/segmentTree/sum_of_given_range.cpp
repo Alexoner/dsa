@@ -30,7 +30,7 @@ int* constructST(int* arr, int n)
         return 0;
     }
     // height of segment tree. Use Geometric progression sum formula
-    int height = int(ceil(log2(n + 1)) - 1);
+    int height = int(ceil(log2(n)) - 1);
     //int height = ceil(log2(n));
     // maximum size of the segment tree
     int max_size = int(pow(2, height + 1) - 1);
@@ -68,6 +68,7 @@ void updateValue(int* arr, int* st, int n, int idx, int value)
     }
     // the diff of segment sum
     int diff = value - arr[idx];
+    arr[idx] = value;
     updateValueRecursion(st, 0, n - 1, 0, idx, diff);
 }
 
@@ -127,6 +128,8 @@ int main()
 
     // Update: set arr[1] = 10 and update corresponding
     // segment tree nodes
+    updateValue(arr, st, n, 1, 10);
+
     updateValue(arr, st, n, 1, 10);
 
     // Find sum after the value is updated

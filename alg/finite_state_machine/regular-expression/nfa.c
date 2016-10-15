@@ -10,6 +10,10 @@
  *
  * Copyright (c) 2007 Russ Cox.
  * Can be distributed under the MIT license, see bottom of file.
+ *
+ * INFIX to POSTFIX.
+ * Stack to build Finite State Machine Graph.
+ * NFA simulation.
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,10 +51,12 @@ re2post(char *re)
 	int nalt, natom;
 	static char buf[8000];
 	char *dst;
+	// parenthesis states STACK, serving as a STACK FRAME in the corresponding
+	// recursive procedure
 	struct {
 		int nalt;
 		int natom;
-	} paren[100], *p; // parenthesis states stack
+	} paren[100], *p;
 
 	p = paren;
 	dst = buf;
@@ -125,7 +131,8 @@ re2post(char *re)
 	for(; nalt > 0; nalt--)
 		*dst++ = '|';
 	*dst = 0;
-	/*fprintf(stdout, "re2post: %s => %s\n", re, buf);*/
+	fprintf(stdout, "re2post: %s => %s\n", re, buf);
+	fflush(stdout);
 	return buf;
 }
 
@@ -277,6 +284,7 @@ post2nfa(char *postfix)
 	#define push(s) *stackp++ = s
 	#define pop() *--stackp
 
+	nstate = 0;
 	stackp = stack;
 	for(p=postfix; *p; p++){
 		switch(*p){
@@ -487,15 +495,23 @@ void test()
 	assert(rematch(".*", "aa"));
 	assert(rematch(".*", "ab"));
 	assert(!rematch(".*b", "a"));
+	assert(rematch("(((((((((a)))))))))", "a"));
 	assert(rematch("(a)+b|aac", "aac"));
 	assert(rematch("a*(a|cd)+b|aac", "acdb"));
 	assert(rematch("a|b|c|d|e", "d"));
 	assert(rematch("a|b|c|d|e.*", "d"));
 	assert(!rematch("(a|b)c*d", "abcd"));
 	assert(rematch("(a|b)c*d", "acd"));
-	assert(rematch("(((((((((a)))))))))", "a"));
+	assert(rematch("(a|b)c*d*d*d*d*d*d*d*d*d*d*d*d*d*d*d*d*d", "acddddddddddddddddddddddddddddddddddddd"));
+	assert(rematch("a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*c*b+", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab"));
+	assert(rematch("a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*"
+				"a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*"
+				"a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*b+a*a*",
+				"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+				"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab"
+		    ));
 	/*assert(rematch("\xff", "\377"));*/
-	fprintf(stdout, "self test passed!\n");
+	fprintf(stdout, "\nSELF TEST PASSED!\n\n");
 	fflush(stdout);
 }
 
