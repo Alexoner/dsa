@@ -11,7 +11,7 @@ qsort-apple:qsort-apple.c
 	$(CC) -o $@ $^ $(CFLAGS)
 qsort-glibc:qsort-glibc.c
 	$(CC) -o $@ $^ $(CFLAGS)
-quicksort:quicksort.c quickmain.c
+quicksort:quicksort.c
 	$(CC) -o $@ $^ $(CFLAGS)
 maxmin:maxmin.c maxmin-main.c
 	$(CC) -o $@ $^ -std=c99 $(CFLAGS)

@@ -27,7 +27,7 @@ extern void swap(int *x,int *y);
 //for heapsort
 int heap_size;
 extern void max_heapify(int *a,int i);
-extern void heapsort(int *a);
+//extern void heapsort(int *a);
 extern void build_max_heap(int *a);
 //end of heapsort
 
