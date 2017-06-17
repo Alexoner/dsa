@@ -1,0 +1,2 @@
+
+add_executable(testThreadPool testThreadPool.cpp threadPool.cpp)

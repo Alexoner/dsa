@@ -9,6 +9,7 @@ class Observable:
         self.__observers.append(observer)
 
     def notify_observers(self, *args, **kwargs):
+        print("notifying %d listeners/observers" % len(self.__observers))
         for observer in self.__observers:
             observer.notify(self, *args, **kwargs)
 
