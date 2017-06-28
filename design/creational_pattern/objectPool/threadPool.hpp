@@ -9,8 +9,7 @@
 
 using namespace std;
 
-void* runLoop(void* data);
-void *thr_func(void *data);
+void* workerLoop(void* data);
 
 
 class ThreadPool {
@@ -46,7 +45,7 @@ public:
         int rc;
         cout << "creating " << size << " threads" << endl;
         for (int i = 0; i < size; i++) {
-            if ((rc = pthread_create(&tid, NULL, runLoop, this))) {
+            if ((rc = pthread_create(&tid, NULL, workerLoop, this))) {
                 fprintf(stderr, "error: pthread_create, rc: %d\n", rc);
                 exit(-1);
             }
@@ -58,7 +57,13 @@ public:
     ~ThreadPool() {
         if (!dead) {
             shutdown();
-            // TODO: wait for join and destroy?
+            // TODO: wait for join and destroy
+            for (int i; i < (int)m_threads.size(); ++i) {
+                pthread_join(m_threads[i], NULL);
+            }
+            pthread_mutex_destroy(&m_lock);
+            pthread_cond_destroy(&m_cond);
+            pthread_attr_destroy(&m_thread_attr);
         }
     }
 
@@ -99,7 +104,7 @@ public:
         return task;
     }
 
-    void workerLoop()
+    void runLoop()
     {
         cout << "working" << endl;
         while (1) {
@@ -115,9 +120,10 @@ public:
             }
             // TODO: actual job
             //cout << "Running task: " << task << endl;
-            float r = (rand() % 10000) / 9999.0;
-            sleep(r);
-            printf( "Running task: %d after delay: %.2f\n", task, r);
+            //float r = (rand() % 10000) / 9999.0;
+            float t = 1.0 / task;
+            sleep(t);
+            printf( "Ran task: %02d, time used: %.3f\n", task, t);
         }
     }
 };

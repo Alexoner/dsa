@@ -1,11 +1,11 @@
 #include "threadPool.hpp"
 
-void* runLoop(void* data)
+void* workerLoop(void* data)
 {
     printf("starting runLoop, data: %p\n", data);
     //cout << "hello from runLoop, data: " << data << endl;
     ThreadPool* ptr = (ThreadPool*)data;
-    ptr->workerLoop();
+    ptr->runLoop();
 
     return NULL;
 }
