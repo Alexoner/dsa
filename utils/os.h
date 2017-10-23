@@ -18,7 +18,7 @@
     #endif
 #elif __linux__
     // linux
-#elif __unix__ // all unices not caught above
+#elif __unix__ // all *nix not caught above
     // Unix
 #elif defined(_POSIX_VERSION)
     // POSIX
