@@ -45,6 +45,11 @@ else ()
 	message(STATUS "Build flags for release: ${CMAKE_CXX_FLAGS_RELEASE}")
 endif ()
 
+# link logging library
+add_library(easylogging SHARED language/cpp/logger/easylogging++.cc)
+link_libraries(easylogging)
+
+
 if (NOT BUILD_ARCH)
 	set(BUILD_ARCH "-m64")
 endif ()
