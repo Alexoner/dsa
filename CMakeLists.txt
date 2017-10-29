@@ -47,6 +47,7 @@ endif ()
 
 # link logging library
 add_library(easylogging SHARED language/cpp/logger/easylogging++.cc)
+include_directories(language/cpp/logger)
 link_libraries(easylogging)
 
 
