@@ -4,7 +4,7 @@
  * ANswer:
  * infinite times.
  *
- * If you said 300, you would have been correct if i had been declared as an int. However, since i was declared as an unsigned char, the corrct answer is that this code will result in an infinite loop.
+ * If you said 300, you would have been correct if i had been declared as an int. However, since i was declared as an unsigned char, the correct answer is that this code will result in an infinite loop.
 
 Here’s why:
 
