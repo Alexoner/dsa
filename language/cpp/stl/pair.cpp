@@ -10,6 +10,7 @@ int main()
     pair <string, int> g2("Quiz", 3);
     pair <string, int> g3(g2);
     pair <int, int> g4(5, 10);
+    pair <int, int> g5({1, 2});
 
     g1 = make_pair(string("Geeks"), 1);
     g2.first = ".com";
@@ -35,6 +36,9 @@ int main()
         << "sum of the values in this pair is "
         << g4.first+g4.second
         << "." << endl << endl;
+
+    cout << "This is pair<int, int> g5 initialized from array {1, 2} => "
+        << "(" << g5.first << ", " << g5.second << ")" << endl;
 
     cout << "We can concatenate the values of"
         << " the pairs g1, g2 and g3 : "

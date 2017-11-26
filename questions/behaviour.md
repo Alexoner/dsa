@@ -2,6 +2,15 @@
 Self introduction: Tell Me about Yourself
 =========================================
 
+How to describe your projects(achievements)
+===========================================
+General guides:
+- Background(what and why)
+- Roles(who)
+- Challenges
+- Solution and achievements (how)
+
+
 Questions and Answers
 =====================
 

@@ -58,7 +58,7 @@ public:
         if (!dead) {
             shutdown();
             // TODO: wait for join and destroy
-            for (int i; i < (int)m_threads.size(); ++i) {
+            for (int i = 0; i < (int)m_threads.size(); ++i) {
                 pthread_join(m_threads[i], NULL);
             }
             pthread_mutex_destroy(&m_lock);

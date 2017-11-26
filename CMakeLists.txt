@@ -10,6 +10,33 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+##################################### OS specific ############################################
+if(WIN32)
+    # for Windows operating system in general
+endif()
+
+# or
+#if(MSVS OR MSYS OR MINGW)
+    ## for detecting Windows compilers
+#endif()
+
+# Apple MacOS
+if(APPLE)
+    # for MacOS X
+endif()
+
+# Detect Unix and Linux 
+if(UNIX AND NOT APPLE)
+    # for Linux, BSD, Solaris, Minix
+endif()
+
+############################### build architecture ########
+if (NOT BUILD_ARCH)
+    set(BUILD_ARCH "-m64")
+endif ()
+message(STATUS "Build architecture: ${BUILD_ARCH}")
+
+############################ BUILD TYPE and FLAGS ###################
 if (NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "DEBUG")
 endif (NOT CMAKE_BUILD_TYPE)
@@ -40,6 +67,7 @@ if (CMAKE_BUILD_TYPE MATCHES "DEBUG")
 
     set( CMAKE_EXPORT_COMPILE_COMMANDS ON ) # export compilation database
 
+    option (WITH_PROFILE "build profiler" OFF) 
     # google profiling tool: google perftools
     message(STATUS "WITH_PROFILE: " ${WITH_PROFILE})
     if (WITH_PROFILE MATCHES "ON")
@@ -51,28 +79,46 @@ else ()
     message(STATUS "Build flags for release: ${CMAKE_CXX_FLAGS_RELEASE}")
 endif ()
 
-if (NOT WITH_LOGGER)
-  SET(WITH_LOGGER "ON")
-endif()
+##################################### HEADERS ####
+
+include_directories(language/cpp)
+
+############################ LOGGER #################
+#if (NOT WITH_LOGGER)
+  #SET(WITH_LOGGER "ON")
+#endif()
+
+# Options: control statement
+option (WITH_LOGGER "build logger" ON) 
 
 # link logging library
 message(STATUS "WITH_LOGGER: " ${WITH_LOGGER})
 if (WITH_LOGGER STREQUAL "ON") # or use MATCHES instead of STREQUAL
   message(STATUS "add library easylogging++")
-  add_library(easylogging SHARED language/cpp/logger/easylogging++.cc)
+
+  if (APPLE)
+	  add_library(easylogging STATIC language/cpp/logger/easylogging++.cc)
+  else()
+	  add_library(easylogging SHARED language/cpp/logger/easylogging++.cc)
+  endif()
+
   include_directories(language/cpp/logger)
-  link_libraries(easylogging)
+  #link_libraries(easylogging)
 endif()
 
+########################## TEST #####################
+if (NOT DEFINED WITH_TESTS)
+  if (CMAKE_BUILD_TYPE MATCHES "DEBUG")
+    SET(WITH_TESTS "ON")
+  endif()
+endif()
+message(STATUS "WITH_TESTS: ${WITH_TESTS}")
 
-if (NOT BUILD_ARCH)
-    set(BUILD_ARCH "-m64")
-endif ()
-message(STATUS "Build architecture: ${BUILD_ARCH}")
-
+########################## add sub-directories ##########
 add_subdirectory (design/creational_pattern) 
 add_subdirectory (design/behavioral_pattern) 
 add_subdirectory (design/concurrency_pattern) 
 add_subdirectory (oj/leetcode) 
 add_subdirectory (oj/questions) 
 add_subdirectory (language/cpp)
+add_subdirectory (questions/akunacapital)
