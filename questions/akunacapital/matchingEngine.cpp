@@ -219,7 +219,8 @@ struct Order {
     }
 
     tuple<int, int> getKey() {
-        return make_tuple(price, timestamp);
+        // prefer higher price buyer, and lower price seller.
+        return make_tuple(operation == SELL ? price : -price, timestamp);
     }
 
     bool parseBuy(istringstream& iss) {
@@ -242,18 +243,17 @@ struct Order {
     }
 
     bool parsePrint(istringstream& iss) {
-        return true;
+        return iss.eof();
     }
 };
 
-// FIXME: more than half cases are failed, even segmentation fault.
 class Engine {
     public:
         //Engine() {};
-        map<OrderKey, shared_ptr<Order>> orders_buy;
-        map<OrderKey, shared_ptr<Order>> orders_sell;
-        map<string, OrderKey> id2key_buy; // hash table, mapping from order id to index
-        map<string, OrderKey> id2key_sell;
+        map<OrderKey, shared_ptr<Order>> orders_buy; // ordered, by (price, time)
+        map<OrderKey, shared_ptr<Order>> orders_sell; // ordered by (-price, time)
+        unordered_map<string, OrderKey> id2key_buy; // hash table, mapping from order id to index
+        unordered_map<string, OrderKey> id2key_sell;
 
         void process(string line) {
 
@@ -286,16 +286,6 @@ class Engine {
             }
         }
 
-        void addBuyer(shared_ptr<Order> order) {
-            orders_buy.insert(make_pair(order->getKey(), order));
-            this->id2key_buy[order->id] = order->getKey();
-        }
-
-        void addSeller(shared_ptr<Order> order) {
-            orders_sell.insert(make_pair(order->getKey(), order));
-            this->id2key_sell[order->id] = order->getKey();
-        }
-
         void cancel(shared_ptr<Order> order) {
             OrderKey key;
             shared_ptr<Order> oldOrder;
@@ -321,21 +311,34 @@ class Engine {
             return priceCount;
         }
 
+        void _print(map<OrderKey, shared_ptr<Order>> orders, bool reverse=false) {
+
+            int quantitySum = 0;
+            int pricePrev = 0;
+            auto f = [&quantitySum,&pricePrev] (shared_ptr<Order> o){
+                if (o->price != pricePrev) {
+                    cout << pricePrev << " " << quantitySum << endl;
+                    quantitySum = o->quantity;
+                } else quantitySum += o->quantity;
+                pricePrev = o->price;
+            };
+            if (reverse) {
+                pricePrev = orders.size() ? orders.rbegin()->second->price : 0;
+                for (auto it = orders.rbegin(); it != orders.rend(); ++it) { f(it->second); }
+            } else {
+                pricePrev = orders.size() ? orders.begin()->second->price : 0;
+                for (auto it = orders.begin(); it != orders.end(); ++it) { f(it->second); }
+            }
+            if (pricePrev > 0 && quantitySum > 0) {
+                cout << pricePrev << " " << quantitySum << endl;
+            }
+        }
+
         void print() {
-            map<int, int> priceCount;
-            priceCount = _getPriceCount(orders_sell);
             cout << "SELL:" << endl;
-            accumulate(priceCount.begin(), priceCount.end(), 0,[](int, map<int, int>::value_type v){
-                        cout << v.first << " " << v.second << endl;
-                        return 0;
-                    });
-            //priceCount.clear();
-            priceCount = _getPriceCount(orders_buy);
+            _print(orders_sell, true);
             cout << "BUY:" << endl;
-            accumulate(priceCount.rbegin(), priceCount.rend(), 0,[](int, map<int, int>::value_type v){
-                        cout << v.first << " " << v.second << endl;
-                        return 0;
-                    });
+            _print(orders_buy, false);
         }
 
         shared_ptr<Order> modifyOrder(shared_ptr<Order> order) {
@@ -368,23 +371,20 @@ class Engine {
 
         bool trade(shared_ptr<Order> order) {
             if (!order)  return false;
-            map<int, shared_ptr<Order>> others; // orders possible to trade with
+            //map<int, shared_ptr<Order>> to_cancel; // orders possible to trade with
+            map<OrderKey, shared_ptr<Order>> to_cancel; // orders possible to trade with
 
             int quantity = order->quantity;
+                map<OrderKey, shared_ptr<Order>>::iterator begin_it;
+                map<OrderKey, shared_ptr<Order>>::iterator match_it;
             if (order->operation == BUY) {
-                map<OrderKey, shared_ptr<Order>>::iterator seller_it = matchSeller(order);
-                map<OrderKey, shared_ptr<Order>>::reverse_iterator itr(seller_it);
-                for (auto it = itr; it != orders_sell.rend(); ++it) {
-                    others.insert(make_pair(it->second->timestamp, it->second));
-                }
-                // else, it's discarded anyway
+                begin_it = orders_sell.begin();
+                match_it = matchSeller(order);
             } else if (order->operation == SELL) {
-                map<OrderKey, shared_ptr<Order>>::iterator buyer_it = matchBuyer(order);
-                for (auto it = buyer_it; it != orders_buy.end(); ++it) {
-                    others.insert(make_pair(it->second->timestamp, it->second));
-                }
+                begin_it = orders_buy.begin();
+                match_it = matchBuyer(order);
             }
-            for (auto it = others.begin(); quantity > 0 && it != others.end(); ++it) {
+            for (auto it = begin_it; quantity > 0 && it != match_it; ++it) {
                 shared_ptr<Order> other = it->second;
                 int quantity_traded = min(quantity, it->second->quantity);
                 cout << "TRADE "
@@ -394,24 +394,26 @@ class Engine {
                 quantity -= quantity_traded;
                 other->quantity -= quantity_traded;
                 if (other->quantity <= 0) {
-                    //orders_buy.erase(other->getKey());
-                    cancel(other);
+                    to_cancel.insert(make_pair(other->getKey(), other));
                 }
+            }
+            for (auto it = to_cancel.begin(); it != to_cancel.end(); ++it) {
+                cancel(it->second);
             }
             order->quantity = quantity;
             // deal with remaining quantity
-            if (quantity > 0 && order->type == GFD) {
+            if (order->type == GFD && quantity > 0) {
                 addOrder(order);
-            }
+            } // else, it's discarded anyway
             return false;
         }
 
         map<OrderKey, shared_ptr<Order>>::iterator matchBuyer(shared_ptr<Order> order) {
-            return orders_buy.lower_bound(order->getKey());
+            return orders_buy.upper_bound(make_pair(-order->price, order->timestamp));
         }
 
         map<OrderKey, shared_ptr<Order>>::iterator matchSeller(shared_ptr<Order> order) {
-            return orders_sell.upper_bound(order->getKey());
+            return orders_sell.upper_bound(make_pair(order->price, order->timestamp));
         }
 };
 
