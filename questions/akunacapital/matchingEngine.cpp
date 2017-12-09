@@ -161,6 +161,7 @@ Any input with price <= 0 or quantity <= 0 or empty order id is invalid. Should 
 #include <iostream>
 #include <algorithm>
 #include <unordered_map>
+#include <tuple>
 #include <memory>
 
 
@@ -209,12 +210,8 @@ struct Order {
         } else if (order->operation == MODIFY) {
             valid = order->parseModify(iss);
         } else if (order->operation == PRINT) {
-            // ORDER
             valid = order->parsePrint(iss);
         } else valid = false;
-        //if (!valid) {
-            //cerr << "INVALID INPUT! " << line << " " << order->price << " id:" << order->id << endl;
-        //}
         return valid ? order: NULL;
     }
 
@@ -298,17 +295,6 @@ class Engine {
                 orders_sell.erase(key);
                 id2key_sell.erase(order->id);
             }
-        }
-
-        map<int, int> _getPriceCount(map<OrderKey, shared_ptr<Order>> orders) {
-
-            map<int, int> priceCount;
-            accumulate(orders.begin(), orders.end(), 0,
-                    [&priceCount,this](int res, map<OrderKey, shared_ptr<Order>>::value_type v) {
-                        priceCount[v.second->price] += v.second->quantity;
-                        return 0;
-                    });
-            return priceCount;
         }
 
         void _print(map<OrderKey, shared_ptr<Order>> orders, bool reverse=false) {
@@ -417,11 +403,11 @@ class Engine {
         }
 };
 
-shared_ptr<Engine> engine = make_shared<Engine>();
 
 int main(int argc, char **argv) {
     /* Enter your code here. Read input from STDIN. Print output to STDOUT */
 
+    shared_ptr<Engine> engine = make_shared<Engine>();
     string line;
     while(getline(cin, line)) {
         if (line.empty()) { continue; }

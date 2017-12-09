@@ -1,17 +1,55 @@
-#include <iostream>
+#pragma once
+
 #include <stdint.h>
 #include <assert.h>
 
-#include <functional>
-#include <vector>
-#include <map>
-#include <stack>
-#include <queue>
-#include <algorithm>
-#include <sstream>
-#include <numeric>
+#include "base_headers.hpp"
 
-using namespace std;
+
+/**
+ *
+ * print a vector
+ *
+ */
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
+{
+    os << "{";
+    for (auto& el : vec)
+    {
+        if (std::is_same<T, string>::value) {
+            os << '"' << el << '"' << ", "; // wrap string between ""
+        } else if (std::is_same<T, char>::value) {
+            os << "'" << el << "'" << ", "; // wrap string between ''
+        } else {
+            os << el << ", ";
+        }
+    }
+    os << "}";
+    return os;
+}
+
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const std::multiset<T>& data)
+{
+    os << "{";
+    for (auto& el : data)
+    {
+        if (std::is_same<T, string>::value) {
+            os << '"' << el << '"' << ", "; // wrap string between ""
+        } else if (std::is_same<T, char>::value) {
+            os << "'" << el << "'" << ", "; // wrap string between ''
+        } else {
+            os << el << ", ";
+        }
+    }
+    os << "}";
+    return os;
+}
+
+string to_string(string s) {
+    return "\"" + s + "\"";
+}
 
 template <typename T>
 string to_string(vector<T> v)
@@ -20,8 +58,8 @@ string to_string(vector<T> v)
            v.begin(),
            v.end(),
            string("{"),
-           [](string a, char b) {
-           return a + std::to_string(b) + ", ";
+           [](string a, T b) {
+           return a + to_string(b) + ", ";
            })
     + string("}");
 }

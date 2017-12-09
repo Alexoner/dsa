@@ -74,6 +74,14 @@ int main()
     cout << gquiz1.upper_bound(5)->first << '\t';
     cout << "\tELEMENT = " << gquiz1.upper_bound(5)->second << endl;
 
+
+    cout << "elements with upper bound: -1->" << gquiz1.upper_bound(-1)->second << endl;
+    for (itr = gquiz1.begin(); itr != gquiz1.upper_bound(-1); ++itr)
+    {
+        cout  <<  '\t' << itr->first
+              <<  '\t' << itr->second << '\n';
+    }
+
     return 0;
 
 }
