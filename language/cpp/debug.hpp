@@ -47,7 +47,7 @@ std::ostream& operator<<(std::ostream& os, const std::multiset<T>& data)
     return os;
 }
 
-string to_string(string s) {
+static string to_string(string s) {
     return "\"" + s + "\"";
 }
 
@@ -94,14 +94,14 @@ string to_string(queue<T> v)
 #ifdef _WIN32
 
 #include <intrin.h>
-uint64_t rdtsc(){
+static uint64_t rdtsc(){
     return __rdtsc();
 }
 
 //  Linux/GCC
 #else
 
-uint64_t rdtsc(){
+static uint64_t rdtsc(){
     unsigned int lo,hi;
     __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
     return ((uint64_t)hi << 32) | lo;
