@@ -7,6 +7,7 @@ add_executable(queue queue.cpp)
 target_link_libraries(debugCopy easylogging)
 
 add_executable(closure closure.cpp)
+add_executable(move move.cpp)
 
 add_executable(numeric numeric.cpp)
 target_link_libraries(numeric easylogging)
