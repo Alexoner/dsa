@@ -18,11 +18,12 @@ void thread2() {
 }
 
 void test_memory_order_sequential_consistent() {
-    //cout << "memory order sequential consistent" << endl;
+    cout << "TESTING memory order sequential consistent" << endl;
     int i = 0;
     while(++i < 1000) {
         x.store(0);
         y.store(0);
+        r1 = r2 = 0;
 
         thread t1([&]() {
                 x.store(1);
@@ -42,12 +43,14 @@ void test_memory_order_sequential_consistent() {
 }
 
 void test_memory_order_relaxed() {
-    //cout << "memory order sequential consistent" << endl;
+    cout << "TESTING memory order relaxed" << endl;
     int i = 0;
     while(++i < 10000)  {
         x = y = false;
+        r1 = r2 = 0;
         thread t1([&] {
-                x.store(1, memory_order_relaxed); // these two lines might be reordered
+                //relaxed operations on separate variables might be reordered by compiler or hardware
+                x.store(1, memory_order_relaxed);
                 r1 = y.load(memory_order_relaxed);
                 });
         thread t2([&](void) -> void {
@@ -58,9 +61,41 @@ void test_memory_order_relaxed() {
         t2.join();
 
         if (r1 == 0 && r2 == 0) {
-            cout << "memory reorder detected!" << endl;
+            cout << "memory reorder detected!" << " iteration: " << i << endl;
         };
     }
+}
+
+void test_fences() {
+    cout << "TESTING fence" << endl;
+    int i = 0;
+    // TODO: fences don't work yet?
+    while(++i < 10000)  {
+        x = y = false;
+        r1 = r2 = 0;
+        thread t1([&] {
+                x.store(1, memory_order_relaxed);
+                atomic_thread_fence(memory_order_release);
+                r1 = y.load(memory_order_relaxed);
+                });
+        thread t2([&](void) -> void {
+                y.store(1, memory_order_relaxed);
+                atomic_thread_fence(memory_order_acquire);
+                r2 = x.load(memory_order_relaxed);
+                cout << "r1: " << r1 << " r2: " << r2 << endl;
+                });
+        t1.join();
+        t2.join();
+
+        if (r1 == 0 && r2 == 0) {
+            cout << "memory reorder detected!" << " iteration: " << i << endl;
+        };
+        assert(!(r1 == 0 && r2 == 0));
+    }
+}
+
+void test_lock_free() {
+
 }
 
 // TODO: ABA problem in lock free algorithm
@@ -76,5 +111,7 @@ int main(int argc, char *argv[])
     test_memory_order_sequential_consistent();
 
     test_memory_order_relaxed();
+    test_fences();
+
     return 0;
 }

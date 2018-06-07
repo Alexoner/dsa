@@ -9,11 +9,11 @@ struct Callable {
     void operator() (int step=1) {
         try {
             for (unsigned j = 0; j < 1000000; ++j) {
-                 i += step; // potential access to dangling reference in detached thread! segmentation fault
+                i += step; // FIXME: potential access to dangling reference in detached thread! segmentation fault
             }
             cout << "callable finished with i: " << i << endl;
 
-        }catch(exception e) {
+        } catch (exception e) {
             cout << "ERROR executing callable" << e.what() << endl;
         }
         //std::this_thread::sleep_for (std::chrono::seconds(1));
@@ -55,7 +55,7 @@ void f() {
     if (t.joinable()) {
         t.detach(); // detach immediately after new thread executes
     }
-    //t.join();
+    //t.join(); // can't join detached thread
 }
 
 int main(int argc, char *argv[])

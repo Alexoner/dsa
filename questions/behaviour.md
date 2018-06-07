@@ -28,9 +28,16 @@ Questions and Answers
 - This company is great
 - I'm qualified/talented/
 - Make a difference here
-- Hang with those TALENTED PEOPLE who make this organization great. 
+- Hang with those TALENTED PEOPLE who make this organization great.
 
 * Why do you want to leave?
+- Looking for more CHALLENGES
+- to utilize my educational background in my next position
+- CHOICE between this position one my current one.
+- PERSONNEL issues
+- Office politics
+- Looking for fast growing business/better compensation
+- City
 
 * Do you have any question for me ?
 - Biggest CHALLENGE in day to day work, day to day responsibility?

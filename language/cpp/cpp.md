@@ -1,3 +1,11 @@
+# Features of C++
+- REFERENCE variables and POINTER variables
+- Deterministic destruction of object
+- Inheritance: virtual function
+- Template
+- Data structures and algorithms: STL
+- Concurrency: threads, lock, lock free, wait free.
+
 # Memory Management
 
 ## [RAII(Resource Acquisition is Initialization)](http://en.wikipedia.org/wiki/RAII)
