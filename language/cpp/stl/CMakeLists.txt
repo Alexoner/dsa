@@ -10,4 +10,5 @@ add_executable(closure closure.cpp)
 add_executable(move move.cpp)
 
 add_executable(numeric numeric.cpp)
+add_executable(transform transform.cpp)
 target_link_libraries(numeric easylogging)

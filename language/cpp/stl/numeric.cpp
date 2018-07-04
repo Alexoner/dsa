@@ -24,6 +24,8 @@ int main()
 {
     std::vector<int> v{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
+    LOG(DEBUG) << "vector of int: " << v << endl;
+
     // compute sum
     int sum = std::accumulate(v.begin(), v.end(), 0);
 
@@ -54,6 +56,8 @@ int main()
                     //return a;
                 }
             );
+
+    LOG(DEBUG) << "splitString: " << splitString << endl;
 
     std::string vectorAsString = std::accumulate(
             v.begin(),

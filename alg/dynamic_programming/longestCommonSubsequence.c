@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 void print_lcs(int *pc, int m, int n)
 {
@@ -27,7 +28,7 @@ void print_lcs(int *pc, int m, int n)
 
 int lcs_length(char *x, int lx, char *y, int ly)
 {
-    int c[lx + 1][ly + 1]; //contains length of an LCS of X and Y
+    int c[lx + 1][ly + 1]; // contains length of an LCS of X and Y
     int i, j;
 
     for (j = 0; j < ly + 1; j++)
@@ -48,9 +49,9 @@ int lcs_length(char *x, int lx, char *y, int ly)
         {
             if (x[i - 1] == y[j - 1])
             {
-                c[i][j] = c[i - 1][j - 1] + 1;
+                c[i][j] = c[i - 1][j - 1] + 1; // same characters, length plus 1
             }
-            else if (c[i - 1][j] >= c[i ][j - 1])
+            else if (c[i - 1][j] >= c[i ][j - 1]) // different characters, choose longer configuration
             {
                 c[i][j] = c[i - 1][j];
             }
@@ -62,7 +63,7 @@ int lcs_length(char *x, int lx, char *y, int ly)
     }
 
     //print the solution two-dimensional array
-    printf("   \t");
+    printf("        ");
     for (i = 0; i <= ly; i++)
     {
         printf("%c\t", y[i]);
@@ -70,7 +71,8 @@ int lcs_length(char *x, int lx, char *y, int ly)
     printf("\n");
     for (i = 0; i <= lx; i++)
     {
-        printf("%c: ", x[i]);
+        if (i > 0) printf("%c:  ", x[i-1]);
+        else printf("\t");
         for (j = 0; j <= ly; j++)
         {
             printf("%d\t", c[i][j]);
@@ -78,13 +80,15 @@ int lcs_length(char *x, int lx, char *y, int ly)
         printf("\n");
     }
 
+    // TODO: construct the solution by reading the state transition table
+
     //print out the longest common subsequence
-    return 0;
+    return c[lx][ly];
 }
 
 int main()
 {
     char *x = "ABCBDAB", *y = "BDCABA";
-    lcs_length(x, 7, y, 6);
+    assert(lcs_length(x, strlen(x), y, strlen(y)) == 4);
     return 0;
 }

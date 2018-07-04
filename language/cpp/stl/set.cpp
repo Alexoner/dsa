@@ -5,30 +5,41 @@
 
 int main ()
 {
-  std::multiset<int> mymultiset;
-  std::multiset<int>::iterator it;
+    std::multiset<int> mymultiset;
+    std::multiset<int>::iterator it;
 
-  // insert some values:
-  mymultiset.insert (40);                            // 40
-  for (int i=1; i<7; i++) mymultiset.insert(i*10);   // 10 20 30 40 40 50 60
+    // insert some values:
+    mymultiset.insert (40);                            // 40
+    for (int i=1; i<7; i++) mymultiset.insert(i*10);   // 10 20 30 40 40 50 60
 
-  it=mymultiset.begin();
-  it++;                                              //    ^
-  cout << "initial it: " << *it << ", " << mymultiset << endl;
+    it=mymultiset.begin();
+    it++;                                              //    ^
+    cout << "initial it: " << *it << ", " << mymultiset << endl;
 
-  mymultiset.erase (it);                             // 10 30 40 40 50 60
+    mymultiset.erase (it);                             // 10 30 40 40 50 60
 
-  cout << "removed it: " << *it << ", " << *next(it, 1) << ", " << mymultiset << endl;
+    cout << "removed it: " << *it << ", " << *next(it, 1) << ", " << mymultiset << endl;
 
-  mymultiset.erase (40);                             // 10 30 50 60
+    mymultiset.erase (40);                             // 10 30 50 60
 
-  it=mymultiset.find (50);
-  mymultiset.erase ( it, mymultiset.end() );         // 10 30
+    it=mymultiset.find (50);
+    mymultiset.erase ( it, mymultiset.end() );         // 10 30
 
-  std::cout << "mymultiset contains:" << mymultiset;
-  //for (it=mymultiset.begin(); it!=mymultiset.end(); ++it)
-    //std::cout << ' ' << *it;
-  std::cout << '\n';
+    std::cout << "mymultiset contains:" << mymultiset;
+    //for (it=mymultiset.begin(); it!=mymultiset.end(); ++it)
+      //std::cout << ' ' << *it;
+    std::cout << '\n';
 
-  return 0;
+
+    std::set<int> myset = {1, 2, 3, 4, 5, 6};
+    cout << "delete from set: " << myset << endl;
+    for (int x: myset)
+    {
+        cout << "delete: " << x << endl;
+        myset.erase(x);
+    }
+
+    std::cout << "after delete: " << myset;
+
+    return 0;
 }

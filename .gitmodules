@@ -1,3 +1,6 @@
 [submodule "oj"]
 	path = oj
 	url = https://github.com/Alexoner/oj.git
+[submodule "external/googletest"]
+	path = external/googletest
+	url = https://github.com/google/googletest.git

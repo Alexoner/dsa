@@ -12,17 +12,17 @@
  *
  */
 template<typename T>
-std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
+static std::ostream& operator<<(std::ostream& os, const std::vector<T>& container)
 {
-    os << "{";
-    for (auto& el : vec)
+    os << "vector{";
+    for (auto& x : container)
     {
         if (std::is_same<T, string>::value) {
-            os << '"' << el << '"' << ", "; // wrap string between ""
+            os << '"' << x << '"' << ", "; // wrap string between ""
         } else if (std::is_same<T, char>::value) {
-            os << "'" << el << "'" << ", "; // wrap string between ''
+            os << "'" << x << "'" << ", "; // wrap char between ''
         } else {
-            os << el << ", ";
+            os << x << ", "; // numeric data, print directly
         }
     }
     os << "}";
@@ -30,20 +30,38 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
 }
 
 template<typename T>
-std::ostream& operator<<(std::ostream& os, const std::multiset<T>& data)
+static std::ostream& operator<<(std::ostream& os, const std::multiset<T>& container)
 {
-    os << "{";
-    for (auto& el : data)
+    os << "multiset{";
+    for (auto& x : container)
     {
         if (std::is_same<T, string>::value) {
-            os << '"' << el << '"' << ", "; // wrap string between ""
+            os << '"' << x << '"' << ", "; // wrap string between ""
         } else if (std::is_same<T, char>::value) {
-            os << "'" << el << "'" << ", "; // wrap string between ''
+            os << "'" << x << "'" << ", "; // wrap string between ''
         } else {
-            os << el << ", ";
+            os << x << ", ";
         }
     }
     os << "}";
+    return os;
+}
+
+template<typename T>
+static std::ostream& operator<<(std::ostream& os, const std::set<T>& container)
+{
+    os << "set{";
+    for (auto& x: container) {
+        if (std::is_same<T, string>::value) {
+            os << '"' << x << '"' << ", ";
+        } else if (std::is_same<T, char>::value) {
+            os << "'" << x << "'" << ", ";
+        } else {
+            os << x << ", ";
+        }
+    }
+    os << "}";
+
     return os;
 }
 
