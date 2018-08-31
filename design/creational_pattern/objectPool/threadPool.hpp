@@ -77,7 +77,7 @@ public:
         dead = true;
     }
 
-#pragma mark - worker threads' functions
+#pragma mark - worker threads functions
 
     void addTask(int task)
     {
@@ -92,7 +92,7 @@ public:
     {
         // synchronized task queue pop operation
         pthread_mutex_lock(&m_lock);
-        int task = NULL; // NULL for no task available: should shutdown
+        int task = 0; // NULL for no task available: should shutdown
         while (m_tasks.empty() && !should_shutdown) {
             pthread_cond_wait(&m_cond, &m_lock);
         }

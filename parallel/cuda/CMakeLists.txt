@@ -1,1 +1,1 @@
-project(cmake_and_cuda LANGUAGES CXX CUDA)
+#project(cmake_and_cuda LANGUAGES CXX CUDA)
