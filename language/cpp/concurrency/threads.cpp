@@ -53,6 +53,7 @@ void f() {
     for(int i = 0; i < 1000; ++i);
     cout << "current thread" << " '" << std::this_thread::get_id() << "' " << " task finished" << endl;
     if (t.joinable()) {
+        // FIXME: running out of this function scope causes dangling reference to `i`.
         t.detach(); // detach immediately after new thread executes
     }
     //t.join(); // can't join detached thread

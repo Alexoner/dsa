@@ -10,6 +10,11 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+# use clang instead of gcc
+#set(CMAKE_CXX_COMPILER "clang++")
+#set(CMAKE_CXX_COMPILER "g++") # to enable address sanitizer, gcc>=6 is recommended
+
+
 ##################################### OS specific ############################################
 if(WIN32)
     # for Windows operating system in general
@@ -50,12 +55,12 @@ LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 #set(CMAKE_CXX_FLAGS_MINSIZEREL "put your flags")
 #set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "put your flags")
 #set(CMAKE_CXX_FLAGS_RELEASE "put your flags")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -O0 -g -Wall -Wextra -std=c++11")
-#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -O0 -ggdb -Wall -Wextra -Wno-unused-result -Wreturn-type -Wmain -Werror=return-type -Werror=main -std=c++11")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -std=c++11")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -std=c++11 -O0 -g -Wall -Wextra -fsanitize=address")
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -std=c++11 -O0 -ggdb -Wall -Wextra -Wno-unused-result -Wreturn-type -Wmain -Werror=return-type -Werror=main -fsanitize=address")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -std=c++11 -O3")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -ggdb -Wall -std=c++11")
 
-message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "[root] Build type: ${CMAKE_BUILD_TYPE}")
 
 # thread library
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -63,7 +68,7 @@ find_package(Threads REQUIRED)
 link_libraries(Threads::Threads)
 
 if (CMAKE_BUILD_TYPE MATCHES "DEBUG")
-    message(STATUS "Build flags for debug: ${CMAKE_CXX_FLAGS_DEBUG}")
+    message(STATUS "[root] Build flags for debug: ${CMAKE_CXX_FLAGS_DEBUG}")
 
     set( CMAKE_EXPORT_COMPILE_COMMANDS ON ) # export compilation database
 
