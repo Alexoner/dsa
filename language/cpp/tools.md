@@ -516,7 +516,7 @@ Profiling tools
 
 #### Install
 
-    sudo apt install --no-install-recommends libgoogle-perftools-dev
+    sudo apt install --no-install-recommends libgoogle-perftools-dev google-perftools
 
 #### TC malloc
 
@@ -564,6 +564,7 @@ Now that api is provided, we can attach a running process with gdb and call `Hea
 
     gcc [...] -o myprogram -lprofiler
     CPUPROFILE=/tmp/profile ./myprogram
+    LD_PRELOAD=/usr/lib/libprofiler.so CPUPROFILE=/tmp/profile ./myprogram
 
 #### Analyze dumped file with pprof
 `gperftools heap profiler` will generate a heap profile output file. That file can be analyzed with with `pprof`.
