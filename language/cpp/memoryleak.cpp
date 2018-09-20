@@ -12,6 +12,8 @@ char* leak()
     for (int i = 0; i < 10; ++i) {
         std::cout << "leaking: " << i << std::endl;
         p = new char[1024];
+        delete[] p;
+        p = new char[1024];
         p = NULL;
     }
 

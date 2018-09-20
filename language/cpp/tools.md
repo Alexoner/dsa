@@ -1,15 +1,18 @@
-# compiler
+Linux debug, profile, performance tuning tools
+==============================================
 
-	sudo apt install --no-install-recommends clang gcc-7
+Compiler
+--------
 
-# debugger
+    sudo apt install --no-install-recommends clang gcc-7
 
-## gdb
+Debugger(ptrace), profiler
+--------------------------
+
+### gdb
 Compile the binaries with debug symbols, and run it with gdb.
 
-### Attach a program
-
-#### Interactive mode
+#### Start gdb
 
     gdb [prog|prog procID|prog core]
     gdb program
@@ -31,7 +34,7 @@ ARGS=${@:2}
 gdb $1 -ex "${ARGS}"
 ```
 
-### Essential commands
+#### Essential commands and common practices
 
 ```shell
 $ gdb program (pid)
@@ -53,6 +56,8 @@ gdb> print *pa
 $5 = {name = "A"}
 gdb> c # continue
 gdb> #b ... # break at somewhere
+gdb> break operator new # break at operator new
+gdb> break mmap # break at mmap
 gdb> whatis i
 type = int
 gdb> print i
@@ -67,8 +72,24 @@ gdb> set variable $i = (int)i # $i assign a process's variable to gdb shell vari
 gdb> print $i
 2
 gdb> call printf("xxxxxx") # execute/call function
+gdb> compile  # compile C code
 
 ```
+
+Connect to gdb server: 
+
+```shell
+sudo gdbserver --attach 0.0.0.0:8000 pid
+gdb
+gdb> target remote host:port
+gdb> #...
+```
+
+#### GUI
+
+https://sourceware.org/gdb/wiki/GDB%20Front%20Ends
+
+[gdbgui](https://github.com/cs01/gdbgui/) is awesome.
 
 Refrence
 --------
@@ -77,7 +98,7 @@ Refrence
 - https://www.codeproject.com/Articles/33340/Code-Injection-into-Running-Linux-Application
 - https://blogs.oracle.com/linux/8-gdb-tricks-you-should-know-v2
 
-### [Dump all thread stack to a file](https://stackoverflow.com/questions/26805197/how-to-pipe-gdbs-full-stack-trace-to-a-file)
+#### [Dump all thread stack to a file](https://stackoverflow.com/questions/26805197/how-to-pipe-gdbs-full-stack-trace-to-a-file)
 ```shell
 $ gdb <binary> core.dump
 gdb> set logging on
@@ -85,30 +106,21 @@ gdb> set pagination off
 gdb> thread apply all full bt
 ```
 
-### Modifying program state
+#### Modifying program state
 
+```shell
+gdb> call i = 0;
+```
 
-## `/proc/$PID/`
+#### [Stack trace of running program](https://unix.stackexchange.com/questions/166541/how-to-know-where-a-program-is-stuck-in-linux)
 
-Experiment:
-Run `deadloop` and experiment with those tools.
+Underlying kernel api `ptrace` is needed to get the current stack trace/frame of a process.
 
-1. `/proc/$PID/cmdline`: command line that started this process
-2. `/proc/$PID/status`: VmSize for memory usage?
-3. `/proc/$PID/exe`: `realpath /proc/$PID/exec` the program being run.
-4. `/proc/$PID/stat`: 14 system time, 15 user time, blah blah.. `pidstat` is an easier tool.
-5. `/proc/$PID/environ`: `cat /proc/37517/environ|tr '\0' '\n'` to display environment variables of a running process.
-
-## Frequent situations 
-
-### [Stack trace of running program](https://unix.stackexchange.com/questions/166541/how-to-know-where-a-program-is-stuck-in-linux)
-#### `gdb`
 1. Direct use of gdb
 
 Run the program with gdb. 
 When it caught `SIGSEGV`, enter `where` in gdb.
 
-[stack frame](https://stackoverflow.com/questions/505465/line-number-of-segmentation-fault)
 
 ```shell
 linux:~ # sleep 3600 &
@@ -126,22 +138,19 @@ linux:~ # sleep 3600 &
 ```
 
 Use gdb to change environment variables of a running process.
-```shell
-(gdb) attach process_id
 
-(gdb) call putenv ("env_var_name=env_var_value")
-
-(gdb) detach
-```
+    (gdb) attach process_id
+    (gdb) call putenv ("env_var_name=env_var_value")
+    (gdb) detach
 
 2. `pstack.sh`
-This is a script using gdb to attach to a running process then get the process's
+This is a wrapper script using gdb to attach to a running process then get the process's
 call stack.
 
-#### strace & ltrace
+### strace & ltrace
 `strace` can be used to trace system call and signals.
 
-    strace -f -p -Ttt $PID -o app.strace
+    strace -Ttt -f -p $PID -o app.strace
 
 - -f: trace child processes, all threads
 - -T: show time spent in system calls
@@ -149,27 +158,40 @@ call stack.
 - -tt: macroseconds
 - -o: output
 
-#### Core dump
+### Core dump
 When a process runs into `segmentation fault`, the operating system can dump the process state.
 
 Make sure `ulimit`  for core size is not 0.
 
-	ulimit -c unlimited
+    ulimit -c unlimited
 
 Consider modify core dump file
 
-	$ cat /proc/sys/kernel/core_pattern                                              │
-	|/usr/share/apport/apport %p %s %c %d %P 
+    $ cat /proc/sys/kernel/core_pattern                                              │
+    |/usr/share/apport/apport %p %s %c %d %P 
 
 Generate a core file of a running program.
 
-	sudo gcore [-o filename] pid
+    sudo gcore [-o filename] pid
 
 After a core dump file is generated, view it with `gdb`
 
-	gdb <binary file> core
+    gdb <binary file> core
 
-## [address sanitizer]()
+### ld.so
+
+    man 8 ld.so
+
+`LD_PRELOAD` environment variable can be used to override functions in other libraries.
+
+For example, setting to enable `leak sanitizer` we can do this:
+
+    LD_PRELOAD=/usr/lib/x86_64-linux-gnu/liblsan.so.0 ./a.out
+
+For example, a sandbox environment can be created by overriding system calls.
+
+
+### [address sanitizer](https://github.com/google/sanitizers/wiki/AddressSanitizer)
 
 This feature is supported by gcc/clang with higher version(gcc>=6).
 Update compiler if necessary.
@@ -198,7 +220,7 @@ Run the binary with appropriate `ASAN_OPTION`:
     export ASAN_OPTIONS=detect_leaks=1:abort_on_error=1:disable_coredump=0:unmap_shadow_on_exit=1
     ./a.out
 
-#### Use gdb to attach to a running process
+#### How to check memory of a running process - Use gdb to call check function?
 
 To use address sanitizer or leak sanitizer under `ptrace`(gdb, strace), we need to set:
 
@@ -214,55 +236,370 @@ Then use gdb:
 
 The problem is, where did the output go?
 
+Linux administrative tools
+--------------------------
 
-## pmap - report memory map of a process
+### `taskset` - set or retrieve a process's CPU affinity
+
+#### Read the CPU Affinity of a Running Process
+To retrieve the CPU affinity of a process, you can use the following command.
+
+    taskset -p [PID]
+
+For example, to check the CPU affinity of a process with PID 1141.
+
+    $ taskset -p 1141
+    pid 1141's current affinity mask: ffffffff
+
+The return value `ffffffff` is essentially a hexadecimal bitmask, corresponding to 1111 1111 1111 1111 1111 1111 1111 1111. Each bit in the bitmask corresponds to a CPU core. The bit value 1 means that the process can be executed on the corresponding CPU core. Therefore, in above example, pid 1141 can be executed on CPU core 0-31.
+
+You may think that bitmask is a little hard to understand. Don’t worry. taskset can also show CPU affinity as a list of processors instead of a bitmask using “-c” option. An example is given as follows.
+
+    $ taskset -cp 1141
+    pid 1141's current affinity list: 0-31
+
+#### Pin a Running Process to Particular CPU Core(s)
+You can also use taskset to pin a running process to particular CPU core(s). The command formats are given as follows.
+
+    taskset -p [CORE-LIST] [PID]
+    taskset -cp [CORE-LIST] [PID]
+
+For example, to assign process 1141 to CPU core 0 and 4:
+
+    $ taskset -p 0x11 1141
+    $ taskset -c -p 0-55 221441
+    pid 221441's current affinity list: 0-63
+    pid 221441's new affinity list: 0-55
+
+Set CPU affinity of a process and all of its children threads:
+
+    #!/bin/sh
+    # file: limitcpu
+
+    PID=$1
+    NCORES=${2:-55}
+
+    echo "taskset for pid: $PID, to number of cores: $NCORES"
+
+    for pid in `ps -T ax |grep $PID |awk '{print $2}' |sort`
+    do
+        taskset -p -c 0-$((NCORES - 1)) $pid
+    done
+
+
+#### Launch a Program on Specific CPU Cores
+`taskset` also allows us to launch a program running on specific CPU cores. The command is given as follows.
+
+    taskset [COREMASK] [EXECUTABLE]
+
+For example, to launch a ping program (destination 8.8.8.8) on a CPU core 0, use the following command.
+
+    $ taskset 0x1 ping 8.8.8.8
+
+Reference: https://baiweiblog.wordpress.com/2017/11/02/how-to-set-processor-affinity-in-linux-using-taskset/
+
+### `iptables` - administrative tool for IPv4/IPv6 packet filtering and NAT
+TODO
+
+
+### tc - traffic control
+
+Rate limit for a specific host:
+
+    #!/bin/sh
+    # file: limittraffic
+
+
+    DEVICE=bond0
+    CLIENT_IP=${1:-10.40.46.23}
+
+    echo "device: $DEVICE, IP: $CLIENT_IP"
+
+    tc qdisc del dev $DEVICE root # delete root rule
+    tc qdisc add dev $DEVICE root handle 1: htb default 10
+
+    tc class add dev $DEVICE parent 1: classid 1:1 htb rate 1gbps ceil 1500mbps
+
+    tc class add dev $DEVICE parent 1:1 classid 1:10 htb rate 1gbps ceil 1500mbps # default goes here
+
+    tc class add dev $DEVICE parent 1:1 classid 1:11 htb rate 1gbps ceil 1gbps # matches limited IP goes here
+
+    tc filter add dev $DEVICE protocol ip parent 1:0 prio 1 u32 match ip src ${CLIENT_IP} flowid 1:11
+    tc filter add dev $DEVICE protocol ip parent 1:0 prio 1 u32 match ip dst ${CLIENT_IP} flowid 1:11
+
+### pmap - report memory map of a process
 
     pmap -x pid
 
-# Finding process/threads
+### ps & top & htop
 
-### memory 
+`ps`:
+- -T: show threads
+- -e: select all process
+- -f: full format
+- -F: extra full format
+- -p: select by pid list
+
+```shell
+    ps -TFe # list all threads, with extra full format of all processes
+    ps -TF -p $PID # list all threads, with extra full format, of process $PID
+```
+#### memory
 
 Sort processes by memory consumption
 
     ps aux |sort -k 4,4 -h -r |head
-
-### top & htop
-
+    ps aux -T --sort=-%mem |less
     top -H -p pid # only show process with pid and kernel process(cloned process, thread)
     htop -p pid
 
 
-## dmesg
+### dmesg
 If a process is killed by the process, likely because of OOM(out of memory). 
 
 Then messages like this is expected in `dmesg |tail -n 20`
-```text
-[2901452.813490] Out of memory: Kill process 28345 (deadloop) score 765 or sacrifice child
-[2901452.813515] Killed process 28345 (deadloop) total-vm:21474908536kB, anon-rss:30564396kB, file-rss:4kB, shmem-rss:0kB
-[2901454.892452] oom_reaper: reaped process 28345 (deadloop), now anon-rss:0kB, file-rss:0kB, shmem-rss:0kB 
-```
 
-# ld.so
+    [2901452.813490] Out of memory: Kill process 28345 (deadloop) score 765 or sacrifice child
+    [2901452.813515] Killed process 28345 (deadloop) total-vm:21474908536kB, anon-rss:30564396kB, file-rss:4kB, shmem-rss:0kB
+    [2901454.892452] oom_reaper: reaped process 28345 (deadloop), now anon-rss:0kB, file-rss:0kB, shmem-rss:0kB 
 
-    man 8 ld.so
 
-`LD_PRELOAD` environment variable can be used to override functions in other libraries.
+Text processing command line tools
+---------------------------------
 
-For example, setting to enable `leak sanitizer` we can do this:
-    
-    LD_PRELOAD=/usr/lib/x86_64-linux-gnu/liblsan.so.0 ./a.out
+### Search tools
 
-## eu-stack
+#### ag
 
-# Profiling tools
+#### egrep
+
+    grep 'pattern' ${input} # text pattern
+    egrep 'pattern' ${input} # regular expression pattern
+- -o: only show matching portion
+- --color: colorful display
+- -a: number of lines after
+- -C: context number
+
+### Edit tools
+
+#### sed
+
+
+    # substitute substring
+    $ echo "pattern" | sed -r 's/pattern/target/g' # -r for extended regular expression, s for substitute, g for global
+    target
+    $ sed -r -i 's/pattern/target/g' # s for substitute, g for global, i for inplace
+
+    # extract substring with regular expression pattern
+    $ echo "ljljlsfs pattern jljslfjsdl" | sed -r -i 's/^.*(pattern).*$/\1/g' # s for substitute, g for global, i for inplace, \1 for back referencing
+    pattern
+
+    ## advanced example
+    $ echo "hello cruel world" | sed -r 's/(h.+o)(.+)(w.+d)/\1, \3/g' # "hello cruel world" -> "hello, world"
+    hello, world
+    # parse text: extract fields(date, error code, error code literal name)
+    $ cat leaf_node_service_worker_ficus.ERROR |sed -r -n -e 's/(E[0-9]+)[^a-zZ-Z]+?(\S+[ch]pp:[0-9]+).*error code: (-?[0-9]+), (\w+)/\1,\2,\3,\4/pg' > date-error-name.csv
+    E0919,retrieval_storage_client.cpp:93,-22006,THRIFT_CANNOT_INIT_RPCCLIENT_ERROR
+    E0919,retrieval_retrieval_service_3.cpp:241,-22006,THRIFT_CANNOT_INIT_RPCCLIENT_ERROR, list retrieval error
+    E0919,retrieval_retrieval_service_3.cpp:220,-22006,THRIFT_CANNOT_INIT_RPCCLIENT_ERROR, list retrieval error, will retry in 1 seconds
+    E0919,retrieval_storage_client.cpp:127,-22006,THRIFT_CANNOT_INIT_RPCCLIENT_ERROR
+    E0919,retrieval_retrieval_service_3.cpp:271,-22006,THRIFT_CANNOT_INIT_RPCCLIENT_ERROR, list false track error
+    E0919,retrieval_retrieval_service_3.cpp:222,-22006,THRIFT_CANNOT_INIT_RPCCLIENT_ERROR, list false track repo error, will retry in 1 seconds
+    E0919,retrieval_storage_client.cpp:93,-22006,THRIFT_CANNOT_INIT_RPCCLIENT_ERROR
+    E0919,retrieval_retrieval_service_3.cpp:241,-22006,THRIFT_CANNOT_INIT_RPCCLIENT_ERROR, list retrieval error
+    E0919,retrieval_retrieval_service_3.cpp:220,-22006,THRIFT_CANNOT_INIT_RPCCLIENT_ERROR, list retrieval error, will retry in 1 seconds
+    E0919,retrieval_storage_client.cpp:127,-22006,THRIFT_CANNOT_INIT_RPCCLIENT_ERROR
+
+
+- -r, --regexp-extended: use extended regular expression
+- -i: inplace
+
+
+#### awk
+
+### sort
+
+    $ cat input.txt
+    3       tomato
+    1       onion
+    4       beet
+    2       pepper
+    2       apple
+
+    $ cat input.txt | sort -k 1,1n -k 2,2h # sort by multiple columns
+    2       apple
+    2       pepper
+    3       tomato
+    4       beet
+    10      onion
+
+    $ cat input.txt | sort -k 1,1nr -k 2d,2 # column 1: numeric, reverse, column 2: dictionary
+
+    10      onion
+    4       beet
+    3       tomato
+    2       apple
+    2       pepper
+
+    $ cat input.txt | sort -k 1,1nr -k 2d,2r # column 1: numeric, reverse, column 2: dictionary, reverse
+    10      onion
+    4       beet
+    3       tomato
+    2       pepper
+    2       apple
+
+### uniq - report or omit repeated lines
+
+It can be used to group or aggregate results.
+
+    $ cat input.txt
+    a
+    c
+    a
+    c
+    a
+    b
+
+    $ cat a.txt | sort |uniq -c  |sort -k1,1nr
+    3 a
+    2 b
+    1 c
+
+- -c, --count: prefix line by the number of occurrences
+
+
+### eu-stack
+TODO
+
+
+File system
+------------
+
+### `/proc/$PID/`
+
+Experiment:
+Run `deadloop` and experiment with those tools.
+
+- `/proc/$PID/cmdline`: command line that started this process
+- `/proc/$PID/exe`: `realpath /proc/$PID/exec` the program being run.
+- `/proc/$PID/comm`: thread name, [`pthread_setname_np`](https://linux.die.net/man/3/pthread_setname_np) and `pthread_getname_np` will open `/proc/self/task/[tid]/comm`, .
+- `/proc/$PID/task`: threads/tasks.
+- `/proc/$PID/stat`: 14 system time, 15 user time, blah blah.. `pidstat` is an easier tool.
+- `/proc/$PID/status`: VmSize for memory usage?
+- `/proc/$PID/environ`: `cat /proc/37517/environ|tr '\0' '\n'` to display environment variables of a running process.
+
+### `/var/log/auth.log` - system authentication log
+
+For example, if someone used `sudo kill` to kill your process behind you, you can check it out there.
+
+
+Static analysis tool
+--------------------
+
+### cppcheck
+
+### clang-tools
+
+
+Profiling tools
+---------------
+
 [gprof, valgrind, gperftools](http://gernotklingler.com/blog/gprof-valgrind-gperftools-evaluation-tools-application-level-cpu-profiling-linux/)
 
-## [gperftools](https://github.com/gperftools/gperftools/wiki)
-sudo apt install --no-install-recommends libgoogle-perftools-dev
+### [gperftools](https://github.com/gperftools/gperftools/wiki)
+`gperftools` is a collection of high-performance multi-threaded `malloc` implementation, and performance analysis tools.
+- Thread-caching(TC) malloc
+- heap checker
+- heap profiler
+- cpu profiler 
+- pprof and remote servers
+
+#### Install
+
+    sudo apt install --no-install-recommends libgoogle-perftools-dev
+
+#### TC malloc
+
+Link the library:
+
+    gcc [...] -ltcmalloc
+
+Or inject code with `LD_PRELOAD`:
+
+    export LD_PRELOAD=/usr/lib/libtcmalloc.so
+
+#### Heap checker
+
+    gcc [...] -o myprogram -ltcmalloc
+    HEAPCHECK=normal ./myprogram
+
+Or inject code with `LD_PRELOAD`, like other following tools
+
+    LD_PRELOAD=/usr/lib/libtcmalloc.so HEAPCHECK=normal ./myprogram
+
+#### Heap profiler
+
+Link/inject the library and run the code:
+
+    gcc [...] -o myprogram -ltcmalloc
+    HEAPPROFILE=/tmp/netheap ./myprogram
+    HEAPPROFILE=/tmp/profile LD_PRELOAD=/usr/lib/libtcmalloc.so PPROF_PATH=/usr/bin/pprof ./bin/myprogram
+
+##### Call api
+
+In your code, bracket the code you want profiled in calls to `HeapProfilerStart()` and `HeapProfilerStop()`.
+(These functions are declared in `<gperftools/heap-profiler.h>`.)
+`HeapProfilerStart()` will take the profile-filename-prefix as an argument.
+Then, as often as you'd like before calling `HeapProfilerStop()`, you can use `HeapProfilerDump()` or GetHeapProfile() to examine the profile. 
+In case it's useful, `IsHeapProfilerRunning()` will tell you whether you've already called `HeapProfilerStart()` or not.
+
+Now that api is provided, we can attach a running process with gdb and call `HeapProfilerDump()` profile a snapshot.
+
+    (gdb) call HeapProfilerStart("/tmp/profile")
+    (gdb) call HeapProfilerDump()
+    (gdb) call HeapProfilerStop()
 
 
-## valgrind
+#### Cpu Profiler
+
+    gcc [...] -o myprogram -lprofiler
+    CPUPROFILE=/tmp/profile ./myprogram
+
+#### Analyze dumped file with pprof
+`gperftools heap profiler` will generate a heap profile output file. That file can be analyzed with with `pprof`.
+
+Analyze heap checker output:
+
+    $ pprof ./bin/deadloop "/tmp/deadloop.308._main_-end.heap" --inuse_objects --lines --heapcheck  --edgefraction=1e-10 --nodefraction=1e-10  --text
+    Using local file ./bin/deadloop.
+    Using local file /tmp/deadloop.23469._main_-end.heap.
+    Total: 172 objects
+      86  50.0%  50.0%       86  50.0% main /home/hdu/Documents/mine/dsa/language/cpp/deadloop.cpp:46
+      86  50.0% 100.0%       86  50.0% main /home/hdu/Documents/mine/dsa/language/cpp/deadloop.cpp:48
+       0   0.0% 100.0%      172 100.0% __libc_start_main /build/glibc-Cl5G7W/glibc-2.23/csu/../csu/libc-start.c:291
+       0   0.0% 100.0%      172 100.0% _start ??:0
+
+Analyze heap profiler output:
+
+    $ pprof ./bin/deadloop "/tmp/profile.0001.heap" --inuse_objects --lines --heapcheck  --edgefraction=1e-10 --nodefraction=1e-10 --text
+    Using local file ./bin/deadloop.
+    Using local file /tmp/profile.0001.heap.
+    Total: 379 objects
+     189  49.9%  49.9%      189  49.9% main /home/hdu/Documents/mine/dsa/language/cpp/deadloop.cpp:46
+     189  49.9%  99.7%      189  49.9% main /home/hdu/Documents/mine/dsa/language/cpp/deadloop.cpp:48
+       1   0.3% 100.0%        1   0.3% __GI__IO_file_doallocate /build/glibc-Cl5G7W/glibc-2.23/libio/filedoalloc.c:127
+       0   0.0% 100.0%        1   0.3% _IO_new_file_overflow /build/glibc-Cl5G7W/glibc-2.23/libio/fileops.c:820
+       0   0.0% 100.0%        1   0.3% _IO_new_file_xsputn /build/glibc-Cl5G7W/glibc-2.23/libio/fileops.c:1331
+       0   0.0% 100.0%        1   0.3% __GI__IO_doallocbuf /build/glibc-Cl5G7W/glibc-2.23/libio/genops.c:398
+       0   0.0% 100.0%        1   0.3% __GI__IO_fwrite /build/glibc-Cl5G7W/glibc-2.23/libio/iofwrite.c:39
+       0   0.0% 100.0%      379 100.0% __libc_start_main /build/glibc-Cl5G7W/glibc-2.23/csu/../csu/libc-start.c:291
+       0   0.0% 100.0%      379 100.0% _start ??:0
+       0   0.0% 100.0%        1   0.3% main /home/hdu/Documents/mine/dsa/language/cpp/deadloop.cpp:43
+       0   0.0% 100.0%        1   0.3% std::__ostream_insert ??:0
+       0   0.0% 100.0%        1   0.3% std::operator<<  ??:0
+
+
+### valgrind
 
   sudo apt install --no-install-recommends valgrind
   sudo apt install --no-install-recommends graphviz kcachegrind
@@ -272,7 +609,7 @@ This tools can debug memory errors(memory leak, bad access, segmentation fault..
 Reference: 
 https://www.ibm.com/developerworks/community/blogs/6e6f6d1b-95c3-46df-8a26-b7efd8ee4b57/entry/detect_memory_leaks_with_memcheck_tool_provided_by_valgrind_part_i8?lang=en
 
-### common usage
+#### common usage
 ```shell
 valgrind ./executable # memory check
 valgrind --leak-check=full # memory check
@@ -284,40 +621,42 @@ valgrind --tool=drd --read-var-info=yes # drd(data race detection), a thread err
 
 This seems to slow down the program significantly...
 
-### FAQ
-#### Valgrind on OSX reports false positive memory leak
+#### FAQ
+##### Valgrind on OSX reports false positive memory leak
 ImageLoader is part of the OS X runtime and is responsible for loading binaries and dynamic libraries. It allocates some memory once, during initialization and forgets about it, but it's harmless because it's a small block of memory allocated only once. And it does a bunch of things that Valgrind doesn't like but that aren't incorrect.
 
-# ops tools
+Other ops tools
+----------------
 
 https://www.thegeekstuff.com/2011/12/linux-performance-monitoring-tools
 https://www.tecmint.com/command-line-tools-to-monitor-linux-performance/
 
-CPU	htop, top
-GPU	gpu
-process	ps, pstree
-debug	gdb, strace, perf, dtrace
-memory	htop, free, pmap, vmstat
-disk	df, du, iotop, iostat
-network	nc, ping, iperf, iftop, nload, netstat, sar, tcpdump
-misc	dstat, lsof, cat /proc
+CPU    htop, top
+GPU    gpu
+process    ps, pstree
+debug    gdb, strace, perf, dtrace
+memory    htop, free, pmap, vmstat
+disk    df, du, iotop, iostat
+network    nc, ping, iperf, iftop, nload, netstat, sar, tcpdump
+misc    dstat, lsof, cat /proc
 
 - htop
-- iftop
+- [iftop](https://www.systutorials.com/docs/linux/man/8-iftop/)
 - iotop
 - nvidia-smi
 - tcpdump
 
-## production tools
+production tools
+-----------------
 - mongodb
     - robo 3T
 
-## Monitor
+### Monitor tools
 
-### Grafana - analytics and monitoring
+#### Grafana - analytics and monitoring
 https://github.com/grafana/grafana
 
-### influxdb - time series database
+#### influxdb - time series database
 time series database
 
 

@@ -55,7 +55,9 @@ LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 #set(CMAKE_CXX_FLAGS_MINSIZEREL "put your flags")
 #set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "put your flags")
 #set(CMAKE_CXX_FLAGS_RELEASE "put your flags")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -std=c++11 -O0 -g -Wall -Wextra -fsanitize=address")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -std=c++11 -O0 -g -Wall -Wextra") # address sanitizer, linking against libasan, slows down program
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -std=c++11 -O0 -g -Wall -Wextra -fsanitize=address") # address sanitizer, linking against libasan, slows down program
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -std=c++11 -O0 -g -Wall -Wextra -fsanitize=leak") # leak sanitizer, linking liblsan. `LD_PRELOAD=/usr/lib/x86_64-linux-gnu/liblsan.so.0 ./a.out`
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -std=c++11 -O0 -ggdb -Wall -Wextra -Wno-unused-result -Wreturn-type -Wmain -Werror=return-type -Werror=main -fsanitize=address")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -std=c++11 -O3")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -ggdb -Wall -std=c++11")

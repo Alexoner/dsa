@@ -3,6 +3,7 @@
 #include <chrono>
 #include <csignal>
 #include <memory>
+//#include <sanitizer/lsan_interface.h>
 
 using namespace std;
 
@@ -44,12 +45,13 @@ int main(int argc, char *argv[])
         i += 1;
         p = new char[_1K];
         p = NULL; // causes memory leak
+        p = new char[_1K];
         shared_ptr<A> pa = make_shared<A>();
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
         std::cout << "continuing: " << SPIN[i % 4] << "\r";
         std::flush(std::cout);
-        __lsan_do_leak_check();
+        //__lsan_do_leak_check(); // FIXME: doesn't work, how to use it?
     };
     return 0;
 }
