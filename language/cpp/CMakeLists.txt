@@ -4,6 +4,8 @@ endif ()
 
 add_executable(deadloop deadloop.cpp)
 add_executable(memoryleak memoryleak.cpp)
+#set_target_properties(memoryleak PROPERTIES LINK_FLAGS "-ltcmalloc")
+target_link_libraries(memoryleak "tcmalloc")
 add_executable(nestedException nestedException.cpp)
 add_executable(vptr vptr.cpp)
 # Add the -std=c++11 flag as an example

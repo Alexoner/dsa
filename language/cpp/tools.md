@@ -191,51 +191,6 @@ For example, setting to enable `leak sanitizer` we can do this:
 For example, a sandbox environment can be created by overriding system calls.
 
 
-### [address sanitizer](https://github.com/google/sanitizers/wiki/AddressSanitizer)
-
-This feature is supported by gcc/clang with higher version(gcc>=6).
-Update compiler if necessary.
-
-```cpp
-/*
- * a.cpp
- */
-#include <stdlib.h>
-
-void *p;
-
-int main() {
-  p = malloc(7);
-  p = 0; // The memory is leaked here.
-  return 0;
-}
-```
-
-Compile the source code with compiler's [sanitizer flags](https://github.com/google/sanitizers/wiki/AddressSanitizerFlags):
-
-    g++ -std=c++11 -g -fsanitize=address a.cpp
-
-Run the binary with appropriate `ASAN_OPTION`: 
-
-    export ASAN_OPTIONS=detect_leaks=1:abort_on_error=1:disable_coredump=0:unmap_shadow_on_exit=1
-    ./a.out
-
-#### How to check memory of a running process - Use gdb to call check function?
-
-To use address sanitizer or leak sanitizer under `ptrace`(gdb, strace), we need to set:
-
-    export LSAN_OPTIONS=detect_leaks=0
-
-Then use gdb:
-
-    gdb -p pid
-    (gdb) break __sanitizer::Die
-    (gdb) c
-    (gdb) call __lsan_do_leak_check () # tips: tab can complete
-
-
-The problem is, where did the output go?
-
 Linux administrative tools
 --------------------------
 
@@ -301,6 +256,10 @@ Reference: https://baiweiblog.wordpress.com/2017/11/02/how-to-set-processor-affi
 ### `iptables` - administrative tool for IPv4/IPv6 packet filtering and NAT
 TODO
 
+Drop packet from a server port:
+
+    iptables -A INPUT --src $IP --port $PORT -j DROP
+    iptables -A INPUT --src $IP --port $PORT --mode random --probability 0.9 -j DROP
 
 ### tc - traffic control
 
@@ -500,9 +459,163 @@ Static analysis tool
 
 ### clang-tools
 
+Quality assurance tools
+-----------------------
+
+### [Sanitizers](https://github.com/google/sanitizers)
+
+- ASan: Address Sanitizer detects use-after-free, buffer-overflow, and leaks.
+- TSAN: Thread Sanitizer detects data races, deadlocks.
+- MSAN: Memory Sanitizer detects uses of uninitialized memory.
+- UBSan: Undefined Behavior Sanitizer detects… that
+
+New tools, based on compiler instrumentation, ~2x slow down(https://www.usenix.org/sites/default/files/conference/protected-files/enigma_slides_serebryany.pdf).
+Available in LLVM and GCC(with higher version>=6).
+
+```cpp
+/*
+ * a.cpp
+ */
+#include <stdlib.h>
+
+void *p;
+
+int main() {
+  p = malloc(7);
+  p = 0; // The memory is leaked here.
+  return 0;
+}
+```
+
+Compile the source code with compiler's [sanitizer flags](https://github.com/google/sanitizers/wiki/AddressSanitizerFlags):
+
+    g++ -std=c++11 -g -fsanitize=address a.cpp
+
+Run the binary with appropriate `ASAN_OPTION`: 
+
+    export ASAN_OPTIONS=detect_leaks=1:abort_on_error=1:disable_coredump=0:unmap_shadow_on_exit=1
+    ./a.out
+    =================================================================
+    ==32182==ERROR: LeakSanitizer: detected memory leaks
+
+    Direct leak of 7 byte(s) in 1 object(s) allocated from:
+        #0 0x4b8af8  (/tmp/build/a.out+0x4b8af8)
+        #1 0x4ece5a  (/tmp/build/a.out+0x4ece5a)
+        #2 0x7f5bda8e182f  (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+    SUMMARY: AddressSanitizer: 7 byte(s) leaked in 1 allocation(s).
+
+Use-after-free:
+
+    /**
+     * a.cpp
+     */
+    int main(int argc, char **argv) {
+      int *array = new int[100];
+      delete [] array;
+      return array[argc]; 
+    }
+
+Compile with address sanitizer and run:
+
+    clang++ -O0 -std=c++11 -fsanitize=address a.cpp && ./a.out
+    =================================================================
+    ==2565==ERROR: AddressSanitizer: heap-use-after-free on address 0x61400000fe44 at pc 0x0000004eced2 bp 0x7ffc4c3f7440 sp 0x7ffc4c3f7438
+    READ of size 4 at 0x61400000fe44 thread T0
+	#0 0x4eced1  (/tmp/build/a.out+0x4eced1)
+	#1 0x7f0b31cfa82f  (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+	#2 0x4189e8  (/tmp/build/a.out+0x4189e8)
+
+    0x61400000fe44 is located 4 bytes inside of 400-byte region [0x61400000fe40,0x61400000ffd0)
+    freed by thread T0 here:
+	#0 0x4ea840  (/tmp/build/a.out+0x4ea840)
+	#1 0x4ece86  (/tmp/build/a.out+0x4ece86)
+	#2 0x7f0b31cfa82f  (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+    previously allocated by thread T0 here:
+	#0 0x4ea240  (/tmp/build/a.out+0x4ea240)
+	#1 0x4ece64  (/tmp/build/a.out+0x4ece64)
+	#2 0x7f0b31cfa82f  (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+    SUMMARY: AddressSanitizer: heap-use-after-free (/tmp/build/a.out+0x4eced1)
+    Shadow bytes around the buggy address:
+    ...
+
+
+#### How to check memory of a running process - Use gdb to call check function?
+
+To use address sanitizer or leak sanitizer under `ptrace`(gdb, strace), we need to set:
+
+    export LSAN_OPTIONS=detect_leaks=0
+
+Then use gdb:
+
+    gdb -p pid
+    (gdb) break __sanitizer::Die
+    (gdb) c
+    (gdb) call __lsan_do_leak_check () # tips: tab can complete
+
+
+The problem is, where did the output go?
+
+
+#### Control flow sanitizer
+
+    // a.c
+
+    void Bad() { puts("BOOO"); }
+    struct Expr {
+     long a[2];
+     long (*Op)(long *);
+    };
+    int main(int argc, char **argv) {
+     struct Expr e;
+     e.a[2 * argc] = (long)&Bad;
+     e.Op(e.a);
+    }
+
+Compile and run:
+
+    $ clang a.c && ./a.out
+    BOOO
+    $ clang -flto -fsanitize=cfi -fvisibility=hidden a.c && ./a.out
+    Illegal instruction (core dumped)
+
+#### Stack buffer overflow 
+
+    // a.cpp
+    void Bad() { puts("BOOO"); exit(0); }
+    int main(int argc, char **argv) {
+     long array[10];
+     array[argc * 13] = (long)&Bad;
+    }
+
+Compile and run:
+
+    % clang a.c && ./a.out
+    BOOO
+    % clang -fsanitize=safe-stack a.c && ./a.out
+    [1]    10408 segmentation fault (core dumped)  ./a.out
+
+### Testing
+
+#### Unittest
+- gtest
+
+#### Fuzz testing(fuzzing/fuzzer)
+- [libFuzzer](https://llvm.org/docs/LibFuzzer.html)
+
+Shipped with `LLVM` compiler's `-fsanitizer` option.
+
+
+Reference:
+- https://llvm.org/docs/LibFuzzer.html
+- https://github.com/google/fuzzer-test-suite/blob/master/tutorial/libFuzzerTutorial.md
+
 
 Profiling tools
 ---------------
+
 
 [gprof, valgrind, gperftools](http://gernotklingler.com/blog/gprof-valgrind-gperftools-evaluation-tools-application-level-cpu-profiling-linux/)
 
@@ -532,18 +645,44 @@ Or inject code with `LD_PRELOAD`:
 
     gcc [...] -o myprogram -ltcmalloc
     HEAPCHECK=normal ./myprogram
+    pprof ./myprogram "/tmp/myprogram.308._main_-end.heap" --inuse_objects --lines --heapcheck  --edgefraction=1e-10 --nodefraction=1e-10  --text
 
 Or inject code with `LD_PRELOAD`, like other following tools
 
     LD_PRELOAD=/usr/lib/libtcmalloc.so HEAPCHECK=normal ./myprogram
+
+Explicit (Partial-program) Heap Leak Checking
+Instead of whole-program checking, you can check certain parts of your code to verify they do not have memory leaks. 
+This check verifies that between two parts of a program, no memory is allocated without being freed.
+
+To use this kind of checking code, bracket the code you want checked by creating a `HeapLeakChecker` object at the beginning of the code segment, 
+and call `NoLeaks()` at the end. These functions, and all others referred to in this file, are declared in `<gperftools/heap-checker.h>`.
+
+Here's an example:
+
+    HeapLeakChecker heap_checker("test_foo");
+    {
+      code that exercises some foo functionality;
+      this code should not leak memory;
+    }
+    if (!heap_checker.NoLeaks()) assert(NULL == "heap memory leak");
+
+Note that adding in the `HeapLeakChecker` object merely instruments the code for leak-checking. To actually 
+turn on this leak-checking on a particular run of the executable, you must still run with the heap-checker turned on:
+
+    $ env HEAPCHECK=local /usr/local/bin/my_binary_compiled_with_tcmalloc
+
+If you want to do whole-program leak checking in addition to this manual leak checking, you can run in normal or
+some other mode instead: they'll run the "local" checks in addition to the whole-program check.
 
 #### Heap profiler
 
 Link/inject the library and run the code:
 
     gcc [...] -o myprogram -ltcmalloc
-    HEAPPROFILE=/tmp/netheap ./myprogram
+    #HEAPPROFILE=/tmp/netheap ./myprogram
     HEAPPROFILE=/tmp/profile LD_PRELOAD=/usr/lib/libtcmalloc.so PPROF_PATH=/usr/bin/pprof ./bin/myprogram
+    pprof ./myprogram "/tmp/profile.0001.heap" --inuse_objects --lines --heapcheck  --edgefraction=1e-10 --nodefraction=1e-10 --text
 
 ##### Call api
 
@@ -565,9 +704,12 @@ Now that api is provided, we can attach a running process with gdb and call `Hea
     gcc [...] -o myprogram -lprofiler
     CPUPROFILE=/tmp/profile ./myprogram
     LD_PRELOAD=/usr/lib/libprofiler.so CPUPROFILE=/tmp/profile ./myprogram
+    pprof --web ./bin/myprogram /tmp/profile
+
+If `pprof` complains "No nodes to print", then the program uses CPU too little times.
 
 #### Analyze dumped file with pprof
-`gperftools heap profiler` will generate a heap profile output file. That file can be analyzed with with `pprof`.
+`gperftools heap profiler` will generate a heap profile output file. That file can be analyzed with with `pprof`. Some output example following cases above are given here.
 
 Analyze heap checker output:
 
@@ -599,6 +741,16 @@ Analyze heap profiler output:
        0   0.0% 100.0%        1   0.3% std::__ostream_insert ??:0
        0   0.0% 100.0%        1   0.3% std::operator<<  ??:0
 
+Analyze cpu profiler output:
+
+    TODO
+
+#### Best practice
+Profiling the whole program may slow it down drastically. Consider profiling in a smaller granularity. 
+- Call profiling API mannually in the program.
+- Interact with the program with gdb to execute profiling API at appropriate time.
+- Handle SINGPROF(man 7 signal) to deal trigger profiling.
+
 
 ### valgrind
 
@@ -606,6 +758,7 @@ Analyze heap profiler output:
   sudo apt install --no-install-recommends graphviz kcachegrind
 
 This tools can debug memory errors(memory leak, bad access, segmentation fault...) and do other diagnostics.
+But, it's 20x slow down, so use sanitizer where possible.
 
 Reference: 
 https://www.ibm.com/developerworks/community/blogs/6e6f6d1b-95c3-46df-8a26-b7efd8ee4b57/entry/detect_memory_leaks_with_memcheck_tool_provided_by_valgrind_part_i8?lang=en
