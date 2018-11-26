@@ -302,7 +302,10 @@ Rate limit for a specific host:
 ```shell
     ps -TFe # list all threads, with extra full format of all processes
     ps -TF -p $PID # list all threads, with extra full format, of process $PID
+    # a zombie process is already dead, but not waited by parent process. Kill its parent will let 'init' process take over
+    kill $(ps -A -ostat,ppid | awk '/[zZ]/ && !a[$2]++ {print $2}') # [zZ] for pattern, a[$2]++ to filter duplicate ppid.
 ```
+
 #### memory
 
 Sort processes by memory consumption
@@ -341,6 +344,11 @@ Text processing command line tools
 
 ### Edit tools
 
+#### find
+
+    find . -type f -regextype posix-extended -regex '.*\.(h|hpp|cpp|cxx)' # search for files with names matching regular expression
+    find src -type f -regextype posix-extended -regex '.*\.(h|hpp|cpp|cxx)' | while read f; do ln -sfv /mnt/disk/hdu/$f /mnt/disk/jacksp/src_cpu/${f:6} ; done # symbol link all source files to another directory
+
 #### sed
 
 
@@ -375,6 +383,44 @@ Text processing command line tools
 
 
 #### awk
+
+Execution order
+
+Refer to:
+- man page `man awk`
+- [tutorialspoint](https://www.tutorialspoint.com/awk/awk_workflow.htm)
+- [linuxhandbook](https://linuxhandbook.com/awk-command-tutorial/)
+- [An intro to the great language with the strange name](https://www.ibm.com/developerworks/library/l-awk1/index.html)
+
+![image](./data/awk_workflow.jpg)
+
+
+For each input file, if a BEGINFILE rule exists, gawk executes the associated code before processing
+the contents of the file. Similarly, gawk executes the code associated with ENDFILE after processing the file.
+
+For  each RECORD in the input, gawk TESTS to see if it matches any PATTERN in the AWK program.
+For each pattern that the record matches, gawk executes the associated action.
+The patterns are tested in the order they occur in the program.
+
+Finally, after all the input is exhausted, gawk executes the code in the END rule(s) (if any).
+
+
+Variables
+- RS: record separator
+- FS: field separator
+- NR: current input line number, starting with 1. if RS is set to the empty string, then records are separated by sequences consisting of a `<newline>` plus one or more blank lines.
+- `$n`: extract field, where n is a number starting with 1. `n=0` means the entire record.
+
+Using arrays
+All arrays in AWK are `ASSOCIATIVE ARRAYS`, so they allow associating an arbitrary string with another value
+
+Examples
+
+    # print first field of each line, separated by ','
+    cat input | awk '{print $1}'
+    awk '/[zZ]/ && !a[$2]++ {print $2}'
+    # kill zombie process
+    kill $(ps -A -ostat,ppid | awk '/[zZ]/ && !a[$2]++ {print $2}') # [zZ] for pattern, a[$2]++ to filter duplicate ppid.
 
 ### sort
 
@@ -522,20 +568,20 @@ Compile with address sanitizer and run:
     =================================================================
     ==2565==ERROR: AddressSanitizer: heap-use-after-free on address 0x61400000fe44 at pc 0x0000004eced2 bp 0x7ffc4c3f7440 sp 0x7ffc4c3f7438
     READ of size 4 at 0x61400000fe44 thread T0
-	#0 0x4eced1  (/tmp/build/a.out+0x4eced1)
-	#1 0x7f0b31cfa82f  (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
-	#2 0x4189e8  (/tmp/build/a.out+0x4189e8)
+    #0 0x4eced1  (/tmp/build/a.out+0x4eced1)
+    #1 0x7f0b31cfa82f  (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #2 0x4189e8  (/tmp/build/a.out+0x4189e8)
 
     0x61400000fe44 is located 4 bytes inside of 400-byte region [0x61400000fe40,0x61400000ffd0)
     freed by thread T0 here:
-	#0 0x4ea840  (/tmp/build/a.out+0x4ea840)
-	#1 0x4ece86  (/tmp/build/a.out+0x4ece86)
-	#2 0x7f0b31cfa82f  (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #0 0x4ea840  (/tmp/build/a.out+0x4ea840)
+    #1 0x4ece86  (/tmp/build/a.out+0x4ece86)
+    #2 0x7f0b31cfa82f  (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
 
     previously allocated by thread T0 here:
-	#0 0x4ea240  (/tmp/build/a.out+0x4ea240)
-	#1 0x4ece64  (/tmp/build/a.out+0x4ece64)
-	#2 0x7f0b31cfa82f  (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #0 0x4ea240  (/tmp/build/a.out+0x4ea240)
+    #1 0x4ece64  (/tmp/build/a.out+0x4ece64)
+    #2 0x7f0b31cfa82f  (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
 
     SUMMARY: AddressSanitizer: heap-use-after-free (/tmp/build/a.out+0x4eced1)
     Shadow bytes around the buggy address:
@@ -799,6 +845,22 @@ misc    dstat, lsof, cat /proc
 - iotop
 - nvidia-smi
 - tcpdump
+
+
+### netstat
+
+    netstat -nlpte # list all listenig ports
+
+- -n: numeric
+- -l: listening
+- -t: tcp
+- -e: extend, display additional info
+
+### lsof
+
+    lsof -p $PID
+
+
 
 production tools
 -----------------
