@@ -740,7 +740,11 @@ In case it's useful, `IsHeapProfilerRunning()` will tell you whether you've alre
 
 Now that api is provided, we can attach a running process with gdb and call `HeapProfilerDump()` profile a snapshot.
 
+    (gdb) attach $PID # attach to a running process
     (gdb) call HeapProfilerStart("/tmp/profile")
+    (gdb) detach # detach from it
+    ......
+    (gdb) attach $PID
     (gdb) call HeapProfilerDump()
     (gdb) call HeapProfilerStop()
 
