@@ -58,6 +58,7 @@ gdb> c # continue
 gdb> #b ... # break at somewhere
 gdb> break operator new # break at operator new
 gdb> break mmap # break at mmap
+gdb> info break # list breakpoints
 gdb> whatis i
 type = int
 gdb> print i
@@ -748,8 +749,27 @@ Now that api is provided, we can attach a running process with gdb and call `Hea
     (gdb) call HeapProfilerDump()
     (gdb) call HeapProfilerStop()
 
+To use `gdb` with `LD_PRELAOD`:
+
+    (gdb) set environment LD_PRELOAD /usr/lib/libprofiler.so # use set environment
+    (gdb) set exec-wrapper env 'LD_PRELOAD=/usr/lib/libprofiler.so CPUPROFILE=/tmp/profile' # use exec-wrapper
+
 
 #### Cpu Profiler
+
+There are two alternatives to actually turn on CPU profiling for a given run of an executable:
+
+Define the environment variable CPUPROFILE to the filename to dump the profile to. 
+For instance, to profile `/usr/local/netscape`:
+
+      $ CPUPROFILE=/tmp/profile /usr/local/netscape           # sh
+      % setenv CPUPROFILE /tmp/profile; /usr/local/netscape   # csh
+
+OR
+In your code, bracket the code you want profiled in calls to `ProfilerStart()` and `ProfilerStop()`. 
+`ProfilerStart()` will take the profile-filename as an argument.
+
+To insert code with `LD_PRELOAD`:
 
     gcc [...] -o myprogram -lprofiler
     CPUPROFILE=/tmp/profile ./myprogram
