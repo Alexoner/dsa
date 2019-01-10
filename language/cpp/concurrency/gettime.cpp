@@ -9,7 +9,10 @@
 #define NUM_SAMPLES 1000000
 unsigned int NUM_THREADS = 4;
 
-static inline unsigned long long getticks(void)
+/**
+ * get time stamp counter
+ */
+static inline unsigned long long gettsc(void)
 {
     unsigned int lo, hi;
 
@@ -79,7 +82,7 @@ void measure(const std::string& methodName, Method method)
 int main(int argc, char** argv)
 {
     NUM_THREADS = 1;
-    measure("rdtsc", [](){ return getticks(); });
+    measure("rdtsc", [](){ return gettsc(); });
     measure("gettimeofday", [](){ timeval tv; return gettimeofday(&tv, 0); });
     measure("time", [](){ return time(NULL); });
     measure("std chrono system_clock", [](){ return std::chrono::system_clock::now(); });
@@ -90,7 +93,7 @@ int main(int argc, char** argv)
     std::cout << "\n======\n";
 
     NUM_THREADS = 100;
-    measure("rdtsc", [](){ return getticks(); });
+    measure("rdtsc", [](){ return gettsc(); });
     measure("gettimeofday", [](){ timeval tv; return gettimeofday(&tv, 0); });
     measure("time", [](){ return time(NULL); });
     measure("std chrono system_clock", [](){ return std::chrono::system_clock::now(); });
