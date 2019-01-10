@@ -1,6 +1,85 @@
 Linux debug, profile, performance tuning tools
 ==============================================
 
+Table of Contents
+=================
+
+   * [Linux debug, profile, performance tuning tools](#linux-debug-profile-performance-tuning-tools)
+      * [Compiler](#compiler)
+      * [Debugger(ptrace), profiler](#debuggerptrace-profiler)
+         * [gdb](#gdb)
+            * [Start gdb](#start-gdb)
+            * [Execute commands at startup](#execute-commands-at-startup)
+            * [Essential commands and common practices](#essential-commands-and-common-practices)
+            * [GUI](#gui)
+      * [Refrence](#refrence)
+            * [<a href="https://stackoverflow.com/questions/26805197/how-to-pipe-gdbs-full-stack-trace-to-a-file" rel="nofollow">Dump all thread stack to a file</a>](#dump-all-thread-stack-to-a-file)
+            * [Modifying program state](#modifying-program-state)
+            * [<a href="https://unix.stackexchange.com/questions/166541/how-to-know-where-a-program-is-stuck-in-linux" rel="nofollow">Stack trace of running program</a>](#stack-trace-of-running-program)
+         * [strace &amp; ltrace](#strace--ltrace)
+         * [Core dump](#core-dump)
+         * [ld.so](#ldso)
+      * [Linux administrative tools](#linux-administrative-tools)
+         * [taskset - set or retrieve a process's CPU affinity](#taskset---set-or-retrieve-a-processs-cpu-affinity)
+            * [Read the CPU Affinity of a Running Process](#read-the-cpu-affinity-of-a-running-process)
+            * [Pin a Running Process to Particular CPU Core(s)](#pin-a-running-process-to-particular-cpu-cores)
+            * [Launch a Program on Specific CPU Cores](#launch-a-program-on-specific-cpu-cores)
+         * [iptables - administrative tool for IPv4/IPv6 packet filtering and NAT](#iptables---administrative-tool-for-ipv4ipv6-packet-filtering-and-nat)
+         * [tc - traffic control](#tc---traffic-control)
+         * [pmap - report memory map of a process](#pmap---report-memory-map-of-a-process)
+         * [ps &amp; top &amp; htop](#ps--top--htop)
+            * [memory](#memory)
+         * [dmesg](#dmesg)
+      * [Text processing command line tools](#text-processing-command-line-tools)
+         * [Search tools](#search-tools)
+            * [ag](#ag)
+            * [egrep](#egrep)
+         * [Edit tools](#edit-tools)
+            * [find](#find)
+            * [sed](#sed)
+            * [awk](#awk)
+         * [sort](#sort)
+         * [uniq - report or omit repeated lines](#uniq---report-or-omit-repeated-lines)
+         * [eu-stack](#eu-stack)
+      * [File system](#file-system)
+         * [/proc/$PID/](#procpid)
+         * [/var/log/auth.log - system authentication log](#varlogauthlog---system-authentication-log)
+      * [Static analysis tool](#static-analysis-tool)
+         * [cppcheck](#cppcheck)
+         * [clang-tools](#clang-tools)
+      * [Quality assurance tools](#quality-assurance-tools)
+         * [<a href="https://github.com/google/sanitizers">Sanitizers</a>](#sanitizers)
+            * [How to check memory of a running process - Use gdb to call check function?](#how-to-check-memory-of-a-running-process---use-gdb-to-call-check-function)
+            * [Control flow sanitizer](#control-flow-sanitizer)
+            * [Stack buffer overflow](#stack-buffer-overflow)
+         * [Testing](#testing)
+            * [Unittest](#unittest)
+            * [Fuzz testing(fuzzing/fuzzer)](#fuzz-testingfuzzingfuzzer)
+      * [Profiling tools](#profiling-tools)
+         * [<a href="https://github.com/gperftools/gperftools/wiki">gperftools</a>](#gperftools)
+            * [Install](#install)
+            * [TC malloc](#tc-malloc)
+            * [Heap checker](#heap-checker)
+            * [Heap profiler](#heap-profiler)
+               * [Call api](#call-api)
+            * [Cpu Profiler](#cpu-profiler)
+            * [Analyze dumped file with pprof](#analyze-dumped-file-with-pprof)
+            * [Best practice](#best-practice)
+         * [valgrind](#valgrind)
+            * [common usage](#common-usage)
+            * [FAQ](#faq)
+               * [Valgrind on OSX reports false positive memory leak](#valgrind-on-osx-reports-false-positive-memory-leak)
+      * [Other ops tools](#other-ops-tools)
+         * [netstat](#netstat)
+         * [lsof](#lsof)
+      * [production tools](#production-tools)
+         * [Monitor tools](#monitor-tools)
+            * [Grafana - analytics and monitoring](#grafana---analytics-and-monitoring)
+            * [influxdb - time series database](#influxdb---time-series-database)
+
+Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
+
+
 Compiler
 --------
 
@@ -40,6 +119,10 @@ gdb $1 -ex "${ARGS}"
 $ gdb program (pid)
 gdb> run
 gdb> where # print backtrace of all stack frames
+gdb> bt # backtrace, same as where
+gdb> f n # select frame with number n.
+gdb> up n # move n frames up the stack
+gdb> down n # move n frames down the stack
 gdb> layout src # enter TUI mode
 gdb> s # step into function
 gdb> return # make current function return, popping out of stack frame
@@ -105,13 +188,19 @@ $ gdb <binary> core.dump
 gdb> set logging on
 gdb> set pagination off
 gdb> thread apply all full bt
+gdb> thread n # select thread n
+gdb> f m # select frame depth with number m
 ```
 
 #### Modifying program state
 
 ```shell
-gdb> call i = 0;
+gdb> call i = 0; # change variable i to 0
 ```
+Abnormal program state and possible reasons
+- Dirty data that doesn't make sense
+    - Data race
+    - Object has been destroyed, so memory is used for other purpose.
 
 #### [Stack trace of running program](https://unix.stackexchange.com/questions/166541/how-to-know-where-a-program-is-stuck-in-linux)
 
@@ -179,17 +268,45 @@ After a core dump file is generated, view it with `gdb`
 
     gdb <binary file> core
 
-### ld.so
+### ld.so & ld
 
     man 8 ld.so
+    man ld
 
-`LD_PRELOAD` environment variable can be used to override functions in other libraries.
+#### LD_PRELOAD
+
+`LD_PRELOAD` environment variable can be used to override functions in other libraries,
+including `libc` system calls.
 
 For example, setting to enable `leak sanitizer` we can do this:
 
     LD_PRELOAD=/usr/lib/x86_64-linux-gnu/liblsan.so.0 ./a.out
 
-For example, a sandbox environment can be created by overriding system calls.
+A sandbox environment can be created by overriding system calls with environment variable `LD_PRELOAD`.
+
+#### ld --wrap=symbol
+
+Use a wrapper function for symbol.
+Any undefined reference to symbol will be resolved to "__wrap_symbol".  Any undefined reference to "__real_symbol" will be resolved to symbol.
+
+This can be used to provide a wrapper for a system function.  The wrapper function should be called "__wrap_symbol".  If it wishes to call the system function, it should call
+"__real_symbol".
+
+Here is a trivial example:
+
+    void *
+    __wrap_malloc (size_t c)
+    {
+      printf ("malloc called with %zu\n", c);
+      return __real_malloc (c);
+    }
+
+If you link other code with this file using --wrap malloc, then all calls to "malloc" will call the function "__wrap_malloc" instead.  The call to "__real_malloc" in "__wrap_malloc" will
+call the real "malloc" function.
+
+You may wish to provide a "__real_malloc" function as well, so that links without the --wrap option will succeed.  If you do this, you should not put the definition of "__real_malloc" in
+the same file as "__wrap_malloc"; if you do, the assembler may resolve the call before the linker has a chance to wrap it to "malloc".
+
 
 
 Linux administrative tools
@@ -422,6 +539,12 @@ Examples
     awk '/[zZ]/ && !a[$2]++ {print $2}'
     # kill zombie process
     kill $(ps -A -ostat,ppid | awk '/[zZ]/ && !a[$2]++ {print $2}') # [zZ] for pattern, a[$2]++ to filter duplicate ppid.
+
+    # process a csv file, copy all files at the first field, and substitue destination name by replacing pattern with target
+    cat feature.3030.csv|awk '{FS=","}NR > 1 {print $1}' |while read f
+    do
+        cp -v $f  /tmp/features/$(basename $f|sed -r 's/pattern/target/g')
+    done
 
 ### sort
 
