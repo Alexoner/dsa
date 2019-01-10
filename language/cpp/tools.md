@@ -5,6 +5,7 @@ Table of Contents
 =================
 
    * [Linux debug, profile, performance tuning tools](#linux-debug-profile-performance-tuning-tools)
+   * [Table of Contents](#table-of-contents)
       * [Compiler](#compiler)
       * [Debugger(ptrace), profiler](#debuggerptrace-profiler)
          * [gdb](#gdb)
@@ -12,13 +13,14 @@ Table of Contents
             * [Execute commands at startup](#execute-commands-at-startup)
             * [Essential commands and common practices](#essential-commands-and-common-practices)
             * [GUI](#gui)
-      * [Refrence](#refrence)
             * [<a href="https://stackoverflow.com/questions/26805197/how-to-pipe-gdbs-full-stack-trace-to-a-file" rel="nofollow">Dump all thread stack to a file</a>](#dump-all-thread-stack-to-a-file)
             * [Modifying program state](#modifying-program-state)
             * [<a href="https://unix.stackexchange.com/questions/166541/how-to-know-where-a-program-is-stuck-in-linux" rel="nofollow">Stack trace of running program</a>](#stack-trace-of-running-program)
          * [strace &amp; ltrace](#strace--ltrace)
          * [Core dump](#core-dump)
-         * [ld.so](#ldso)
+         * [ld.so &amp; ld](#ldso--ld)
+            * [LD_PRELOAD](#ld_preload)
+            * [ld --wrap=symbol](#ld---wrapsymbol)
       * [Linux administrative tools](#linux-administrative-tools)
          * [taskset - set or retrieve a process's CPU affinity](#taskset---set-or-retrieve-a-processs-cpu-affinity)
             * [Read the CPU Affinity of a Running Process](#read-the-cpu-affinity-of-a-running-process)
@@ -78,7 +80,6 @@ Table of Contents
             * [influxdb - time series database](#influxdb---time-series-database)
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
-
 
 Compiler
 --------
@@ -176,7 +177,6 @@ https://sourceware.org/gdb/wiki/GDB%20Front%20Ends
 [gdbgui](https://github.com/cs01/gdbgui/) is awesome.
 
 Refrence
---------
 - https://sourceware.org/gdb/onlinedocs/gdb/Assignment.html
 - https://sourceware.org/gdb/onlinedocs/gdb/Compiling-and-Injecting-Code.html
 - https://www.codeproject.com/Articles/33340/Code-Injection-into-Running-Linux-Application
