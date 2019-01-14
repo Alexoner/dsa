@@ -43,6 +43,10 @@ Table of Contents
          * [sort](#sort)
          * [uniq - report or omit repeated lines](#uniq---report-or-omit-repeated-lines)
          * [eu-stack](#eu-stack)
+      * [Parallel processing](#parallel-processing)
+         * [background task with &amp;](#background-task-with-)
+         * [parallel](#parallel)
+         * [xargs](#xargs)
       * [File system](#file-system)
          * [/proc/$PID/](#procpid)
          * [/var/log/auth.log - system authentication log](#varlogauthlog---system-authentication-log)
@@ -599,6 +603,55 @@ It can be used to group or aggregate results.
 
 ### eu-stack
 TODO
+
+Parallel processing
+-------------------
+- Use GNU/parallel or xargs command.
+- Use wait built-in command with &.
+- Use xargs command.
+
+### background task with `&`
+
+    prog1 &
+    prog2 &
+    wait
+    prog3
+
+###  `parallel`
+Refere to `man parallel_tutorial`
+
+    $ parallel --no-notice echo {} ::: A B C
+    A
+    B
+    C
+    $ parallel echo {} ::: A B C ::: D E F
+    A D
+    A E
+    A F
+    B D
+    B E
+    B F
+    C D
+    C E
+    C F
+
+- `{}` for replacement string(placeholder)
+
+### `xargs`
+
+    $ ls
+    A B C
+    $ find . -type f |xargs -I {} echo "Found {}"
+    Found A
+    Found B
+    Found C
+    $ find . -type f -exec echo 'Found {}' \;
+    Found A
+    Found B
+    Found C
+    $ # find . -type f |xargs -I {} sed -i -r 's/pattern/target/g' |awk ...
+
+- `-I replace-str`: replace occurrences of string `replace-str` with names read from standard input. 
 
 
 File system
