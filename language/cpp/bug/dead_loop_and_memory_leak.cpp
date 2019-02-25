@@ -1,3 +1,24 @@
+/**
+ *
+ * run:
+ * $ LD_PRELOAD=/usr/lib/x86_64-linux-gnu/liblsan.so.0 ./bin/dead_loop_and_memory_leak
+ * $ ctrl+c
+ *
+ *=================================================================
+==9662==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 110592 byte(s) in 108 object(s) allocated from:
+    #0 0x7f42145c1975 in operator new[](unsigned long) (/usr/lib/x86_64-linux-gnu/liblsan.so.0+0xd975)
+    #1 0x404d5f in main /home/hao.du/Documents/mine/dsa/language/cpp/bug/dead_loop_and_memory_leak.cpp:51
+    #2 0x7f4213a5582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+Direct leak of 109568 byte(s) in 107 object(s) allocated from:
+    #0 0x7f42145c1975 in operator new[](unsigned long) (/usr/lib/x86_64-linux-gnu/liblsan.so.0+0xd975)
+    #1 0x404d49 in main /home/hao.du/Documents/mine/dsa/language/cpp/bug/dead_loop_and_memory_leak.cpp:49
+    #2 0x7f4213a5582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+SUMMARY: LeakSanitizer: 220160 byte(s) leaked in 215 allocation(s).
+ */
 #include <iostream>
 #include <thread>
 #include <chrono>

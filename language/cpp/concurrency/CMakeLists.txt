@@ -1,6 +1,5 @@
 add_executable(helloConcurrency helloConcurrency.cpp)
 add_executable(threads threads.cpp)
-add_executable(deadlock deadlock.cpp)
 add_executable(atomicOperation atomicOperation.cpp)
 add_executable(falseSharing falseSharing.cpp)
 add_executable(promise promise.cpp)

@@ -1,11 +1,7 @@
 if (NOT BUILD_ARCH)
-	set(BUILD_ARCH "-m64")
+    set(BUILD_ARCH "-m64")
 endif ()
 
-add_executable(deadloop deadloop.cpp)
-add_executable(memoryleak memoryleak.cpp)
-#set_target_properties(memoryleak PROPERTIES LINK_FLAGS "-ltcmalloc")
-target_link_libraries(memoryleak "tcmalloc")
 add_executable(nestedException nestedException.cpp)
 add_executable(vptr vptr.cpp)
 # Add the -std=c++11 flag as an example
@@ -19,7 +15,10 @@ add_executable(typePromotion typePromotion.cpp)
 add_executable(destructionOrder destructionOrder.cpp)
 add_executable(isDerivedFrom isDerivedFrom.cpp)
 add_executable(rand rand.cpp)
+add_executable(inherit inherit.cpp)
+add_executable(template template.cpp)
 
 # stl
 add_subdirectory(stl)
 add_subdirectory(concurrency)
+add_subdirectory(bug)

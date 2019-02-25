@@ -11,8 +11,9 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # use clang instead of gcc
+#set(CMAKE_C_COMPILER "clang")
 #set(CMAKE_CXX_COMPILER "clang++")
-#set(CMAKE_CXX_COMPILER "g++") # to enable address sanitizer, gcc>=6 is recommended
+set(CMAKE_CXX_COMPILER "g++-8") # to enable sanitizer(-fsanitizer=thread,address), gcc>=6 is recommended
 
 
 ##################################### OS specific ############################################
@@ -104,9 +105,9 @@ if (WITH_LOGGER STREQUAL "ON") # or use MATCHES instead of STREQUAL
   message(STATUS "add library easylogging++")
 
   if (APPLE)
-	  add_library(easylogging STATIC language/cpp/logger/easylogging++.cc)
+      add_library(easylogging STATIC language/cpp/logger/easylogging++.cc)
   else()
-	  add_library(easylogging SHARED language/cpp/logger/easylogging++.cc)
+      add_library(easylogging SHARED language/cpp/logger/easylogging++.cc)
   endif()
 
   include_directories(language/cpp/logger)

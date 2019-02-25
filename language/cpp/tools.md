@@ -204,7 +204,7 @@ gdb> call i = 0; # change variable i to 0
 Abnormal program state and possible reasons
 - Dirty data that doesn't make sense
     - Data race
-    - Object has been destroyed, so memory is used for other purpose.
+    - Illegal memory access: object has been destroyed, so memory is used for other purpose.
 
 #### [Stack trace of running program](https://unix.stackexchange.com/questions/166541/how-to-know-where-a-program-is-stuck-in-linux)
 
@@ -311,6 +311,14 @@ call the real "malloc" function.
 You may wish to provide a "__real_malloc" function as well, so that links without the --wrap option will succeed.  If you do this, you should not put the definition of "__real_malloc" in
 the same file as "__wrap_malloc"; if you do, the assembler may resolve the call before the linker has a chance to wrap it to "malloc".
 
+
+#### `mprotect`
+
+    man mprotect
+
+#### `electric-fence`
+
+    man libefence
 
 
 Linux administrative tools
@@ -653,6 +661,11 @@ Refere to `man parallel_tutorial`
 
 - `-I replace-str`: replace occurrences of string `replace-str` with names read from standard input. 
 
+### `find`
+
+    # https://stackoverflow.com/questions/602706/batch-renaming-files-with-bash
+    find . -type f |sed -n -r 's/(.+)pattern(.+)/mv \1pattern\2 \1target\2/p' |sh # batch renaming multiple files
+
 
 File system
 ------------
@@ -840,7 +853,7 @@ Profiling tools
 ---------------
 
 
-[gprof, valgrind, gperftools](http://gernotklingler.com/blog/gprof-valgrind-gperftools-evaluation-tools-application-level-cpu-profiling-linux/)
+[gprof, valgrind, gperftools](http://gernotklingler.com/blog/gprof-valgrind-gperftools-evaluation-tools-application-level-cpu-profiling-linux/), linux perf
 
 ### [gperftools](https://github.com/gperftools/gperftools/wiki)
 `gperftools` is a collection of high-performance multi-threaded `malloc` implementation, and performance analysis tools.
@@ -938,17 +951,17 @@ There are two alternatives to actually turn on CPU profiling for a given run of 
 Define the environment variable CPUPROFILE to the filename to dump the profile to. 
 For instance, to profile `/usr/local/netscape`:
 
+      gcc [...] -o myprogram -lprofiler
       $ CPUPROFILE=/tmp/profile /usr/local/netscape           # sh
       % setenv CPUPROFILE /tmp/profile; /usr/local/netscape   # csh
 
 OR
 In your code, bracket the code you want profiled in calls to `ProfilerStart()` and `ProfilerStop()`. 
+(These functions are declared in `<gperftools/profiler.h>`).
 `ProfilerStart()` will take the profile-filename as an argument.
 
 To insert code with `LD_PRELOAD`:
 
-    gcc [...] -o myprogram -lprofiler
-    CPUPROFILE=/tmp/profile ./myprogram
     LD_PRELOAD=/usr/lib/libprofiler.so CPUPROFILE=/tmp/profile ./myprogram
     pprof --web ./bin/myprogram /tmp/profile
 
