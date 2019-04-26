@@ -28,20 +28,18 @@
 #include <iostream>
 #include <boost/stacktrace.hpp>
 
-#include <easylogging++.h>
-INITIALIZE_EASYLOGGINGPP
-
 
 using namespace std;
 
 class StackDepthGuard
 {
 public:
-    StackDepthGuard(bool enabled, int &depth):
+    StackDepthGuard(bool &enabled, int &depth):
         mEnabled(enabled),
         mDepth(depth)
     {
         ++mDepth;
+        //printf("depth: %d\n", depth);
     }
     ~StackDepthGuard()
     {
@@ -57,25 +55,24 @@ public:
     int &mDepth; // stack depth counter
 };
 
-namespace
+namespace hook
 {
     bool enableHook = true; // global switch, not used yet
     thread_local int depth = 0;
 }
+using namespace hook;
 
 extern "C"
 {
 
 // Link with 'LINKFLAGS='-Xlinker --wrap=memcpy -rdynamic' for this implementation.
 void* __real_memcpy(void* dest, const void* src, size_t n);
-// FIXME: not finished
 void* __wrap_memcpy(void* dest, const void* src, size_t n)
 {
     StackDepthGuard enabled(enableHook, depth);
     if (enabled)
     {
-        //LOG(INFO) << "memcpy n: " << n << " backtrace:\n" << boost::stacktrace::stacktrace();
-        fprintf(stdout, "calling memcpy");
+        std::cout << "memcpy n: " << n << " backtrace:\n" << boost::stacktrace::stacktrace();
     }
 
     // call underlying memcpy
@@ -91,17 +88,12 @@ void* __wrap_memcpy(void* dest, const void* src, size_t n)
 // XXX: if dlsym calls an underlying system call that we're trying to override, use ld --wrap=symbol
 void* memcpy(void* dest, const void* src, size_t n)
 {
-    //if (enabled)
     StackDepthGuard enabled(enableHook, depth);
 
     if (enabled)
     {
-        //LOG(INFO) << "hooking memcpy";
-        //fprintf(stdout, "HOOK: memcpy( dest=%p , src=%p, n=%zd )\n", dest, src, n);
         fprintf(stdout, "HOOK: memcpy( dest=%p , src=%p, n=%zd )\n", dest, src, n);
         std::cout << boost::stacktrace::stacktrace() << endl;
-        //memcpy(NULL, NULL, 0); // XXX: test infinite recursion stack overflow
-        //printf("HOOK: memcpy( dest=%p , src=%p, n=%zd )\n", dest, src, n);
     }
 
     // call underlying memcpy
