@@ -853,7 +853,11 @@ Profiling tools
 ---------------
 
 
-[gprof, valgrind, gperftools](http://gernotklingler.com/blog/gprof-valgrind-gperftools-evaluation-tools-application-level-cpu-profiling-linux/), linux perf
+[gprof, valgrind, gperftools](http://gernotklingler.com/blog/gprof-valgrind-gperftools-evaluation-tools-application-level-cpu-profiling-linux/), [perf_events](http://www.brendangregg.com/perf.html)
+
+For large applications, heavy profiling tools isn't appropriate. Light-weighted tools like `perf_events` comes in handy.
+One strategy is to use `perf_events` to draw statistics about most heavy low level system call, then override those
+functions with `LD_PERLOAD` magic to get information of corresponding call stacks.
 
 ### [gperftools](https://github.com/gperftools/gperftools/wiki)
 `gperftools` is a collection of high-performance multi-threaded `malloc` implementation, and performance analysis tools.
