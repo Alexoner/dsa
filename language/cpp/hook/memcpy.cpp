@@ -34,50 +34,33 @@ INITIALIZE_EASYLOGGINGPP
 
 using namespace std;
 
-struct WrapperFence
-{
-    WrapperFence(bool& globalEnabled) : globalEnabled(globalEnabled), enabled(true) {}
-private:
-    friend struct WrapperGuard;
-    operator bool() const { return globalEnabled && enabled; }
-    bool& globalEnabled;
-    bool enabled;
-};
-
-struct WrapperGuard
-{
-    WrapperGuard(WrapperFence& fence);
-    ~WrapperGuard();
-    WrapperGuard(const WrapperGuard&) = delete;
-    WrapperGuard(WrapperGuard&&) = delete;
-    operator bool() const { return enabled; }
-private:
-    WrapperFence& fence;
-    bool enabled;
-};
-
 class StackDepthGuard
 {
 public:
-    StackDepthGuard(int &depth): mDepth(depth)
+    StackDepthGuard(bool enabled, int &depth):
+        mEnabled(enabled),
+        mDepth(depth)
     {
         ++mDepth;
-
     }
     ~StackDepthGuard()
     {
         --mDepth;
     }
 
-    int &mDepth;
+    operator bool() const
+    {
+        return mDepth == 1 && mEnabled;
+    }
+
+    bool &mEnabled; // global switch reference
+    int &mDepth; // stack depth counter
 };
 
-namespace {
-bool enableHook = false;
-thread_local int depth = 0;
-
-bool memcpyWrapperEnabled = true;
-thread_local WrapperFence memcpyWrapperFence(memcpyWrapperEnabled);
+namespace
+{
+    bool enableHook = true; // global switch, not used yet
+    thread_local int depth = 0;
 }
 
 extern "C"
@@ -88,7 +71,7 @@ void* __real_memcpy(void* dest, const void* src, size_t n);
 // FIXME: not finished
 void* __wrap_memcpy(void* dest, const void* src, size_t n)
 {
-    WrapperGuard enabled(memcpyWrapperFence);
+    StackDepthGuard enabled(enableHook, depth);
     if (enabled)
     {
         //LOG(INFO) << "memcpy n: " << n << " backtrace:\n" << boost::stacktrace::stacktrace();
@@ -108,17 +91,16 @@ void* __wrap_memcpy(void* dest, const void* src, size_t n)
 // XXX: if dlsym calls an underlying system call that we're trying to override, use ld --wrap=symbol
 void* memcpy(void* dest, const void* src, size_t n)
 {
-    //WrapperGuard enabled(memcpyWrapperFence);
     //if (enabled)
-    StackDepthGuard _(depth);
+    StackDepthGuard enabled(enableHook, depth);
 
-    if (depth == 1)
+    if (enabled)
     {
         //LOG(INFO) << "hooking memcpy";
-        //cout << "hooking memcpy";
-        std::cout << boost::stacktrace::stacktrace();
         //fprintf(stdout, "HOOK: memcpy( dest=%p , src=%p, n=%zd )\n", dest, src, n);
-        memcpy(NULL, NULL, 0); // XXX: test infinite recursion stack overflow
+        fprintf(stdout, "HOOK: memcpy( dest=%p , src=%p, n=%zd )\n", dest, src, n);
+        std::cout << boost::stacktrace::stacktrace() << endl;
+        //memcpy(NULL, NULL, 0); // XXX: test infinite recursion stack overflow
         //printf("HOOK: memcpy( dest=%p , src=%p, n=%zd )\n", dest, src, n);
     }
 
@@ -130,8 +112,6 @@ void* memcpy(void* dest, const void* src, size_t n)
     }
 
     return func_memcpy(dest, src, n);
-
-    //return __wrap_memcpy(dest, src, n);
 }
 
 }
