@@ -1,6 +1,8 @@
 /**
  * memcpy hook to print information about call stack
  *
+ * Override a system call
+ * ----------------------
  * There are two methods to override a system call in C.
  * 1) Using LD_PRELOAD.
  *    There is a shell environment variable in Linux called LD_PRELOAD, which can be set to a path of a shared library, and that library will be loaded before any other library (including glibc).
@@ -8,7 +10,10 @@
  *    This can be used to use a wrapper function for symbol. Any further reference to symbol will be resolved to the wrapper function. [man 1 ld].LINKFLAGS='-Xlinker --wrap=memcpy -rdynamic'
  *    Link with 'LINKFLAGS='-Xlinker --wrap=memcpy -rdynamic'.
  *
- * Reference: http://samanbarghi.com/blog/2014/09/05/how-to-wrap-a-system-call-libc-function-in-linux/
+ * Reference
+ * ---------
+ * http://samanbarghi.com/blog/2014/09/05/how-to-wrap-a-system-call-libc-function-in-linux/
+ * https://www.boost.org/doc/libs/1_70_0/doc/html/stacktrace/getting_started.html#stacktrace.getting_started.how_to_print_current_call_stack
  *
  * Problems:
  * memcpy is a very low level call, many function will call it. So we must avoid stack overflow caused by infinite calling hook function.
@@ -92,8 +97,9 @@ void* memcpy(void* dest, const void* src, size_t n)
 
     if (enabled)
     {
-        fprintf(stdout, "HOOK: memcpy( dest=%p , src=%p, n=%zd )\n", dest, src, n);
-        std::cout << boost::stacktrace::stacktrace() << endl;
+        std::cout << "memcpy n: " << n << " backtrace:\n" << boost::stacktrace::stacktrace();
+        //fprintf(stdout, "HOOK: memcpy( dest=%p , src=%p, n=%zd )\n", dest, src, n);
+        //std::cout << boost::stacktrace::stacktrace() << endl;
     }
 
     // call underlying memcpy
