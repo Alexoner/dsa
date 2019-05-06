@@ -41,6 +41,16 @@
  *
  * (Hint: we can use something like LPS array construction in KMP algorithm)
  * .
+ *
+ * Takeaway
+ * =========
+ * 1. A brute force search takes O(mn) time complexity. This method is actually tracking
+ * state of LENGTH BEGINNING HERE.
+ * 2. Keep track of the state as LENGTH ENDING HERE(length of prefix matched so far), and build a
+ * finite state machine to search takes O(mk) time to preprocess and O(n) time to search.
+ * 3. Build a sparse finite state machine, like in KMP, will reduce the preprocessing
+ * time complexity to O(m).
+ *
  */
 
 #include <stdio.h>
