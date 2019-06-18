@@ -16,7 +16,7 @@ Table of Contents
             * [<a href="https://stackoverflow.com/questions/26805197/how-to-pipe-gdbs-full-stack-trace-to-a-file" rel="nofollow">Dump all thread stack to a file</a>](#dump-all-thread-stack-to-a-file)
             * [Modifying program state](#modifying-program-state)
             * [<a href="https://unix.stackexchange.com/questions/166541/how-to-know-where-a-program-is-stuck-in-linux" rel="nofollow">Stack trace of running program</a>](#stack-trace-of-running-program)
-         * [strace &amp; ltrace](#strace--ltrace)
+         * [ptrace(strace &amp; ltrace)](#strace--ltrace)
          * [Core dump](#core-dump)
          * [ld.so &amp; ld](#ldso--ld)
             * [LD_PRELOAD](#ld_preload)
@@ -241,10 +241,11 @@ Use gdb to change environment variables of a running process.
 This is a wrapper script using gdb to attach to a running process then get the process's
 call stack.
 
-### strace & ltrace
+### ptrace(strace & ltrace)
 `strace` can be used to trace system call and signals.
 
-    strace -Ttt -f -p $PID -o app.strace
+    strace -Ttt -f -p $PID -o app.strace # print out syscall
+    strace -w -c # show syscall latency
 
 - -f: trace child processes, all threads
 - -T: show time spent in system calls
@@ -626,12 +627,20 @@ Parallel processing
     prog3
 
 ###  `parallel`
-Refere to `man parallel_tutorial`
+Refer to `man parallel_tutorial`
 
+    # use ::: to input data
     $ parallel --no-notice echo {} ::: A B C
     A
     B
     C
+
+    # pipe data into parallel
+    $ echo -e 'a\nb\nc'  |parallel --no-notice echo processed {}
+    processed a
+    processed b
+    processed c
+
     $ parallel echo {} ::: A B C ::: D E F
     A D
     A E
@@ -833,6 +842,12 @@ Compile and run:
     % clang -fsanitize=safe-stack a.c && ./a.out
     [1]    10408 segmentation fault (core dumped)  ./a.out
 
+### Set thread name
+
+```cpp
+    pthread_setname_np(pthread_self(), "thread_name");
+```
+
 ### Testing
 
 #### Unittest
@@ -858,6 +873,53 @@ Profiling tools
 For large applications, heavy profiling tools isn't appropriate. Light-weighted tools like `perf_events` comes in handy.
 One strategy is to use `perf_events` to draw statistics about most heavy low level system call, then override those
 functions with `LD_PERLOAD` magic to get information of corresponding call stacks.
+
+If you want to debug a specific module, profiling with manually inserted code to draw statistics of program execution
+will be a good choice if external tools don't work.
+
+### The USE(Utilization Saturation and Errors) Method
+
+Reference: http://www.brendangregg.com/usemethod.html
+
+### perf_event
+
+#### Record cpu clock
+
+    perf record -e cpu-clock --call-graph dwarf ./a.out # profile ./a.out by sampling with cpu-clock event 
+    perf record -e cs --call-graph dwarf ./a.out # profile ./a.out by sampling with context switch event 
+    perf report # report
+
+#### Off-CPU analysis
+
+Generic thread states
+Performance issues can be categorized into one of two types:
+- On-CPU: where threads are spending time running on-CPU.
+- Off-CPU: where time is spent waiting while blocked on I/O, locks, timers, paging/swapping, etc.
+
+
+
+    # echo 1 > /proc/sys/kernel/sched_schedstats # since Linux kernel 4.5
+    # perf record -e sched:sched_stat_sleep -e sched:sched_switch \
+        -e sched:sched_process_exit -a -g -o perf.data.raw sleep 1
+    # perf inject -v -s -i perf.data.raw -o perf.data
+    # perf script -f comm,pid,tid,cpu,time,period,event,ip,sym,dso,trace | awk '
+        NF > 4 { exec = $1; period_ms = int($5 / 1000000) }
+        NF > 1 && NF <= 4 && period_ms > 0 { print $2 }
+        NF < 2 && period_ms > 0 { printf "%s\n%d\n\n", exec, period_ms }' | \
+        ./stackcollapse.pl | \
+        ./flamegraph.pl --countname=ms --title="Off-CPU Time Flame Graph" --colors=io > offcpu.svg
+
+Reference:
+- http://www.brendangregg.com/offcpuanalysis.html
+- http://www.brendangregg.com/blog/2015-02-26/linux-perf-off-cpu-flame-graph.html
+- https://github.com/iovisor/bcc#tracing
+
+Note:
+perf record for 
+
+### SystemTap
+
+TODO
 
 ### [gperftools](https://github.com/gperftools/gperftools/wiki)
 `gperftools` is a collection of high-performance multi-threaded `malloc` implementation, and performance analysis tools.
@@ -1051,7 +1113,7 @@ https://www.tecmint.com/command-line-tools-to-monitor-linux-performance/
 CPU    htop, top
 GPU    gpu
 process    ps, pstree
-debug    gdb, strace, perf, dtrace
+debug    gdb, ptrace(strace), perf, dtrace
 memory    htop, free, pmap, vmstat
 disk    df, du, iotop, iostat
 network    nc, ping, iperf, iftop, nload, netstat, sar, tcpdump

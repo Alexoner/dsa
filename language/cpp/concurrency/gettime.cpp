@@ -81,15 +81,20 @@ void measure(const std::string& methodName, Method method)
 
 int main(int argc, char** argv)
 {
+    double begin = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count() * 1e-6);
+    //std::cout << "timestamp now: " <<  << std::endl;
     NUM_THREADS = 1;
     measure("rdtsc", [](){ return gettsc(); });
     measure("gettimeofday", [](){ timeval tv; return gettimeofday(&tv, 0); });
     measure("time", [](){ return time(NULL); });
-    measure("std chrono system_clock", [](){ return std::chrono::system_clock::now(); });
+    measure("std chrono system_clock", [](){ return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()); });
     measure("std chrono steady_clock", [](){ return std::chrono::steady_clock::now(); });
     measure("clock_gettime monotonic", [](){ timespec tp; return clock_gettime(CLOCK_MONOTONIC, &tp); });
     measure("clock_gettime cpu time", [](){ timespec tp; return clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &tp); });
 
+    double end = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count() * 1e-6);
+
+    std::cout << "\nended in " << (end - begin) << " seconds" << std::endl;
     std::cout << "\n======\n";
 
     NUM_THREADS = 100;

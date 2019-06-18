@@ -90,6 +90,8 @@ endif ()
 ##################################### HEADERS ####
 
 include_directories(language/cpp)
+include_directories(/home/hao.du/.linuxbrew/Cellar/boost/1.68.0_1/include/boost/)
+link_directories(/home/hao.du/.linuxbrew/Cellar/boost/1.68.0_1/lib/)
 
 ############################ LOGGER #################
 #if (NOT WITH_LOGGER)

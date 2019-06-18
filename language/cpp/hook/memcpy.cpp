@@ -24,8 +24,6 @@
 #define RTLD_NEXT ((void *) -1l)
 #endif
 
-#define REAL_LIBC RTLD_NEXT
-
 
 #include <dlfcn.h>
 #include <string.h>
@@ -63,7 +61,7 @@ public:
 namespace hook
 {
     bool enableHook = true; // global switch, not used yet
-    thread_local int depth = 0;
+    thread_local int depth = 0; // stack depth, keeping track of recursion depth
 }
 using namespace hook;
 
@@ -106,7 +104,7 @@ void* memcpy(void* dest, const void* src, size_t n)
     static void* (*func_memcpy) (void*, const void *, size_t) = NULL;
     if (!func_memcpy)
     {
-        func_memcpy = (void* (*) (void*, const void *, size_t)) dlsym (REAL_LIBC, "memcpy");
+        func_memcpy = (void* (*) (void*, const void *, size_t)) dlsym (RTLD_NEXT, "memcpy");
     }
 
     return func_memcpy(dest, src, n);

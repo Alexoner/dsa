@@ -36,7 +36,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <stdio.h>
-#include <dlfcn.h>
+#include <dlfcn.h>  // dynamic loading
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
@@ -46,7 +46,7 @@ int g_obvio=0;
 #define DPRINTF(format, args...)    if (!g_obvio) { g_obvio=1; fprintf(stderr, format, ## args); g_obvio=0; }
 
 #ifndef RTLD_NEXT
-#define RTLD_NEXT ((void *) -1l)
+#define RTLD_NEXT ((void *) -1l) // RTLD_NEXT, RTLD_DEFAULT are from dlfcn.h header
 #endif
 
 #define REAL_LIBC RTLD_NEXT
