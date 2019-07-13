@@ -487,6 +487,7 @@ Text processing command line tools
     $ echo "pattern" | sed -r 's/pattern/target/g' # -r for extended regular expression, s for substitute, g for global
     target
     $ sed -r -i 's/pattern/target/g' # s for substitute, g for global, i for inplace
+    $ sed -r -i '2,$s/pattern/target/g' # s for substitute, g for global, i for inplace, only operate between line 2 and last line
 
     # extract substring with regular expression pattern
     $ echo "ljljlsfs pattern jljslfjsdl" | sed -r -i 's/^.*(pattern).*$/\1/g' # s for substitute, g for global, i for inplace, \1 for back referencing
@@ -548,16 +549,22 @@ All arrays in AWK are `ASSOCIATIVE ARRAYS`, so they allow associating an arbitra
 Examples
 
     # print first field of each line, separated by ','
-    cat input | awk '{print $1}'
-    awk '/[zZ]/ && !a[$2]++ {print $2}'
+    $ cat input | awk '{print $1}'
+    # search for [zZ] pattern and filter duplicate
+    $ awk '/[zZ]/ && !a[$2]++ {print $2}'
     # kill zombie process
     kill $(ps -A -ostat,ppid | awk '/[zZ]/ && !a[$2]++ {print $2}') # [zZ] for pattern, a[$2]++ to filter duplicate ppid.
 
     # process a csv file, copy all files at the first field, and substitue destination name by replacing pattern with target
-    cat feature.3030.csv|awk '{FS=","}NR > 1 {print $1}' |while read f
+    $ cat feature.3030.csv|awk '{FS=","}NR > 1 {print $1}' |while read f
     do
         cp -v $f  /tmp/features/$(basename $f|sed -r 's/pattern/target/g')
     done
+
+    # REPLACE string but SKIP first line
+    $ echo -e "This is first line.\nThis is PATTERN1. END" | awk 'NR==1{print}NR>1{sub(/PATTERN1/,"PATTERN2");print}'
+    This is first line.
+    This is PATTERN2. END
 
 ### sort
 
@@ -916,6 +923,11 @@ Reference:
 
 Note:
 perf record for 
+
+### eBPF - bcc tools
+
+Reference:
+http://www.brendangregg.com/blog/2019-01-01/learn-ebpf-tracing.html
 
 ### SystemTap
 
