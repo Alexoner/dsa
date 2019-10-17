@@ -22,18 +22,60 @@ Reference:
 [shared_ptr](http://en.cppreference.com/w/cpp/memory/shared_ptr)
 [weak_ptr](http://en.cppreference.com/w/cpp/memory/weak_ptr)
 
-# Architecture
+# Concurrency
 
-## Architecture as a collection of Data Structures
+## condition variable
 
-## Use STATE MACHINE, instead of nested callback functions!
-Callback hell is evil!
+consumer				producer
+acquire LOCK
+wait & release LOCK
+						acquire LOCK
+						produce data
+						release LOCK
+						notify
+wake & acquire LOCK
+consume data
 
-## Parse STATE/DATA, instead of using callback functions
+Question: how to ensure wait is called before notify?
+Answer: the LOCK is to ensure this with thread synchronization!
 
-## Synchronize data between threads using lock, signal, variables
+## [Readers writers problem](https://en.wikipedia.org/wiki/Readers%E2%80%93writers_problem)
 
-## Encapsulate low-level resources as classes, and wrap objects with smart pointers to manage the resource releasing automatically
+c++17: https://en.cppreference.com/w/cpp/thread/shared_mutex
+
+Question: how to prevent starvation?
+
+## Lock Free Programming
+
+![image](./lockFreeChart.png)
+
+- CAS operation uses compare, so it suffers from  [ABA problem](https://en.wikipedia.org/wiki/ABA_problem).
+
+Reference
+- [An Introduction To Lock Free programming](https://preshing.com/20120612/an-introduction-to-lock-free-programming/)
+
+# Operating System
+
+## Context Switch
+
+## Memory 
+
+## Process & Thread
+
+# Network
+
+## Basic TCP/UDP
+
+## Kernel Bypass
+
+# Architecture & Design
+
+- Architecture as a collection of Data Structures
+- Use STATE MACHINE and DAG(directed acyclic graph), instead of nested callback functions!
+	- Callback hell is evil!
+	- Parse STATE/DATA, instead of using callback functions
+- Synchronize data between threads using lock, signal, variables
+- Encapsulate low-level resources as classes, and wrap objects with smart pointers to manage the resource releasing automatically
 
 ## Implement getter and setter methods, if properties are from member objects, not member variables
 1. Subclasses inheriting the base class can capture the member property change event
@@ -96,9 +138,21 @@ int main () {
 }
 ```
 
-### Coding tricks
+### C++ STL & Coding tricks
 
-#### STL containers will take care of elements' release automatically, but not allocated memory
+STL containers will take care of elements' release automatically, but not allocated memory
+
+#### vector
+`vector` grows capacity in a EXPONENTIAL rate, and its amortized time complexity is 
+`O(N)` when inserting N objects one by one.
+
+#### map
+map `operator[](key)` is not THREAD SAFE, when if key doesn't exist in the 
+underlying red-black tree yet, because in this case, the red-black tree 
+must be MODIFIED to insert such `key`.
+Solutions include: use lock to synchronize, assign `(key, value)` before the 
+critical section.
+
 
 #### Macros
 
@@ -106,6 +160,8 @@ int main () {
 #define DEBUG_NEW new(__FILE__, __LINE__)
 #define new DEBUG_NEW
 
+#### lock free & wait free
+https://en.wikipedia.org/wiki/Non-blocking_algorithm
 ```
 
 ### Performance
@@ -135,4 +191,11 @@ $$
 
 where, $N = Number of users, T = RT (average response time), X = TPS$
 
+
+### practial libraries
+- google test
+- computation graph libraries
+  - cpp-taskflow(https://github.com/cpp-taskflow/cpp-taskflow)
+  - openmp task(pragma implementation), only for static dependency
+  - tbb flow graph(https://www.threadingbuildingblocks.org/tutorial-intel-tbb-flow-graph)
 

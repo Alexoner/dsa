@@ -122,6 +122,8 @@ gdb $1 -ex "${ARGS}"
 
 ```shell
 $ gdb program (pid)
+gdb> b fwrite if $rcx==&_IO_2_1_stdout_ # https://stackoverflow.com/questions/23757996/gdb-how-to-break-on-something-is-written-to-cout
+gdb> b fwrite if $rcx==&_IO_2_1_stderr_
 gdb> run
 gdb> where # print backtrace of all stack frames
 gdb> bt # backtrace, same as where
@@ -460,6 +462,25 @@ Then messages like this is expected in `dmesg |tail -n 20`
 Text processing command line tools
 ---------------------------------
 
+### PIPE
+Pipe operator `|` in linux shell is very powerful.
+Another useful tool is NAMED PIPE(`man mkfifo`), which create a virtual file
+as a pipe in memory.
+
+    # keep testing until fail
+    while true; do ./program || break; done
+
+### while 
+
+    while true; do ./program || break; done # keep running a program until fail
+	# heredoc with indentation of tab, piped into while, split string with IFS
+    IFS=" " cat <<-EOF | while read a b c d
+	1 2 3 4 
+	5 6 7 8
+	EOF
+	do echo $a,$b,$c,$d
+	done
+
 ### Search tools
 
 #### ag
@@ -475,22 +496,28 @@ Text processing command line tools
 
 ### Edit tools
 
+#### cat & tac
+cat: catenate files and print
+tac: catenate and print in reverse
+
 #### find
 
     find . -type f -regextype posix-extended -regex '.*\.(h|hpp|cpp|cxx)' # search for files with names matching regular expression
     find src -type f -regextype posix-extended -regex '.*\.(h|hpp|cpp|cxx)' | while read f; do ln -sfv /mnt/disk/hdu/$f /mnt/disk/jacksp/src_cpu/${f:6} ; done # symbol link all source files to another directory
+    find . -maxdepth 1 -iname '*namepattern'
 
 #### sed
+A simple text processing and transforming tool, mostly for regular expression matching.
 
 
     # substitute substring
-    $ echo "pattern" | sed -r 's/pattern/target/g' # -r for extended regular expression, s for substitute, g for global
+    $ echo "Pattern" | sed -r 's/pattern/target/gI' # -r for extended regular expression, s for substitute, g for global, I for case insensitive
     target
     $ sed -r -i 's/pattern/target/g' # s for substitute, g for global, i for inplace
     $ sed -r -i '2,$s/pattern/target/g' # s for substitute, g for global, i for inplace, only operate between line 2 and last line
 
     # extract substring with regular expression pattern
-    $ echo "ljljlsfs pattern jljslfjsdl" | sed -r -i 's/^.*(pattern).*$/\1/g' # s for substitute, g for global, i for inplace, \1 for back referencing
+    $ echo "ljljlsfs pattern jljslfjsdl" | sed -r 's/^.*(pattern).*$/\1/g' # s for substitute, g for global, i for inplace, \1 for back referencing
     pattern
 
     ## advanced example
@@ -515,6 +542,7 @@ Text processing command line tools
 
 
 #### awk
+A versatile programming language.
 
 Execution order
 
@@ -530,7 +558,7 @@ Refer to:
 For each input file, if a BEGINFILE rule exists, gawk executes the associated code before processing
 the contents of the file. Similarly, gawk executes the code associated with ENDFILE after processing the file.
 
-For  each RECORD in the input, gawk TESTS to see if it matches any PATTERN in the AWK program.
+For each RECORD in the input, gawk TESTS to see if it matches any PATTERN in the AWK program.
 For each pattern that the record matches, gawk executes the associated action.
 The patterns are tested in the order they occur in the program.
 
@@ -540,7 +568,7 @@ Finally, after all the input is exhausted, gawk executes the code in the END rul
 Variables
 - RS: record separator
 - FS: field separator
-- NR: current input line number, starting with 1. if RS is set to the empty string, then records are separated by sequences consisting of a `<newline>` plus one or more blank lines.
+- NR: total Number of input Records seen so far, starting with 1. if RS is set to the empty string, then records are separated by sequences consisting of a `<newline>` plus one or more blank lines.
 - `$n`: extract field, where n is a number starting with 1. `n=0` means the entire record.
 
 Using arrays
@@ -548,12 +576,30 @@ All arrays in AWK are `ASSOCIATIVE ARRAYS`, so they allow associating an arbitra
 
 Examples
 
-    # print first field of each line, separated by ','
-    $ cat input | awk '{print $1}'
-    # search for [zZ] pattern and filter duplicate
+    # PRINT first and last field of each line, separated by ','
+    $ cat input | awk '{print $1, $NF}'
+
+    # FORMAT PRINT
+    $ echo 1 2 | awk '{printf "input is %s and %s", $1, $2}'
+    input is 1 and 2
+
+    # REGULAR EXPRESSION MATCHING and array accumulate
+    $ echo "input: 1;\ninput: 2;\ninput: 3;" |awk 'match($0, /input: ([^;]+)/, x){a[NR] += x[1]} END{printf "input is %s, %s, %s", a[1], a[2], a[3]}'
+    $ echo "input: 1;\ninput: 2;\ninput: 3;" |awk '$0 ~ /input: ([^;]+)/{a[NR] += $2} END{printf "input is %s, %s, %s", a[1], a[2], a[3]}'
+    $ echo "input: 1;\ninput: 2;\ninput: 3;" |awk '{if(match($0, /input: ([^;]+)/, x))a[NR] += x[1]} END{printf "input is %s, %s, %s", a[1], a[2], a[3]}'
+    input is 1, 2, 3
+
+    # CONDITIONAL STATEMENT: search for [zZ] pattern and filter duplicate
     $ awk '/[zZ]/ && !a[$2]++ {print $2}'
     # kill zombie process
     kill $(ps -A -ostat,ppid | awk '/[zZ]/ && !a[$2]++ {print $2}') # [zZ] for pattern, a[$2]++ to filter duplicate ppid.
+
+    # access CAPTURED GROUP from line pattern
+    $ echo "abcdefgh" | gawk 'match($0, /b(.*)e((f).+)/, a) {print a[1]"\t"a[2]}'
+    cd    f
+    # back reference
+    $ echo abbc | awk '{ print gensub(/a(b*)c/, "Here are bees: \\1", "g", $1);}'
+    Here are bees: bb
 
     # process a csv file, copy all files at the first field, and substitue destination name by replacing pattern with target
     $ cat feature.3030.csv|awk '{FS=","}NR > 1 {print $1}' |while read f
@@ -561,10 +607,24 @@ Examples
         cp -v $f  /tmp/features/$(basename $f|sed -r 's/pattern/target/g')
     done
 
-    # REPLACE string but SKIP first line
+    # REPLACE string but SKIP first line with CONDITIONAL STATEMENT
     $ echo -e "This is first line.\nThis is PATTERN1. END" | awk 'NR==1{print}NR>1{sub(/PATTERN1/,"PATTERN2");print}'
     This is first line.
     This is PATTERN2. END
+
+    # generate a tabular separated value file: prepend a header line, sort by columns 1 and 2 numerically
+    # NOTE: sort will skip first header line.
+    $ cat input.txt | awk 'BEGIN{print "col1\tcol2\tcol3\tcol4"} {print $1"\t"$2"\t"$3"\t"$4 | "sort -k 1,1n -k 2,2n"}'
+
+    # SET operation
+    # generate Cartesian product of two files
+    $ awk 'NR==FNR {a[$0]; next}{for (i in a) print i"\t"$0}' file1.txt file2.txt
+
+    # get elements in file 1 excluding elements in file 2
+    $ awk 'NR==FNR {a[$0]; next}{for (i in a) print i"\t"$0}' file2.xt file1.txt
+
+    # join two files row wise
+    awk 'NR==FNR {a[NR] = $0; next}{print a[FNR]"\t"$0}' file1.txt file2.txt
 
 ### sort
 
@@ -642,7 +702,7 @@ Refer to `man parallel_tutorial`
     B
     C
 
-    # pipe data into parallel
+    # PIPE data into parallel
     $ echo -e 'a\nb\nc'  |parallel --no-notice echo processed {}
     processed a
     processed b
@@ -659,9 +719,13 @@ Refer to `man parallel_tutorial`
     C E
     C F
 
+    # want to copy files parallely? rsync -R for relative to keep file hierarchy
+    $ find src/ -not -path .git |parallel rsync -avPR {} dst/
+
 - `{}` for replacement string(placeholder)
 
 ### `xargs`
+Sequentially execute batch tasks.
 
     $ ls
     A B C
@@ -1111,6 +1175,66 @@ valgrind --tool=drd --read-var-info=yes # drd(data race detection), a thread err
 ```
 
 This seems to slow down the program significantly...
+
+### git
+We'll skip basic `git clone/commit/pull/push/commit/revert` usage.
+Git commits have a TREE structure!
+
+#### git rebase --onto
+Refer to `git help rebase`.
+
+       Assume the following history exists and the current branch is "topic":
+
+                     A---B---C topic
+                    /
+               D---E---F---G master
+
+       From this point, the result of either of the following commands:
+
+           git rebase master
+           git rebase master topic
+
+       would be:
+
+                             A'--B'--C' topic
+                            /
+               D---E---F---G master
+
+       NOTE: The latter form is just a short-hand of git checkout topic followed by git rebase
+       master. When rebase exits topic will remain the checked-out branch.
+
+
+       Here is how you would transplant a topic branch based on one branch to another, to pretend
+       that you forked the topic branch from the latter branch, using rebase --onto.
+
+       First let's assume your topic is based on branch next. For example, a feature developed in
+       topic depends on some functionality which is found in next.
+
+               o---o---o---o---o  master
+                    \
+                     o---o---o---o---o  next
+                                      \
+                                       o---o---o  topic
+
+       We want to make topic forked from branch master; for example, because the functionality on
+       which topic depends was merged into the more stable master branch. We want our tree to look
+       like this:
+
+               o---o---o---o---o  master
+                   |            \
+                   |             o'--o'--o'  topic
+                    \
+                     o---o---o---o---o  next
+
+       We can get this using the following command:
+
+           git rebase --onto master next topic # transplate range from 'next' to 'topic' onto 'master'
+
+
+#### git bisect
+
+
+#### log 
 
 #### FAQ
 ##### Valgrind on OSX reports false positive memory leak
