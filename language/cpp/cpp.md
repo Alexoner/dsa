@@ -39,15 +39,34 @@ consume data
 Question: how to ensure wait is called before notify?
 Answer: the LOCK is to ensure this with thread synchronization!
 
-## [Readers writers problem](https://en.wikipedia.org/wiki/Readers%E2%80%93writers_problem)
+## Memory ordering
 
-c++17: https://en.cppreference.com/w/cpp/thread/shared_mutex
+[Memory barriers are like source control operations](https://preshing.com/20120710/memory-barriers-are-like-source-control-operations/)
+
+To eliminate those reorderings
+- Set thread affinities so that both worker threads run exclusively on the same CPU core
+- Introduce a CPU BARRIER between the two instructions
+
+![image](./data/reordered.png)
+![image](./data/iriw-state.png)
+
+Reference
+- [memory-barriers](https://www.kernel.org/doc/Documentation/memory-barriers.txt)
+
+## Reader Writer Lock
 
 Question: how to prevent starvation?
 
+[Readers writers problem](https://en.wikipedia.org/wiki/Readers%E2%80%93writers_problem)
+- Reader preference: writer starvation.
+- Writer preference: readers starvation and low concurrency.
+- Semaphore with FIFO queue: to avoid starvation!
+
+c++17: https://en.cppreference.com/w/cpp/thread/shared_mutex
+
 ## Lock Free Programming
 
-![image](./lockFreeChart.png)
+![image](./data/lockFreeChart.png)
 
 - CAS operation uses compare, so it suffers from  [ABA problem](https://en.wikipedia.org/wiki/ABA_problem).
 
