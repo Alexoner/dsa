@@ -18,7 +18,18 @@ double compute(struct timespec start,struct timespec end) //computes time in mil
 
 int array[100];
 
-void *expensive_function(void *param) {
+void *readValue(void *param)
+{
+  int   index = *((int*)param);
+  int result = 0;
+  for (int i = 0; i < 100000000; i++)
+  {
+    result += array[index];
+  }
+
+}
+
+void *writeValue(void *param) {
   int   index = *((int*)param);
   int   i;
   for (i = 0; i < 100000000; i++)
@@ -27,49 +38,57 @@ void *expensive_function(void *param) {
 
 int main(int argc, char *argv[]) {
   int       first_elem  = 0;
-  int       bad_elem    = 1;
-  int       good_elem   = 99;
+  int       bad_elem    = 1; // data sharing same cache line with first element
+  int       good_elem   = 99; // data using different cache line with first element
+
   double time1;
   double time2;
   double time3;
-  pthread_t     thread_1;
-  pthread_t     thread_2;
 
   //---------------------------START--------Serial Computation---------------------------------------------
 
-  clock_gettime(CLOCK_REALTIME,&tpBegin1);
-  expensive_function((void*)&first_elem);
-  expensive_function((void*)&bad_elem);
-  clock_gettime(CLOCK_REALTIME,&tpEnd1);
+  {
+    clock_gettime(CLOCK_REALTIME,&tpBegin1);
+    writeValue((void*)&first_elem);
+    //writeValue((void*)&bad_elem);
+    readValue((void*)&bad_elem);
+    clock_gettime(CLOCK_REALTIME,&tpEnd1);
+  }
 
   //---------------------------END----------Serial Computation---------------------------------------------
 
-
+  pthread_t     thread_1;
+  pthread_t     thread_2;
   //---------------------------START--------parallel computation with False Sharing----------------------------
+  {
+    clock_gettime(CLOCK_REALTIME,&tpBegin2);
+    pthread_create(&thread_1, NULL,writeValue, (void*)&first_elem);
+    //pthread_create(&thread_2, NULL,writeValue, (void*)&bad_elem);
+    pthread_create(&thread_2, NULL,readValue, (void*)&bad_elem);
+    pthread_join(thread_1, NULL);
+    pthread_join(thread_2, NULL);
+    clock_gettime(CLOCK_REALTIME,&tpEnd2);
+  }
 
-  clock_gettime(CLOCK_REALTIME,&tpBegin2);
-  pthread_create(&thread_1, NULL,expensive_function, (void*)&first_elem);
-  pthread_create(&thread_2, NULL,expensive_function, (void*)&bad_elem);
-  pthread_join(thread_1, NULL);
-  pthread_join(thread_2, NULL);
-  clock_gettime(CLOCK_REALTIME,&tpEnd2);
-
-  //---------------------------END----------parallel computation with False Sharing----------------------------
-
-
-  //---------------------------START--------parallel computation without False Sharing------------------------
-
-  clock_gettime(CLOCK_REALTIME,&tpBegin3);
-  pthread_create(&thread_1, NULL,expensive_function, (void*)&first_elem);
-  pthread_create(&thread_2, NULL,expensive_function, (void*)&good_elem);
-  pthread_join(thread_1, NULL);
-  pthread_join(thread_2, NULL);
-  clock_gettime(CLOCK_REALTIME,&tpEnd3);
-
-  //---------------------------END--------parallel computation without False Sharing------------------------
+  //---------------------------END----------parallel computation with False Sharing-------------
 
 
-  //--------------------------START------------------OUTPUT STATS--------------------------------------------
+  //---------------------------START--------parallel computation without False Sharing----------
+
+  {
+    clock_gettime(CLOCK_REALTIME,&tpBegin3);
+    pthread_create(&thread_1, NULL,writeValue, (void*)&first_elem);
+    //pthread_create(&thread_2, NULL,writeValue, (void*)&good_elem);
+    pthread_create(&thread_2, NULL,readValue, (void*)&good_elem);
+    pthread_join(thread_1, NULL);
+    pthread_join(thread_2, NULL);
+    clock_gettime(CLOCK_REALTIME,&tpEnd3);
+  }
+
+  //---------------------------END--------parallel computation without False Sharing------------
+
+
+  //--------------------------START------------------OUTPUT STATS-------------------------------
   printf("array[first_element]: %d\t\t array[bad_element]: %d\t\t array[good_element]: %d\n\n\n", array[first_elem],array[bad_elem],array[good_elem]);
 
 
@@ -80,7 +99,7 @@ int main(int argc, char *argv[]) {
   printf("Time take with false sharing      : %f ms\n", time2);
   printf("Time taken without false sharing  : %f ms\n", time3);
 
-  //--------------------------END------------------OUTPUT STATS--------------------------------------------
+  //--------------------------END------------------OUTPUT STATS---------------------------------
 
 
   return 0;

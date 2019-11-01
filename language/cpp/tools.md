@@ -473,13 +473,13 @@ as a pipe in memory.
 ### while 
 
     while true; do ./program || break; done # keep running a program until fail
-	# heredoc with indentation of tab, piped into while, split string with IFS
+    # heredoc with indentation of tab, piped into while, split string with IFS
     IFS=" " cat <<-EOF | while read a b c d
-	1 2 3 4 
-	5 6 7 8
-	EOF
-	do echo $a,$b,$c,$d
-	done
+    1 2 3 4 
+    5 6 7 8
+    EOF
+    do echo $a,$b,$c,$d
+    done
 
 ### Search tools
 
@@ -502,6 +502,7 @@ tac: catenate and print in reverse
 
 #### find
 
+    find . -regextype posix-extended -regex '.*(perftest|unittest|ficus)' -type f |parallel rm -v {} # delete files with name matching regex
     find . -type f -regextype posix-extended -regex '.*\.(h|hpp|cpp|cxx)' # search for files with names matching regular expression
     find src -type f -regextype posix-extended -regex '.*\.(h|hpp|cpp|cxx)' | while read f; do ln -sfv /mnt/disk/hdu/$f /mnt/disk/jacksp/src_cpu/${f:6} ; done # symbol link all source files to another directory
     find . -maxdepth 1 -iname '*namepattern'
