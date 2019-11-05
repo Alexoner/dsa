@@ -1,6 +1,7 @@
 #pragma once
 
 // STL containers
+#include <string>
 #include <array>
 #include <deque>
 #include <forward_list>
