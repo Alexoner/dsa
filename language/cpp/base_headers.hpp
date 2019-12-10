@@ -12,6 +12,7 @@
 #include <unordered_set>
 #include <stack>
 #include <queue>
+#include <list>
 
 // STL algorithm, functors
 #include <algorithm>

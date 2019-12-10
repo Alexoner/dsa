@@ -53,7 +53,7 @@ void test_memory_order_relaxed() {
         thread t1([&] {
                 //while(!flag.load(memory_order_relaxed));
                 //relaxed operations on separate variables might be reordered by compiler or hardware
-                x.store(1, memory_order_relaxed);
+                x.store(1, memory_order_relaxed); // maybe store reordered after load
                 r1 = y.load(memory_order_relaxed);
                 });
         thread t2([&](void) -> void {

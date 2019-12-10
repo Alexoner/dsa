@@ -17,12 +17,13 @@ double compute(struct timespec start,struct timespec end) //computes time in mil
 }
 
 int array[100];
+int gTestCount = 100000000;
 
 void *readValue(void *param)
 {
   int   index = *((int*)param);
   int result = 0;
-  for (int i = 0; i < 100000000; i++)
+  for (int i = 0; i < gTestCount; i++)
   {
     result += array[index];
   }
@@ -32,14 +33,14 @@ void *readValue(void *param)
 void *writeValue(void *param) {
   int   index = *((int*)param);
   int   i;
-  for (i = 0; i < 100000000; i++)
+  for (i = 0; i < gTestCount; i++)
     array[index]+=1;
 }
 
 int main(int argc, char *argv[]) {
   int       first_elem  = 0;
   int       bad_elem    = 1; // data sharing same cache line with first element
-  int       good_elem   = 99; // data using different cache line with first element
+  int       good_elem   = 64; // data using different cache line with first element
 
   double time1;
   double time2;

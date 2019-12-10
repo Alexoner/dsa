@@ -164,6 +164,9 @@ gdb> print $i
 2
 gdb> call printf("xxxxxx") # execute/call function
 gdb> compile  # compile C code
+gdb> disassemble main # show assemble language representation of function main
+gdb> info vtbl *pa # show virtual method table of C++ object *pa
+gdb> x /4xw $rip # examin memory pointed by $rip (instruction register), 4 words hex
 
 ```
 
@@ -472,6 +475,7 @@ as a pipe in memory.
 
 ### while 
 
+    # heredoc piped into while read
     while true; do ./program || break; done # keep running a program until fail
     # heredoc with indentation of tab, piped into while, split string with IFS
     IFS=" " cat <<-EOF | while read a b c d
@@ -479,7 +483,7 @@ as a pipe in memory.
     5 6 7 8
     EOF
     do echo $a,$b,$c,$d
-    done
+    done | parallel echo "processing {}"
 
 ### Search tools
 
@@ -622,7 +626,7 @@ Examples
     $ awk 'NR==FNR {a[$0]; next}{for (i in a) print i"\t"$0}' file1.txt file2.txt
 
     # get elements in file 1 excluding elements in file 2
-    $ awk 'NR==FNR {a[$0]; next}{for (i in a) print i"\t"$0}' file2.xt file1.txt
+    $ awk 'NR==FNR {a[$0] = 1; next} a[$0] == 0 {print $0}' file2.xt file1.txt
 
     # join two files row wise
     awk 'NR==FNR {a[NR] = $0; next}{print a[FNR]"\t"$0}' file1.txt file2.txt
@@ -753,16 +757,21 @@ File system
 
 ### `/proc/$PID/`
 
+Refer to `man proc`
+
 Experiment:
 Run `deadloop` and experiment with those tools.
 
 - `/proc/$PID/cmdline`: command line that started this process
 - `/proc/$PID/exe`: `realpath /proc/$PID/exec` the program being run.
+- `/proc/$PID/cwd`: link to current working directory
+- `/proc/$PID/fd/`: directory of symbolic links to opened files
 - `/proc/$PID/comm`: thread name, [`pthread_setname_np`](https://linux.die.net/man/3/pthread_setname_np) and `pthread_getname_np` will open `/proc/self/task/[tid]/comm`, .
 - `/proc/$PID/task`: threads/tasks.
 - `/proc/$PID/stat`: 14 system time, 15 user time, blah blah.. `pidstat` is an easier tool.
 - `/proc/$PID/status`: VmSize for memory usage?
 - `/proc/$PID/environ`: `cat /proc/37517/environ|tr '\0' '\n'` to display environment variables of a running process.
+- `/proc/$PID/maps`: mapped memory regions
 
 ### `/var/log/auth.log` - system authentication log
 
@@ -940,6 +949,9 @@ Profiling tools
 ---------------
 
 
+Gprof, Gcov, gperftools, perf_events
+
+Reference:
 [gprof, valgrind, gperftools](http://gernotklingler.com/blog/gprof-valgrind-gperftools-evaluation-tools-application-level-cpu-profiling-linux/), [perf_events](http://www.brendangregg.com/perf.html)
 
 For large applications, heavy profiling tools isn't appropriate. Light-weighted tools like `perf_events` comes in handy.

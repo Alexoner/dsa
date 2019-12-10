@@ -22,7 +22,39 @@ Reference:
 [shared_ptr](http://en.cppreference.com/w/cpp/memory/shared_ptr)
 [weak_ptr](http://en.cppreference.com/w/cpp/memory/weak_ptr)
 
+# assembly
+
+## General-Purpose Registers (GPR) - 16-bit naming conventions
+The 8 GPRs are:
+
+Accumulator register (AX). Used in arithmetic operations
+Counter register (CX). Used in shift/rotate instructions and loops.
+Data register (DX). Used in arithmetic operations and I/O operations.
+Base register (BX). Used as a pointer to data (located in segment register DS, when in segmented mode).
+Stack Pointer register (SP). Pointer to the top of the stack.
+Stack Base Pointer register (BP). Used to point to the base of the stack.
+Source Index register (SI). Used as a pointer to a source in stream operations.
+Destination Index register (DI). Used as a pointer to a destination in stream operations.
+
+## Instruction Pointer
+The EIP register contains the address of the next instruction to be executed if no branching is done.
+
+EIP can only be read through the stack after a call instruction.
+
+
+# tools
+`g++ -fdump-class-hierarchy -c a.cpp` can be used to generate layout of class.
+`gdb disassemble main` can be used to show assemble code of function.
+
+Reference: https://stackoverflow.com/questions/1632600/memory-layout-c-objects
+
 # Concurrency
+
+## synchronization
+- mutex: mutual exclusive
+- semaphore: signal/wait mechanism, an integer whose value is never below zero.
+  - named semaphore: system wide
+  - unnamed semaphore: memory-bases semaphore. A binary semaphore can implement mutex.
 
 ## condition variable
 
@@ -70,6 +102,9 @@ To eliminate those reorderings
 - Set thread affinities so that both worker threads run exclusively on the same CPU core
 - Introduce a CPU BARRIER between the two instructions
 
+[memory barrier](https://en.wikipedia.org/wiki/Memory_barrier)
+
+A memory barrier, also known as a membar, memory fence or fence instruction, is a type of barrier instruction that causes a central processing unit (CPU) or compiler to enforce an ordering constraint on memory operations issued before and after the barrier instruction
 Note that whether memory reorder happens depends on the hardware and compiler support, for example, ARM is weakly ordered CPU while x86 is strongly.
 
 ![image](./data/reordered.png)
@@ -86,6 +121,20 @@ Reference
 
 Reference
 - [An Introduction To Lock Free programming](https://preshing.com/20120612/an-introduction-to-lock-free-programming/)
+
+# CPU architecture
+
+## Strategy to improve throughput
+- parallel/batch:
+- pipeline
+
+## [pipeline](https://en.wikipedia.org/wiki/Instruction_pipelining)
+
+Problems:
+- hazard caused pipeline stall. Out-of-order execution may solve this.
+
+Reference:
+- Computer systems: a programmer's perspective
 
 # Operating System
 
@@ -119,7 +168,7 @@ Reference
 2. Use RAII. In multi-threaded scenario, an asynchronous thread referencing an object that may be destroyed by another thread.
 Solution:
 - Use shared_ptr as strong reference to that object in the asynchronous thread, and the destroying thread never manually release resources, just decrease its reference.
-- Use weak_ptr to check whether it has expired. Still, the resource should not be destroyed manually, instead, be managed with its life span.
+- Use weak_ptr to check whether it has expired. Still, the resource is managed with its life span. Used to resolve cyclical reference, such as in observer pattern.
 
 
 # [Design Patterns](https://en.wikipedia.org/wiki/Software_design_pattern)
@@ -223,6 +272,18 @@ N  =  T  *  X
 $$
 
 where, $N = Number of users, T = RT (average response time), X = TPS$
+
+#### Optimization
+
+- cache usage: adherence 
+- parallel: loop unrolling, SMID, gpu
+
+### interview questions
+- underlying of virtual method table
+- `vector` resize algorithm(may cause iterator invalid)
+- `map<float>` comparing equality function
+- what happens when allocating a very large block of memory
+
 
 
 ### practial libraries
