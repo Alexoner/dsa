@@ -122,8 +122,6 @@ gdb $1 -ex "${ARGS}"
 
 ```shell
 $ gdb program (pid)
-gdb> b fwrite if $rcx==&_IO_2_1_stdout_ # https://stackoverflow.com/questions/23757996/gdb-how-to-break-on-something-is-written-to-cout
-gdb> b fwrite if $rcx==&_IO_2_1_stderr_
 gdb> run
 gdb> where # print backtrace of all stack frames
 gdb> bt # backtrace, same as where
@@ -134,8 +132,9 @@ gdb> layout src # enter TUI mode
 gdb> s # step into function
 gdb> return # make current function return, popping out of stack frame
 gdb> n # next statement, step over
+gdb> c # continue
 gdb> set variable $address = &i # get address of i in process
-gdb> set variable {int}$address = 999 # To store values into arbitrary places in memory, use the ‘{…}’ construct to generate a value of specified type at a specified address (see Expressions). For example, {int}0x83040 refers to memory location 0x83040 as an integer (which implies a certain size and representation in memory), and
+gdb> set variable {int}$address = 999 # To store values into arbitrary places in memory
 gdb> print i
 0
 gdb> print pa # print shared_ptr<type> pa
@@ -144,10 +143,15 @@ gdb> print pa->name
 A
 gdb> print *pa
 $5 = {name = "A"}
-gdb> c # continue
-gdb> #b ... # break at somewhere
+gdb> #b ... # break points at somewhere
 gdb> break operator new # break at operator new
 gdb> break mmap # break at mmap
+# set break point on new_do_write if second register parameter string is "ERROR\n". $_streq is convenience function
+gdb> b new_do_write if $_streq((char*)$rsi, "ERROR\n")
+gdb> b __GI___libc_write if $x0 == 2 # set break point when writing to stderr(2), ARM register
+# https://stackoverflow.com/questions/23757996/gdb-how-to-break-on-something-is-written-to-cout
+gdb> b fwrite if $rcx==&_IO_2_1_stdout_
+gdb> b fwrite if $rcx==&_IO_2_1_stderr_ # Intel register
 gdb> info break # list breakpoints
 gdb> whatis i
 type = int
@@ -159,14 +163,22 @@ gdb> print i
 gdb> call i = 1 + 1 # execute/call statement
 gdb> print i
 2
+gdb> print/s data # print as string format
+$5 = 0x614c20 "hello world\n"
 gdb> set variable $i = (int)i # $i assign a process's variable to gdb shell variable
 gdb> print $i
 2
 gdb> call printf("xxxxxx") # execute/call function
 gdb> compile  # compile C code
 gdb> disassemble main # show assemble language representation of function main
+gdb> info frame
+gdb> info registers # show register values
 gdb> info vtbl *pa # show virtual method table of C++ object *pa
 gdb> x /4xw $rip # examin memory pointed by $rip (instruction register), 4 words hex
+gdb> print /s $
+gdb> x /s $rsi # examine memory address stored in register as string
+0x614c20:       "begin().base0\n"
+gdb> x/5i $rip # examine 5 instructions in register %rip
 
 ```
 
@@ -178,6 +190,16 @@ gdb
 gdb> target remote host:port
 gdb> #...
 ```
+
+Strategies to use gdb
+- Use `strace` to monitor system calls, then set conditional break points in gdb
+- Use `objdump` and `readelf` for static examination then gdb for runtime debugging
+
+```shell
+  > gcc -g -c test.c
+  > objdump -d -M intel -S test.o
+```
+
 
 #### GUI
 

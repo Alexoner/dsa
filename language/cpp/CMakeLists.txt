@@ -17,6 +17,8 @@ add_executable(isDerivedFrom isDerivedFrom.cpp)
 #add_executable(rand rand.cpp)
 #add_executable(inherit inherit.cpp)
 add_executable(template template.cpp)
+add_executable(inherit inherit.cpp)
+add_executable(pageFault os/pageFault.cpp)
 
 # stl
 add_subdirectory(stl)
