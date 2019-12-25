@@ -153,6 +153,12 @@ gdb> b __GI___libc_write if $x0 == 2 # set break point when writing to stderr(2)
 gdb> b fwrite if $rcx==&_IO_2_1_stdout_
 gdb> b fwrite if $rcx==&_IO_2_1_stderr_ # Intel register
 gdb> info break # list breakpoints
+gdb> # watch [-l|-location] expr [thread thread-id] [mask maskvalue]. Set a watchpoint for an expression
+gdb> # In gdb there two types of watch points: hardware and software. Programmatic watch point? See debug registers.
+gdb> watch foo
+gdb> watch  foo mask 0xffff00ff # watch variable address for mask
+gdb> watch *0xdeadbeef mask 0xffffff00 # watch address for mask
+gdb> # Ordinarily a watchpoint respects the scope of variables in expr (see below). The -location argument tells GDB to instead watch the memory referred to by expr
 gdb> whatis i
 type = int
 gdb> print i
@@ -279,6 +285,16 @@ call stack.
 - -t: prefix line with time of day
 - -tt: macroseconds
 - -o: output
+
+### objdump & readelf
+These two commands are used to display information from object files.
+
+	objdump -s ./a.out # -s --full-contents. display all sections
+	objdump -d ./a.out # disassemble
+	objdump -ds ./a.out # display both instructions and data.
+	objdump -dj .text ./a.out # disassemble parts containing code
+	objdump -sj .rodata ./a.out # display .rodata section
+	readelf -x .rodata ./a.out # display .rodata section
 
 ### Core dump
 When a process runs into `segmentation fault`, the operating system can dump the process state.
@@ -1210,6 +1226,11 @@ valgrind --tool=drd --read-var-info=yes # drd(data race detection), a thread err
 ```
 
 This seems to slow down the program significantly...
+
+Linux Tracing tools
+-------------------
+
+TODO
 
 ### git
 We'll skip basic `git clone/commit/pull/push/commit/revert` usage.
