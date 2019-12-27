@@ -41,10 +41,13 @@ The EIP register contains the address of the next instruction to be executed if 
 
 EIP can only be read through the stack after a call instruction.
 
+## SIMD
+SIMD instructions use wide registers like `xmm0`, can be inspected with gdb `print $xmm0`.
 
 # tools
 `g++ -fdump-class-hierarchy -c a.cpp` can be used to generate layout of class.
-`gdb disassemble main` can be used to show assemble code of function.
+Gdb `disassemble main` can be used to show assemble code of function.
+Use gdb `info all-registers` can show all register values.
 
 Reference: https://stackoverflow.com/questions/1632600/memory-layout-c-objects
 

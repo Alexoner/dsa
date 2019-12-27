@@ -19,6 +19,8 @@ add_executable(isDerivedFrom isDerivedFrom.cpp)
 add_executable(template template.cpp)
 add_executable(inherit inherit.cpp)
 add_executable(pageFault os/pageFault.cpp)
+add_executable(memoryLayout memory/memoryLayout.cpp)
+add_executable(smartPointers memory/smartPointers.cpp)
 
 # stl
 add_subdirectory(stl)

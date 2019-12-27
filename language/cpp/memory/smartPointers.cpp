@@ -5,10 +5,10 @@
 using namespace std;
 
 /**
- * stack:  pFrame     pFrame1
+ * stack:  pFrame{control & data pointer}     pFrame1    pString
  *
  *
- * Heap:   Frame|counter          string|counter
+ * Heap:   (*pFrame: Frame{pString}|counter) (*pString: string|counter)
  *
  */
 
@@ -31,20 +31,28 @@ int testPointerQueue() {
     {
         shared_ptr<string> pString = make_shared<string>("hello world");
         pFrame->pString = pString;
-        cout << &pString  << " " << pString.get()  << " " << *pString << endl;
+        cout << &pFrame->pString  << " " << pFrame->pString.get()  << " " << *pFrame->pString << endl;
+        // 0x61aee0 0x61af10 hello world
     }
 
-    mq.push(pFrame);
     {
-        shared_ptr<string> &pString = mq.front()->pString;
+        shared_ptr<string> &pString = pFrame->pString; // pFrame->pString is shared_ptr object on heap
         auto address = &pString;
         cout << "to watch address: " << address << endl;
         /**
          * watchpoint on *address
+         * gdb> watch -l pString # &pString == &pString._M_ptr
          * gdb> watch -l *address # equivalent to watch -l pString._M_ptr
          * or just
          * gdb> watch -l *0x61aee0
+         * gdb> x/s *0x0061af10 # examine string at pString.at()
+         * gdb> print *(char**)0x0061af10 # equivalent to above
          */
+    }
+
+    {
+        mq.push(pFrame);
+        //shared_ptr<string> &pString = mq.front()->pString;
     }
 
     {

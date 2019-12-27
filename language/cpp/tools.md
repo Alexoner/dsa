@@ -153,12 +153,16 @@ gdb> b __GI___libc_write if $x0 == 2 # set break point when writing to stderr(2)
 gdb> b fwrite if $rcx==&_IO_2_1_stdout_
 gdb> b fwrite if $rcx==&_IO_2_1_stderr_ # Intel register
 gdb> info break # list breakpoints
-gdb> # watch [-l|-location] expr [thread thread-id] [mask maskvalue]. Set a watchpoint for an expression
-gdb> # In gdb there two types of watch points: hardware and software. Programmatic watch point? See debug registers.
+gdb> # watch [-l|-location] expr [thread thread-id] [mask maskvalue]. 
+gdb> # Set a watchpoint for an expression
+gdb> # In gdb there two types of watch points: hardware and software.
+gdb> # Programmatic watch point? See debug registers.
 gdb> watch foo
-gdb> watch  foo mask 0xffff00ff # watch variable address for mask
+gdb> watch foo mask 0xffff00ff # watch variable address for bit mask
 gdb> watch *0xdeadbeef mask 0xffffff00 # watch address for mask
-gdb> # Ordinarily a watchpoint respects the scope of variables in expr (see below). The -location argument tells GDB to instead watch the memory referred to by expr
+gdb> watch -l *address # equivalent to watch -l pString._M_ptr
+gdb> # Ordinarily a watchpoint respects the scope of variables in expr (see below). 
+gdb> # The -location argument tells GDB to instead watch the memory referred to by expr
 gdb> whatis i
 type = int
 gdb> print i
@@ -359,6 +363,7 @@ the same file as "__wrap_malloc"; if you do, the assembler may resolve the call 
 #### `mprotect`
 
     man mprotect
+    getconf PAGE_SIZE # get page size, usually 4096B=4KB
 
 #### `electric-fence`
 
@@ -822,6 +827,10 @@ Static analysis tool
 ### cppcheck
 
 ### clang-tools
+
+### gcc
+
+    g++ -fdump-class-hierachy a.cpp # show class hiearchy
 
 Quality assurance tools
 -----------------------
