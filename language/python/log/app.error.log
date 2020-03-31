@@ -1,0 +1,260 @@
+[2018-09-01 15:00:15,234 ERROR   ] this is error [18848-MainThread test() app.py:16]
+[2018-09-01 15:00:15,234 CRITICAL] this is fatal [18848-MainThread test() app.py:17]
+[2018-09-01 15:00:15,234 CRITICAL] this is critical [18848-MainThread test() app.py:18]
+[2018-09-01 15:00:15,235 ERROR   ] Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all? [18848-MainThread f() app.py:23]
+Traceback (most recent call last):
+  File "/home/hdu/Documents/mine/dsa/language/python/app.py", line 21, in f
+    requests.get("this is not an url at all")
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 72, in get
+    return request('get', url, params=params, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 58, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 498, in request
+    prep = self.prepare_request(req)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 441, in prepare_request
+    hooks=merge_hooks(request.hooks, self.hooks),
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 309, in prepare
+    self.prepare_url(url, params)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 383, in prepare_url
+    raise MissingSchema(error)
+requests.exceptions.MissingSchema: Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all?
+[2018-09-01 16:38:34,617 ERROR   ] this is error [32270-MainThread test() app.py:21]
+[2018-09-01 16:38:34,618 CRITICAL] this is fatal [32270-MainThread test() app.py:22]
+[2018-09-01 16:38:34,618 CRITICAL] this is critical [32270-MainThread test() app.py:23]
+[2018-09-01 16:38:34,635 ERROR   ] Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all? [32270-MainThread f() app.py:28]
+Traceback (most recent call last):
+  File "app.py", line 26, in f
+    requests.get("this is not an url at all")
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 72, in get
+    return request('get', url, params=params, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 58, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 498, in request
+    prep = self.prepare_request(req)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 441, in prepare_request
+    hooks=merge_hooks(request.hooks, self.hooks),
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 309, in prepare
+    self.prepare_url(url, params)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 383, in prepare_url
+    raise MissingSchema(error)
+requests.exceptions.MissingSchema: Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all?
+[2018-09-01 16:38:40,347 ERROR   ] this is error [32732-MainThread test() app.py:21]
+[2018-09-01 16:38:40,347 CRITICAL] this is fatal [32732-MainThread test() app.py:22]
+[2018-09-01 16:38:40,348 CRITICAL] this is critical [32732-MainThread test() app.py:23]
+[2018-09-01 16:38:40,349 ERROR   ] Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all? [32732-MainThread f() app.py:28]
+Traceback (most recent call last):
+  File "app.py", line 26, in f
+    requests.get("this is not an url at all")
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 72, in get
+    return request('get', url, params=params, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 58, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 498, in request
+    prep = self.prepare_request(req)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 441, in prepare_request
+    hooks=merge_hooks(request.hooks, self.hooks),
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 309, in prepare
+    self.prepare_url(url, params)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 383, in prepare_url
+    raise MissingSchema(error)
+requests.exceptions.MissingSchema: Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all?
+[2018-09-01 16:39:07,709 ERROR   ] this is error [3221-MainThread test() app.py:21]
+[2018-09-01 16:39:07,709 CRITICAL] this is fatal [3221-MainThread test() app.py:22]
+[2018-09-01 16:39:07,709 CRITICAL] this is critical [3221-MainThread test() app.py:23]
+[2018-09-01 16:39:07,710 ERROR   ] Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all? [3221-MainThread f() app.py:28]
+Traceback (most recent call last):
+  File "app.py", line 26, in f
+    requests.get("this is not an url at all")
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 72, in get
+    return request('get', url, params=params, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 58, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 498, in request
+    prep = self.prepare_request(req)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 441, in prepare_request
+    hooks=merge_hooks(request.hooks, self.hooks),
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 309, in prepare
+    self.prepare_url(url, params)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 383, in prepare_url
+    raise MissingSchema(error)
+requests.exceptions.MissingSchema: Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all?
+[2018-09-01 16:39:20,742 ERROR   ] this is error [4320-MainThread test() app.py:21]
+[2018-09-01 16:39:20,743 CRITICAL] this is fatal [4320-MainThread test() app.py:22]
+[2018-09-01 16:39:20,743 CRITICAL] this is critical [4320-MainThread test() app.py:23]
+[2018-09-01 16:39:20,744 ERROR   ] Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all? [4320-MainThread f() app.py:28]
+Traceback (most recent call last):
+  File "app.py", line 26, in f
+    requests.get("this is not an url at all")
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 72, in get
+    return request('get', url, params=params, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 58, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 498, in request
+    prep = self.prepare_request(req)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 441, in prepare_request
+    hooks=merge_hooks(request.hooks, self.hooks),
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 309, in prepare
+    self.prepare_url(url, params)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 383, in prepare_url
+    raise MissingSchema(error)
+requests.exceptions.MissingSchema: Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all?
+[2018-09-01 16:40:04,394 ERROR   ] this is error [11737-MainThread test() app.py:21]
+[2018-09-01 16:40:04,394 CRITICAL] this is fatal [11737-MainThread test() app.py:22]
+[2018-09-01 16:40:04,394 CRITICAL] this is critical [11737-MainThread test() app.py:23]
+[2018-09-01 16:40:04,395 ERROR   ] Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all? [11737-MainThread f() app.py:28]
+Traceback (most recent call last):
+  File "app.py", line 26, in f
+    requests.get("this is not an url at all")
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 72, in get
+    return request('get', url, params=params, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 58, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 498, in request
+    prep = self.prepare_request(req)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 441, in prepare_request
+    hooks=merge_hooks(request.hooks, self.hooks),
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 309, in prepare
+    self.prepare_url(url, params)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 383, in prepare_url
+    raise MissingSchema(error)
+requests.exceptions.MissingSchema: Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all?
+[2018-09-01 16:40:17,377 ERROR   ] this is error [12772-MainThread test() app.py:21]
+[2018-09-01 16:40:17,377 CRITICAL] this is fatal [12772-MainThread test() app.py:22]
+[2018-09-01 16:40:17,377 CRITICAL] this is critical [12772-MainThread test() app.py:23]
+[2018-09-01 16:40:17,378 ERROR   ] Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all? [12772-MainThread f() app.py:28]
+Traceback (most recent call last):
+  File "app.py", line 26, in f
+    requests.get("this is not an url at all")
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 72, in get
+    return request('get', url, params=params, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 58, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 498, in request
+    prep = self.prepare_request(req)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 441, in prepare_request
+    hooks=merge_hooks(request.hooks, self.hooks),
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 309, in prepare
+    self.prepare_url(url, params)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 383, in prepare_url
+    raise MissingSchema(error)
+requests.exceptions.MissingSchema: Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all?
+[2018-09-01 16:41:43,110 ERROR   ] this is error [20472-MainThread test() app.py:21]
+[2018-09-01 16:41:43,110 CRITICAL] this is fatal [20472-MainThread test() app.py:22]
+[2018-09-01 16:41:43,110 CRITICAL] this is critical [20472-MainThread test() app.py:23]
+[2018-09-01 16:41:43,111 ERROR   ] Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all? [20472-MainThread f() app.py:28]
+Traceback (most recent call last):
+  File "app.py", line 26, in f
+    requests.get("this is not an url at all")
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 72, in get
+    return request('get', url, params=params, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 58, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 498, in request
+    prep = self.prepare_request(req)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 441, in prepare_request
+    hooks=merge_hooks(request.hooks, self.hooks),
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 309, in prepare
+    self.prepare_url(url, params)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 383, in prepare_url
+    raise MissingSchema(error)
+requests.exceptions.MissingSchema: Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all?
+[2018-09-01 16:42:04,706 ERROR   ] this is error [22214-MainThread test_log() app.py:21]
+[2018-09-01 16:42:04,707 CRITICAL] this is fatal [22214-MainThread test_log() app.py:22]
+[2018-09-01 16:42:04,707 CRITICAL] this is critical [22214-MainThread test_log() app.py:23]
+[2018-09-01 16:42:04,708 ERROR   ] Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all? [22214-MainThread f() app.py:28]
+Traceback (most recent call last):
+  File "app.py", line 26, in f
+    requests.get("this is not an url at all")
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 72, in get
+    return request('get', url, params=params, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 58, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 498, in request
+    prep = self.prepare_request(req)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 441, in prepare_request
+    hooks=merge_hooks(request.hooks, self.hooks),
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 309, in prepare
+    self.prepare_url(url, params)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 383, in prepare_url
+    raise MissingSchema(error)
+requests.exceptions.MissingSchema: Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all?
+[2018-09-01 16:44:03,720 ERROR   ] this is error [31918-MainThread test_log() app.py:21]
+[2018-09-01 16:44:03,720 CRITICAL] this is fatal [31918-MainThread test_log() app.py:22]
+[2018-09-01 16:44:03,720 CRITICAL] this is critical [31918-MainThread test_log() app.py:23]
+[2018-09-01 16:44:03,722 ERROR   ] Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all? [31918-MainThread f() app.py:28]
+Traceback (most recent call last):
+  File "app.py", line 26, in f
+    requests.get("this is not an url at all")
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 72, in get
+    return request('get', url, params=params, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 58, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 498, in request
+    prep = self.prepare_request(req)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 441, in prepare_request
+    hooks=merge_hooks(request.hooks, self.hooks),
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 309, in prepare
+    self.prepare_url(url, params)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 383, in prepare_url
+    raise MissingSchema(error)
+requests.exceptions.MissingSchema: Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all?
+[2018-09-01 16:44:16,758 ERROR   ] this is error [433-MainThread test_log() app.py:21]
+[2018-09-01 16:44:16,758 CRITICAL] this is fatal [433-MainThread test_log() app.py:22]
+[2018-09-01 16:44:16,759 CRITICAL] this is critical [433-MainThread test_log() app.py:23]
+[2018-09-01 16:44:16,760 ERROR   ] Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all? [433-MainThread f() app.py:28]
+Traceback (most recent call last):
+  File "app.py", line 26, in f
+    requests.get("this is not an url at all")
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 72, in get
+    return request('get', url, params=params, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 58, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 498, in request
+    prep = self.prepare_request(req)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 441, in prepare_request
+    hooks=merge_hooks(request.hooks, self.hooks),
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 309, in prepare
+    self.prepare_url(url, params)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 383, in prepare_url
+    raise MissingSchema(error)
+requests.exceptions.MissingSchema: Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all?
+[2018-09-01 16:44:22,952 ERROR   ] this is error [1001-MainThread test_log() app.py:21]
+[2018-09-01 16:44:22,952 CRITICAL] this is fatal [1001-MainThread test_log() app.py:22]
+[2018-09-01 16:44:22,952 CRITICAL] this is critical [1001-MainThread test_log() app.py:23]
+[2018-09-01 16:44:22,953 ERROR   ] Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all? [1001-MainThread f() app.py:28]
+Traceback (most recent call last):
+  File "app.py", line 26, in f
+    requests.get("this is not an url at all")
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 72, in get
+    return request('get', url, params=params, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 58, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 498, in request
+    prep = self.prepare_request(req)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 441, in prepare_request
+    hooks=merge_hooks(request.hooks, self.hooks),
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 309, in prepare
+    self.prepare_url(url, params)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 383, in prepare_url
+    raise MissingSchema(error)
+requests.exceptions.MissingSchema: Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all?
+[2018-09-03 10:48:58,552 ERROR   ] this is error [21142-MainThread test_log() app.py:21]
+[2018-09-03 10:48:58,552 CRITICAL] this is fatal [21142-MainThread test_log() app.py:22]
+[2018-09-03 10:48:58,552 CRITICAL] this is critical [21142-MainThread test_log() app.py:23]
+[2018-09-03 10:48:58,554 ERROR   ] Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all? [21142-MainThread f() app.py:28]
+Traceback (most recent call last):
+  File "app.py", line 26, in f
+    requests.get("this is not an url at all")
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 72, in get
+    return request('get', url, params=params, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/api.py", line 58, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 498, in request
+    prep = self.prepare_request(req)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/sessions.py", line 441, in prepare_request
+    hooks=merge_hooks(request.hooks, self.hooks),
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 309, in prepare
+    self.prepare_url(url, params)
+  File "/home/hdu/.pyenv/versions/3.6.0/lib/python3.6/site-packages/requests/models.py", line 383, in prepare_url
+    raise MissingSchema(error)
+requests.exceptions.MissingSchema: Invalid URL 'this is not an url at all': No schema supplied. Perhaps you meant http://this is not an url at all?

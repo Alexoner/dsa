@@ -14,7 +14,7 @@
 template<typename T>
 static std::ostream& operator<<(std::ostream& os, const std::vector<T>& container)
 {
-    os << "vector{";
+    os << "{";
     for (auto& x : container)
     {
         if (std::is_same<T, string>::value) {
@@ -28,6 +28,26 @@ static std::ostream& operator<<(std::ostream& os, const std::vector<T>& containe
     os << "}";
     return os;
 }
+
+template<typename T>
+static std::ostream& operator<<(std::ostream& os, const std::unordered_set<T>& container)
+{
+    os << "{";
+    for (auto& x : container)
+    {
+        if (std::is_same<T, string>::value) {
+            os << '"' << x << '"' << ", "; // wrap string between ""
+        } else if (std::is_same<T, char>::value) {
+            os << "'" << x << "'" << ", "; // wrap string between ''
+        } else {
+            os << x << ", ";
+        }
+    }
+    os << "}";
+    return os;
+}
+
+
 
 template<typename T>
 static std::ostream& operator<<(std::ostream& os, const std::multiset<T>& container)

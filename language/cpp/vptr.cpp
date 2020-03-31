@@ -14,17 +14,30 @@ g++ question_vptr.cpp -std=c++11
 
 #include <iostream>
 
-struct A
+class Base
 {
     int data[2];
 
-    A(int x, int y) : data{x, y} {}
-    virtual void f() {}
+public:
+    Base(int x, int y) : data{x, y} {}
+    virtual void f() {};
+    virtual ~Base() {}
+};
+
+class Derived: public Base {
+public:
+    Derived(): Base(0, 1) {}
+    void f() {}
+    virtual ~Derived() {};
+
 };
 
 int main(int argc, char **argv)
 {
-    A a(22, 33);
+    Base a(22, 33);
+    Base *pBase = new Derived();
+    pBase->f();
+    delete pBase;
 
     int *arr = (int *) &a;
     std::cout << arr[2] << std::endl;

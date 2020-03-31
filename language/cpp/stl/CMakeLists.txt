@@ -11,6 +11,6 @@ add_executable(move move.cpp)
 
 add_executable(numeric numeric.cpp)
 add_executable(transform transform.cpp)
-add_executable(vector vector.cpp)
+#add_executable(vector vector.cpp)
 add_executable(bind bind.cpp)
 target_link_libraries(numeric easylogging)

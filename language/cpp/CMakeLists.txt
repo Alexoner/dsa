@@ -21,6 +21,8 @@ add_executable(inherit inherit.cpp)
 add_executable(pageFault os/pageFault.cpp)
 add_executable(memoryLayout memory/memoryLayout.cpp)
 add_executable(smartPointers memory/smartPointers.cpp)
+add_executable(uninitializedMember undefinedBehaviour/uninitializedMember.cpp)
+add_executable(constReference const_reference.cpp)
 
 # stl
 add_subdirectory(stl)

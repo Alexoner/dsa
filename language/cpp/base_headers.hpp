@@ -14,6 +14,8 @@
 #include <queue>
 #include <list>
 
+#include <cmath>
+
 // STL algorithm, functors
 #include <algorithm>
 #include <functional>

@@ -2,9 +2,9 @@ add_executable(memory_leak memory_leak.cpp)
 #set_target_properties(memory_leak PROPERTIES LINK_FLAGS "-ltcmalloc")
 target_link_libraries(memory_leak "tcmalloc")
 add_executable(dead_loop_and_memory_leak dead_loop_and_memory_leak.cpp)
-set_target_properties(dead_loop_and_memory_leak PROPERTIES 
-    COMPILE_FLAGS "-fsanitize=leak -O1" 
-    LINK_FLAGS "-fsanitize=leak")
+#set_target_properties(dead_loop_and_memory_leak PROPERTIES 
+    #COMPILE_FLAGS "-fsanitize=leak -O1" 
+    #LINK_FLAGS "-fsanitize=leak")
 add_executable(use_after_free use_after_free.cpp)
 set_target_properties(use_after_free PROPERTIES 
     COMPILE_FLAGS "-fsanitize=address" 

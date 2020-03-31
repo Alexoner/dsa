@@ -12,26 +12,34 @@ The important thing to note here is the order of destruction of classes and how 
 
 class Base {
 public:
-	//virtual void method() {std::cout << "from Base" << std::endl;}
-	void method() {std::cout << "from Base" << std::endl;}
-	virtual ~Base() {method();}
-	void baseMethod() {method();}
+    //virtual void method() {std::cout << "from Base" << std::endl;}
+    void method() {std::cout << "from Base" << std::endl;}
+    //virtual ~Base() {method();}
+    ~Base() {method();} // undefined behaviour when destroying inherited class with base pointer
+    void baseMethod() {method();}
 };
 
 class A : public Base {
 public:
-	void method() {std::cout << "from A" << std::endl;}
-	//virtual void method() {std::cout << "from A" << std::endl;}
-	~A() {method();}
+    void method() {std::cout << "from A" << std::endl;}
+    //virtual void method() {std::cout << "from A" << std::endl;}
+    ~A() {method();}
 };
 
+int testOrder() {
+
+    Base* base = new A;
+    base->baseMethod(); // A
+
+    //A *a = (A*)base;
+    //a->method(); // A
+
+    delete base; // A, base
+
+    return 0;
+}
+
 int main(void) {
-	Base* base = new A;
-	base->baseMethod(); // A
-
-	//A *a = (A*)base;
-	//a->method(); // A
-
-	delete base; // A, base
-	return 0;
+    testOrder();
+    return 0;
 }

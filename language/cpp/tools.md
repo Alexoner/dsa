@@ -148,6 +148,7 @@ gdb> break operator new # break at operator new
 gdb> break mmap # break at mmap
 # set break point on new_do_write if second register parameter string is "ERROR\n". $_streq is convenience function
 gdb> b new_do_write if $_streq((char*)$rsi, "ERROR\n")
+gdb> b __GI___libc_write if $rdi == 2 # set break point when writing to stderr(2), x86 register
 gdb> b __GI___libc_write if $x0 == 2 # set break point when writing to stderr(2), ARM register
 # https://stackoverflow.com/questions/23757996/gdb-how-to-break-on-something-is-written-to-cout
 gdb> b fwrite if $rcx==&_IO_2_1_stdout_
@@ -184,7 +185,8 @@ gdb> disassemble main # show assemble language representation of function main
 gdb> info frame
 gdb> info registers # show register values
 gdb> info vtbl *pa # show virtual method table of C++ object *pa
-gdb> x /4xw $rip # examin memory pointed by $rip (instruction register), 4 words hex
+gdb> x $rbp+8 # examine return address of current call, on IA32
+gdb> x /4xw $rip # examine memory pointed by $rip (instruction register), 4 words hex
 gdb> print /s $
 gdb> x /s $rsi # examine memory address stored in register as string
 0x614c20:       "begin().base0\n"
@@ -365,6 +367,8 @@ the same file as "__wrap_malloc"; if you do, the assembler may resolve the call 
     man mprotect
     getconf PAGE_SIZE # get page size, usually 4096B=4KB
 
+Note that `mprotect` needs the memory address to be page aligned.
+
 #### `electric-fence`
 
     man libefence
@@ -513,13 +517,14 @@ Pipe operator `|` in linux shell is very powerful.
 Another useful tool is NAMED PIPE(`man mkfifo`), which create a virtual file
 as a pipe in memory.
 
-    # keep testing until fail
-    while true; do ./program || break; done
+    cat input.txt |awk '{print $1}'
 
 ### while 
 
-    # heredoc piped into while read
+    # keep testing until fail
     while true; do ./program || break; done # keep running a program until fail
+
+    # heredoc piped into while read
     # heredoc with indentation of tab, piped into while, split string with IFS
     IFS=" " cat <<-EOF | while read a b c d
     1 2 3 4 
@@ -531,6 +536,9 @@ as a pipe in memory.
 ### Search tools
 
 #### ag
+
+    # search for class definition
+    ag '(struct|class|enum|(typedef.*)) RetrieveOption'
 
 #### egrep
 
@@ -649,6 +657,8 @@ Examples
     $ echo abbc | awk '{ print gensub(/a(b*)c/, "Here are bees: \\1", "g", $1);}'
     Here are bees: bb
 
+    # multiple variables assignment
+    read -r a b c <<<$(echo 1 2 3) ; echo "$a|$b|$c"
     # process a csv file, copy all files at the first field, and substitue destination name by replacing pattern with target
     $ cat feature.3030.csv|awk '{FS=","}NR > 1 {print $1}' |while read f
     do
@@ -816,9 +826,26 @@ Run `deadloop` and experiment with those tools.
 - `/proc/$PID/environ`: `cat /proc/37517/environ|tr '\0' '\n'` to display environment variables of a running process.
 - `/proc/$PID/maps`: mapped memory regions
 
+
 ### `/var/log/auth.log` - system authentication log
 
 For example, if someone used `sudo kill` to kill your process behind you, you can check it out there.
+
+### `/sys/devices/`
+
+### `/sys/devices/system/cpu/cpu0/cache/`
+
+- `/sys/devices/system/cpu/cpu0/cache/index0/coherency_line_size`: cache line/block size (bytes)
+- `/sys/devices/system/cpu/cpu0/cache/index0/number_of_sets`: number of sets
+- `/sys/devices/system/cpu/cpu0/cache/index0/ways_of_associativity`: ways of associativity
+- `/sys/devices/system/cpu/cpu0/cache/index0/size`: size
+
+```text
+Rember that size = number of sets * ways of associativity * block size
+Block Offset = Memory Address mod 2ⁿ
+Block Address = Memory Address / 2ⁿ 
+Set Index = Block Address mod 2^s
+```
 
 
 Static analysis tool
@@ -831,6 +858,7 @@ Static analysis tool
 ### gcc
 
     g++ -fdump-class-hierachy a.cpp # show class hiearchy
+    g++ -g -std=c++11 -Weffc++ a.cpp # -g for debug, -Weffc++ 
 
 Quality assurance tools
 -----------------------
@@ -995,6 +1023,10 @@ Reference:
 Profiling tools
 ---------------
 
+There are two kinds of profilers:
+- Sampling based
+- Event based (tracing, instrument)
+
 
 Gprof, Gcov, gperftools, perf_events
 
@@ -1008,11 +1040,8 @@ functions with `LD_PERLOAD` magic to get information of corresponding call stack
 If you want to debug a specific module, profiling with manually inserted code to draw statistics of program execution
 will be a good choice if external tools don't work.
 
-### The USE(Utilization Saturation and Errors) Method
-
-Reference: http://www.brendangregg.com/usemethod.html
-
 ### perf_event
+The USE(Utilization Saturation and Errors) Method: http://www.brendangregg.com/usemethod.html .
 
 #### Record cpu clock
 
@@ -1028,17 +1057,18 @@ Performance issues can be categorized into one of two types:
 - Off-CPU: where time is spent waiting while blocked on I/O, locks, timers, paging/swapping, etc.
 
 
-
-    # echo 1 > /proc/sys/kernel/sched_schedstats # since Linux kernel 4.5
-    # perf record -e sched:sched_stat_sleep -e sched:sched_switch \
-        -e sched:sched_process_exit -a -g -o perf.data.raw sleep 1
-    # perf inject -v -s -i perf.data.raw -o perf.data
-    # perf script -f comm,pid,tid,cpu,time,period,event,ip,sym,dso,trace | awk '
-        NF > 4 { exec = $1; period_ms = int($5 / 1000000) }
-        NF > 1 && NF <= 4 && period_ms > 0 { print $2 }
-        NF < 2 && period_ms > 0 { printf "%s\n%d\n\n", exec, period_ms }' | \
-        ./stackcollapse.pl | \
-        ./flamegraph.pl --countname=ms --title="Off-CPU Time Flame Graph" --colors=io > offcpu.svg
+```shell
+echo 1 > /proc/sys/kernel/sched_schedstats # since Linux kernel 4.5
+perf record -e sched:sched_stat_sleep -e sched:sched_switch \
+    -e sched:sched_process_exit -a -g -o perf.data.raw sleep 1
+perf inject -v -s -i perf.data.raw -o perf.data
+perf script -f comm,pid,tid,cpu,time,period,event,ip,sym,dso,trace | awk '
+    NF > 4 { exec = $1; period_ms = int($5 / 1000000) }
+    NF > 1 && NF <= 4 && period_ms > 0 { print $2 }
+    NF < 2 && period_ms > 0 { printf "%s\n%d\n\n", exec, period_ms }' | \
+    ./stackcollapse.pl | \
+    ./flamegraph.pl --countname=ms --title="Off-CPU Time Flame Graph" --colors=io > offcpu.svg
+```
 
 Reference:
 - http://www.brendangregg.com/offcpuanalysis.html
@@ -1046,7 +1076,11 @@ Reference:
 - https://github.com/iovisor/bcc#tracing
 
 Note:
-perf record for 
+Maybe kernel parameters need to be tuned.
+
+### gprof
+`gprof` uses a hybrid of instruments and sampling.
+
 
 ### eBPF - bcc tools
 
@@ -1239,7 +1273,22 @@ This seems to slow down the program significantly...
 Linux Tracing tools
 -------------------
 
+### ptrace, strace
+
+### ftrace
+
+#### trace-cmd
+
+#### perf-tools(https://github.com/brendangregg/perf-tools)
+
+#### kernelshark
+
+#### uprobe
+
 TODO
+
+Development tools
+-----------------
 
 ### git
 We'll skip basic `git clone/commit/pull/push/commit/revert` usage.
