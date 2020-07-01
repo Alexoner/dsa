@@ -278,12 +278,20 @@ Use gdb to change environment variables of a running process.
 
 2. `pstack.sh`
 This is a wrapper script using gdb to attach to a running process then get the process's
-call stack.
+call stack, which uses ptrace as underlying implementation.
+
+#### Generate core dump/exception for accessing a certain file - permission, blocking io
+To get call stack for a process when accessing certain file, we can change the file's 
+permission, or change the file to a named pipe blocking the reader or writer.
+
+This is useful for debugging python system call.
 
 ### ptrace(strace & ltrace)
 `strace` can be used to trace system call and signals.
 
+    man strace
     strace -Ttt -f -p $PID -o app.strace # print out syscall
+    strace -f -Ttt -e trace=%file -s 1024 ./a.out # trace file events of process a.out and its children processes. 1024 maximum lengto for argument data
     strace -w -c # show syscall latency
 
 - -f: trace child processes, all threads
@@ -295,12 +303,12 @@ call stack.
 ### objdump & readelf
 These two commands are used to display information from object files.
 
-	objdump -s ./a.out # -s --full-contents. display all sections
-	objdump -d ./a.out # disassemble
-	objdump -ds ./a.out # display both instructions and data.
-	objdump -dj .text ./a.out # disassemble parts containing code
-	objdump -sj .rodata ./a.out # display .rodata section
-	readelf -x .rodata ./a.out # display .rodata section
+    objdump -s ./a.out # -s --full-contents. display all sections
+    objdump -d ./a.out # disassemble
+    objdump -ds ./a.out # display both instructions and data.
+    objdump -dj .text ./a.out # disassemble parts containing code
+    objdump -sj .rodata ./a.out # display .rodata section
+    readelf -x .rodata ./a.out # display .rodata section
 
 ### Core dump
 When a process runs into `segmentation fault`, the operating system can dump the process state.
@@ -508,16 +516,27 @@ Then messages like this is expected in `dmesg |tail -n 20`
     [2901452.813515] Killed process 28345 (deadloop) total-vm:21474908536kB, anon-rss:30564396kB, file-rss:4kB, shmem-rss:0kB
     [2901454.892452] oom_reaper: reaped process 28345 (deadloop), now anon-rss:0kB, file-rss:0kB, shmem-rss:0kB 
 
+### Misc
+
+    # set run timeout for a process with timeout
+	timeout 1s ./a.out
+	timeout --signal=HUP 1s ./a.out # set run timeout for a process
+	# set CPU time limit with ulimit -t
+
 
 Text processing command line tools
 ---------------------------------
 
 ### PIPE
 Pipe operator `|` in linux shell is very powerful.
-Another useful tool is NAMED PIPE(`man mkfifo`), which create a virtual file
-as a pipe in memory.
+Another useful tool is NAMED PIPE(`man mkfifo`), which create a virtual file as a pipe in memory.
 
-    cat input.txt |awk '{print $1}'
+    mkfifo fifo # make a first in first out named pipe file
+    echo "hello" > fifo # blocked, hang up
+    cat fifo # both echo and cat finishes
+
+    cat fifo # blocked, hang up
+    echo "hello" > fifo # both echo and cat finishes
 
 ### while 
 
