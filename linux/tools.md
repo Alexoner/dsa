@@ -330,7 +330,7 @@ After a core dump file is generated, view it with `gdb`
 
     gdb <binary file> core
 
-### ld.so & ld
+### linking & code injection with ld.so & ld
 
     man 8 ld.so
     man ld
@@ -380,6 +380,57 @@ Note that `mprotect` needs the memory address to be page aligned.
 #### `electric-fence`
 
     man libefence
+
+
+### Python debug
+
+#### with pdb debugger
+pip install options:
+-e,--editable <path/url>
+	Install a project in editable mode (i.e.  setuptools "develop mode") from a local project path or a VCS url.
+
+	pip install -e .
+
+Set breakpoint by inserting:
+
+    __import__('ipdb').set_trace()
+
+#### code injection
+
+```python
+from module_name import SomeClass
+
+def overriddenMethod(self, ...):
+    # do something
+    pass
+
+def overriddenStaticMethod(...):
+    # do something
+    pass
+SomeClass.someMethod       = overriddenMethod
+SomeClass.someStaticMethod = overriddenStaticMethod
+
+# note:
+# Single Underscore means internal use names
+# Double underscore means name mangling, outside access like this:
+SomeClass.__dict__['_SomeClass' + 'double_underscored_names'].__func__(...)
+
+```
+
+#### profiling
+
+
+cProfile will only show list of functions, without call stack.
+For call stack, use [pyinstrument](https://github.com/joerick/pyinstrument), which is a sampling based statistical profiler.
+
+```python
+import cProfile
+cProfile.run('foo()')
+```
+
+```shell
+python -m cProfile <script>
+```
 
 
 Linux administrative tools
@@ -1316,6 +1367,13 @@ Git commits have a TREE structure!
 #### git rebase --onto
 Refer to `git help rebase`.
 
+       SYNOPSIS
+       git rebase [-i | --interactive] [options] [--exec <cmd>] [--onto <newbase>]
+               [<upstream> [<branch>]]
+       git rebase [-i | --interactive] [options] [--exec <cmd>] [--onto <newbase>]
+               --root [<branch>]
+       git rebase --continue | --skip | --abort | --quit | --edit-todo | --show-current-patch
+
        Assume the following history exists and the current branch is "topic":
 
                      A---B---C topic
@@ -1379,14 +1437,14 @@ Other ops tools
 https://www.thegeekstuff.com/2011/12/linux-performance-monitoring-tools
 https://www.tecmint.com/command-line-tools-to-monitor-linux-performance/
 
-CPU    htop, top
-GPU    gpu
-process    ps, pstree
-debug    gdb, ptrace(strace), perf, dtrace
-memory    htop, free, pmap, vmstat
-disk    df, du, iotop, iostat
-network    nc, ping, iperf, iftop, nload, netstat, sar, tcpdump
-misc    dstat, lsof, cat /proc
+CPU     	 htop, top
+GPU     	 gpu
+process 	 ps, pstree
+debug   	 gdb, ptrace(strace), perf, dtrace
+memory  	 htop, free, pmap, vmstat
+disk    	 df, du, iotop, iostat
+network 	 nc, ping, iperf, iftop, nload, netstat, sar, tcpdump
+misc    	 dstat, lsof, cat /proc
 
 - htop
 - [iftop](https://www.systutorials.com/docs/linux/man/8-iftop/)
@@ -1395,7 +1453,7 @@ misc    dstat, lsof, cat /proc
 - tcpdump
 
 
-### netstat
+### netstat - Print network connections, routing tables, interface statistics, masquerade connections, and multicast memberships
 
     netstat -nlpte # list all listenig ports
 
@@ -1404,9 +1462,22 @@ misc    dstat, lsof, cat /proc
 - -t: tcp
 - -e: extend, display additional info
 
-### lsof
+### lsof - list open files
 
-    lsof -p $PID
+	man lsof # man page
+	lsof # list all open files
+	lsof -u $USERNAME # list files opened by specific user, inclusively or exclusively
+	lsof -i 4 # list IPv4 socket files. -i specifier form: [46][protocol][@hostname|hostaddr][:service|port]
+	lsof -i 6 # list IPv6 socket files
+	lsof -i :1-1024 # list open files based on port range 1-1024
+    lsof -p $PID # list open files specific to a process with $PID, inclusively or exclusively
+	lsof $FILENAME # list all processes that opened $FILENAME, inclusively or exclusively
+
+Reference:
+https://www.howtoforge.com/linux-lsof-command/
+
+# mount & umount
+Used to mount files systems, both system or user space file system(fuse).
 
 
 

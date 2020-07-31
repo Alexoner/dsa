@@ -5,6 +5,7 @@
 # rsa:  RSA key management
 # x509: X.509 Certificate Data Management.
 # pkcs12: PKCS#12 Data Management
+# verify: X509 Certificate Verification
 
 ######### GENERATE CA, server, client side key and certificate ############
 
@@ -30,6 +31,8 @@ openssl x509 -req -sha256 -days 365 -in client.csr -CA ca.crt -CAkey ca.key -set
 openssl req -text -noout -verify -in client.csr
 # check a private key
 openssl rsa -in ca.key -check
+# view a private key all content
+openssl rsa -noout -text -in ca.key
 # check a certificate information
 openssl x509 -text -noout -in ca.crt |head -n 15
 # check a PKCS#12 file (.pfx or .p12)
