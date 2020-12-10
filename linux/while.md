@@ -13,3 +13,12 @@
     done | parallel echo "processing {}"
 
 
+### Examples
+
+Find which pip package contains a certain file:
+
+    pip list |awk '{print $1}' |while read f
+	do
+		echo $f
+		pip show -f $f |grep 'filename'
+	done
