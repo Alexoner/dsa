@@ -8,10 +8,18 @@
     IFS=" " cat <<-EOF | while read a b c d
     1 2 3 4 
     5 6 7 8
-    EOF
+	EOF
     do echo $a,$b,$c,$d
     done | parallel echo "processing {}"
 
+	# heredoc piped into while loop for read like this
+    IFS=" " cat <<-EOF |
+    1 2 3 4 
+    5 6 7 8
+	EOF
+	while read a b c d
+		do echo $a,$b,$c,$d
+    done | parallel echo "processing {}"
 
 ### Examples
 
