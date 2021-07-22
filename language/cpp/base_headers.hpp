@@ -13,6 +13,7 @@
 #include <stack>
 #include <queue>
 #include <list>
+#include <bitset>
 
 #include <cmath>
 
