@@ -18,22 +18,23 @@ functions with `LD_PERLOAD` magic to get information of corresponding call stack
 If you want to debug a specific module, profiling with manually inserted code to draw statistics of program execution
 will be a good choice if external tools don't work.
 
-### perf_event
+## perf_event
 The USE(Utilization Saturation and Errors) Method: http://www.brendangregg.com/usemethod.html .
 
-#### setup
+### setup
 
 	echo -1 |sudo tee /proc/sys/kernel/perf_event_paranoid
 	echo 0 | sudo tee /proc/sys/kernel/kptr_restrict
+	sudo mount -o remount,mode=755 /sys/kernel/tracing/  # for perf trace
 
-#### Record cpu clock
+### Record cpu clock
 
-    perf record -e cpu-clock -g ./a.out # if compiling with -fno-omit-frame-pointer
-    perf record -e cpu-clock --call-graph dwarf ./a.out # profile ./a.out by sampling with cpu-clock event 
-    perf record -e cs --call-graph dwarf ./a.out # profile ./a.out by sampling with context switch event 
+    perf record -e cpu-clock -g ./a.out # profile cpu time, if compiling with -fno-omit-frame-pointer
+    perf record -e cpu-clock --call-graph dwarf ./a.out # profile cpu time of ./a.out by sampling with cpu-clock event 
+    perf record -e cs --call-graph dwarf ./a.out # profile context switch of ./a.out by sampling event 
     perf report # report
 
-#### Off-CPU analysis
+### Off-CPU analysis
 
 Generic thread states
 Performance issues can be categorized into one of two types:
@@ -60,20 +61,22 @@ Reference:
 Note:
 Maybe kernel parameters need to be tuned.
 
-### gprof
+## gprof
 `gprof` uses a hybrid of instruments and sampling.
 
 
-### eBPF - bcc tools
+## eBPF - bcc tools
 
 Reference:
 http://www.brendangregg.com/blog/2019-01-01/learn-ebpf-tracing.html
 
-### SystemTap
+## SystemTap
 
 TODO
+Legacy.
 
-### [gperftools](https://github.com/gperftools/gperftools/wiki)
+## [gperftools](https://github.com/gperftools/gperftools/wiki)
+High level user space profiling.
 `gperftools` is a collection of high-performance multi-threaded `malloc` implementation, and performance analysis tools.
 - Thread-caching(TC) malloc
 - heap checker
