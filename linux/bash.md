@@ -60,3 +60,6 @@ https://superuser.com/questions/878640/unix-script-wait-until-a-file-exists
 	  exit 1
 	}
 
+
+### Edit command lines
+Press `Ctrl+X Ctrl+E` to invoke `$EDITOR` (`vim` for example) to edit input lines.

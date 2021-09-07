@@ -1,4 +1,4 @@
-#### awk
+# awk - pattern scanning and processing language
 A versatile programming language.
 
 Execution order
@@ -23,10 +23,10 @@ Finally, after all the input is exhausted, gawk executes the code in the END rul
 
 
 Variables
-- RS: record separator
-- FS: field separator
-- NR: total Number of input Records seen so far, starting with 1. if RS is set to the empty string, then records are separated by sequences consisting of a `<newline>` plus one or more blank lines.
+- `NR`: total Number of input Records seen so far, starting with 1. if RS is set to the empty string, then records are separated by sequences consisting of a `<newline>` plus one or more blank lines.
 - `$n`: extract field, where n is a number starting with 1. `n=0` means the entire record.
+- `RS`: record separator
+- `FS`: field separator
 
 Using arrays
 All arrays in AWK are `ASSOCIATIVE ARRAYS`, so they allow associating an arbitrary string with another value

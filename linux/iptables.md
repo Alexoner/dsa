@@ -1,4 +1,4 @@
-### `iptables` - administrative tool for IPv4/IPv6 packet filtering and NAT
+# `iptables` - administrative tool for IPv4/IPv6 packet filtering and NAT
 
 NAME
        iptables/ip6tables — administration tool for IPv4/IPv6 packet filtering and NAT
@@ -68,8 +68,9 @@ Drop packet from a server port:
     iptables -A INPUT --src $IP --port $PORT --mode random --probability 0.9 -j DROP
 
 Limit band width:
+
 	iptables -A OUTPUT -m owner --uid-owner squid -m limit --limit 10/s -j ACCEPT
-	iptables -A OUTPUT -m owner --uid-owner squid  -j REJECT
+	iptables -A OUTPUT -m owner --uid-owner squid -j REJECT
 
 Save & restore:
 

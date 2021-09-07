@@ -7,6 +7,7 @@
 	export https_proxy="https://USER:PASSWOR@PROXY_SERVER:PORT" # if password authentication is needed
 	export all_proxy="http://PROXY_SERVER:PORT"  # all proxy, including HTTP, HTTPS, 
 	export ftp_proxy="ftp://PROXY_SERVER:PORT"
+	# NO_PROXY: A comma-separated list of host names that shouldn't go through any proxy is set in (only an asterisk, * matches all hosts)
 
 Reference: https://www.shellhacks.com/linux-proxy-server-settings-set-proxy-command-line/
 

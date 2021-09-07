@@ -46,7 +46,7 @@ It can be used to group or aggregate results.
     2 b
     1 c
 
-- -c, --count: prefix line by the number of occurrences
+uniq -c, --count: prefix line by the number of occurrences
 
 
 

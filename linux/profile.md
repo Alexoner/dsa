@@ -61,19 +61,22 @@ Reference:
 Note:
 Maybe kernel parameters need to be tuned.
 
-## gprof
+### eBPF - bcc tools
+`eBPF` is a revolutionary technology that can run sandboxed programs in the Linux kernel without changing kernel source code or loading kernel modules.
+It's a kernel virtual machine for profiling/tracing.
+
+Reference:
+https://ebpf.io/what-is-ebpf/
+
+http://www.brendangregg.com/blog/2019-01-01/learn-ebpf-tracing.html
+
+### gprof
 `gprof` uses a hybrid of instruments and sampling.
 
 
-## eBPF - bcc tools
+### SystemTap
+Legacy solution before `ebpf`.
 
-Reference:
-http://www.brendangregg.com/blog/2019-01-01/learn-ebpf-tracing.html
-
-## SystemTap
-
-TODO
-Legacy.
 
 ## [gperftools](https://github.com/gperftools/gperftools/wiki)
 High level user space profiling.

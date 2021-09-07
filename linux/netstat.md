@@ -1,4 +1,6 @@
-### netstat
+# netstat
+
+## Common usage
 
     netstat -nlpte # list all listenig ports
 
@@ -6,4 +8,6 @@
 - -l: listening
 - -t: tcp
 - -e: extend, display additional info
+
+    netstat -rn  # Display the kernel routing table
 
