@@ -48,5 +48,3 @@ It can be used to group or aggregate results.
 
 uniq -c, --count: prefix line by the number of occurrences
 
-
-
