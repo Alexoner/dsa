@@ -155,9 +155,17 @@ test(val), test(regex; flags)
               ["xabcd", "ABC"]
            => true, true
 
+           jq 'map(select(.key|test("pattern";"i")))'
+
 ## Examples
 
     jq '[.[] | {id: .id, location: .location, vm: [.agentPoolProfiles[]|{size: .vmSize, count: .count}]}]'
+
+### flatten an object
+
+    jq '.key' <<EOF
+    {"key": {"a": 1, "b": 2}}
+    EOF
 
 ### catenate JSONs of arrays
 
@@ -166,12 +174,13 @@ test(val), test(regex; flags)
     jq -s '[.[]|.[]]'  # produces an array, of which each element is the element of arrays of the array
     jq -s 'map(.[])'
 
-### map, group by, sort, top slice, add sum: given an array of array
+### map, group by, select, sort, top slice, add sum: given an array of array
 
     jq 'map(.[]?) 
-	|group_by(.key)|map({name: .[0].key, length: length, key1: .[0].key1} 
-	|select(.key1=="value1")) 
-	|sort_by(-.length)
+	| group_by(.key)
+    | map({name: .[0].key, length: length, key1: .[0].key1} 
+	  |select(.key1=="value1")) 
+	| sort_by(-.length)
 	|.[0:100]
 	| map(.count)
 	| add
