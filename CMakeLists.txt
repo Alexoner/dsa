@@ -57,6 +57,8 @@ LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 #set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "put your flags")
 #set(CMAKE_CXX_FLAGS_RELEASE "put your flags")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -std=c++11 -O0 -g -Wall -Wextra -fno-omit-frame-pointer") # address sanitizer, linking against libasan, slows down program
+# enable sanitizers:
+# set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -O0 -std=c++11 -ggdb -fno-omit-frame-pointer -fsanitize=address,undefined,float-divide-by-zero,unsigned-integer-overflow,implicit-conversion,local-bounds -Wall -Wshadow -Wconversion")
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -std=c++11 -O0 -g -Wall -Wextra -fsanitize=address") # address sanitizer, linking against libasan, slows down program
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -std=c++11 -O0 -g -Wall -Wextra -fsanitize=leak") # leak sanitizer, linking liblsan. `LD_PRELOAD=/usr/lib/x86_64-linux-gnu/liblsan.so.0 ./a.out`
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -std=c++11 -O0 -ggdb -Wall -Wextra -Wno-unused-result -Wreturn-type -Wmain -Werror=return-type -Werror=main -fsanitize=address")
