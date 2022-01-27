@@ -91,7 +91,7 @@ endif ()
 
 ##################################### HEADERS ####
 
-include_directories(language/cpp)
+include_directories(language/cpp/include/)
 include_directories(/home/hao.du/.linuxbrew/Cellar/boost/1.68.0_1/include/boost/)
 link_directories(/home/hao.du/.linuxbrew/Cellar/boost/1.68.0_1/lib/)
 
