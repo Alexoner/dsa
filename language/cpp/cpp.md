@@ -1,4 +1,4 @@
-# Features of C++
+# Overall Features of C++
 - REFERENCE variables and POINTER variables
 - Deterministic destruction of object
 - Inheritance: virtual function
@@ -6,12 +6,22 @@
 - Data structures and algorithms: STL
 - Concurrency: threads, lock, lock free, wait free.
 
-# Memory Management
+# Memory
 
-## [RAII(Resource Acquisition is Initialization)](http://en.wikipedia.org/wiki/RAII)
+## Memory layout of c++ program
+
+### virtual function, virtual table
+
+Reference:
+
+- https://www.martinkysel.com/demystifying-virtual-tables-in-c-part-3-virtual-tables/
+
+## Memory Management
+
+### [RAII(Resource Acquisition is Initialization)](http://en.wikipedia.org/wiki/RAII)
 Resource is hold only in the life cycle.
 
-### [Smart Pointers](https://en.wikipedia.org/wiki/Smart_pointer)
+#### [Smart Pointers](https://en.wikipedia.org/wiki/Smart_pointer)
 Smart pointers are RAII classes implemented with REFERENCE COUNTING.
 Most of crash bugs are caused by referencing a destructed object.
 1. Parent-child relation: avoid CIRCULAR REFERENCES of shared_ptr!
@@ -51,7 +61,7 @@ Use gdb `info all-registers` can show all register values.
 
 Reference: https://stackoverflow.com/questions/1632600/memory-layout-c-objects
 
-# Concurrency
+# Concurrency & parallelism
 
 ## synchronization
 - mutex: mutual exclusive
