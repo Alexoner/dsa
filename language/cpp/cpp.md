@@ -1,5 +1,6 @@
 # Overall Features of C++
 - REFERENCE variables and POINTER variables
+- polymorphism: function overload and override
 - Deterministic destruction of object
 - Inheritance: virtual function
 - Template
@@ -37,6 +38,7 @@ Reference:
 ## General-Purpose Registers (GPR) - 16-bit naming conventions
 The 8 GPRs are:
 
+```
 Accumulator register (AX). Used in arithmetic operations
 Counter register (CX). Used in shift/rotate instructions and loops.
 Data register (DX). Used in arithmetic operations and I/O operations.
@@ -45,6 +47,7 @@ Stack Pointer register (SP). Pointer to the top of the stack.
 Stack Base Pointer register (BP). Used to point to the base of the stack.
 Source Index register (SI). Used as a pointer to a source in stream operations.
 Destination Index register (DI). Used as a pointer to a destination in stream operations.
+```
 
 ## Instruction Pointer
 The EIP register contains the address of the next instruction to be executed if no branching is done.

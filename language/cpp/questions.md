@@ -29,8 +29,6 @@ What is IOCP and why is it useful?
 
 Can you throw and catch exceptions? What about SEH? How is exception handling implemented? (There's so much to be asked here...)
 
-Are you comfortable with RAII?
-
 ================================================================================
 
 Q: Why doesn't std::queue or std::stack return value?
