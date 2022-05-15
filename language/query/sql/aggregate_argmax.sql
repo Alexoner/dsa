@@ -18,27 +18,58 @@ join (
 on Users.UserId=B.UserId and Users.[Date] = B.MaxDate
 
 
---  Inut: a=|Date|value|, b=|Date|Activity|. And a.date not exactly the same as b.date
---  Output: Date|Activity| Latest value as of Date|,
---  Description: in table a, value changes w.r.t Date, we want find the latest value for each Date in table b.
---  For each b.Date, set b.Value=argmax(a.Date).value where a.Date <= b.Date.
+--  Inut: Users=|Date|UserId|value|...|, Activities=|Date|UserId|Event|...|. And Users.date not exactly the same as Activities.date
+--  Output: Date|Event| Latest value as of Date|,
+--  Description: in table Users, value changes w.r.t Date, we want find the latest value for each Date in table Activities.
+--  For each Activities.Date, set Activities.Value=argmax(Users.Date).value where Users.Date <= Activities.Date.
 --  Solution:
---  For each b.Date, find its corresponding max a.Date, and join a on a.Date=max a.Date
+--  For each Activities.Date, find its corresponding max Users.Date, and join Users on Users.Date=max Users.Date
 --  1. join on inequality condition and aggregate with group by
 --  2. Join on equality condition
 
+-- step 1: augment max Date so far from Users table for each record in Activities
 select
-b.date, a.value as latestValue, activity
-from (
+Activities.*
+, max(Users.Date) as maxDateSoFar -- argmax(Users.Date).value where Users.Date <= Activities.Date
+from Activities
+join Users
+on Activities.UserId=Users.UserId and Activities.Date>=Users.Date
+group by Users.UserId, Users.Date
+;
+-- step 2: Use this query as a nested subquery to join with Users table to get Users[argmax(Users.Date where Users.Date<=Activities.Date)].
+
+select
+*
+from
+(
+	select
+	Activities.UserId, Activities.Date, Activities.Event, max(Users.Date) as maxDateSoFar
+	from Activities
+	join Users
+	on Activities.UserId=Users.UserId and Activities.Date>=Users.Date
+	group by Activities.UserId, Activities.Date
+) A
+JOIN Users
+ON A.UserId=Users.UserId and A.maxDateSoFar=Users.Date
+order by A.Date desc
+;
+
+--  Alternative: below query has can be optimized since the nested query doesn't contain all information from Activities, and involes another join outside
+select
+*
+--  Activities.Date, Users.value as latestValue, Event
+from Activities
+join
+(
 	select -- group by aggregating to maximize
-		b.date,
-		max(a.date) as aDate, -- argmax(a.date).value where a.date <= b.date
-		Activity as latestValue
-	from b
-	join a
-	on b.date >= a.date
-	group by b.date
-) c
-join a on c.aDate=a.date -- inner join on columns maximized
-order by b.date desc
+	Activities.Date,
+	max(Users.Date) as aDate,
+	from Activities
+	join Users
+	on Activities.Date >= Users.Date
+	group by Activities.UserId, Activities.Date
+) C
+on Activities.Date=C.Date
+join Users on C.aDate=Users.Date -- inner join on columns maximized
+order by Activities.Date desc
 ;

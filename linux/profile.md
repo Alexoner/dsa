@@ -9,7 +9,8 @@ There are two kinds of profilers:
 Gprof, Gcov, gperftools, perf_events
 
 Reference:
-[gprof, valgrind, gperftools](http://gernotklingler.com/blog/gprof-valgrind-gperftools-evaluation-tools-application-level-cpu-profiling-linux/), [perf_events](http://www.brendangregg.com/perf.html)
+[gprof, valgrind, gperftools](http://gernotklingler.com/blog/gprof-valgrind-gperftools-evaluation-tools-application-level-cpu-profiling-linux/), 
+[perf_events](http://www.brendangregg.com/perf.html)
 
 For large applications, heavy profiling tools isn't appropriate. Light-weighted tools like `perf_events` comes in handy.
 One strategy is to use `perf_events` to draw statistics about most heavy low level system call, then override those
@@ -29,10 +30,11 @@ The USE(Utilization Saturation and Errors) Method: http://www.brendangregg.com/u
 
 ### Record cpu clock
 
-    perf record -e cpu-clock -g ./a.out # profile cpu time, if compiling with -fno-omit-frame-pointer
-    perf record -e cpu-clock --call-graph dwarf ./a.out # profile cpu time of ./a.out by sampling with cpu-clock event 
+    perf record -e cpu-clock -g ./a.out # profile cpu time, with call stack graph, if compiling with -fno-omit-frame-pointer
+    perf record -e cpu-clock --call-graph dwarf ./a.out # alternative call graph: dwarf. profile cpu time of ./a.out by sampling with cpu-clock event 
     perf record -e cs --call-graph dwarf ./a.out # profile context switch of ./a.out by sampling event 
-    perf report # report
+	perf record -e cpu-clock,duration_time,faults,cs -g ./a.out # sample events: cpu, duration, page faults, context switch,
+    perf report -n # report, -n print sample counts.
 
 ### Off-CPU analysis
 

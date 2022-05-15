@@ -16,7 +16,8 @@ INNER JOIN (
 ) A
 ON Orders.CustomerID=A.CustomerID
 JOIN  Category
-on Orders.CustomerID=Category.CustomerID
+on 1=1
+and Orders.CustomerID=Category.CustomerID
 where 1=1
 and OrderDate is not NULL
 ;
