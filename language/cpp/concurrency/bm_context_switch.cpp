@@ -85,5 +85,7 @@ int main (
     // Correct the number of thread switches accordingly
     COUNTER = (uint32_t)(((uint64_t)COUNTER * 1000) / myTime);
     printf("Number of thread switches in about one second was %u\n", COUNTER);
+    printf("throughput: %u\n", COUNTER);
+    printf("latency: %.3e\n", 1.0f/COUNTER);
     return 0;
 }
