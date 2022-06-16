@@ -174,17 +174,27 @@ test(val), test(regex; flags)
     jq -s '[.[]|.[]]'  # produces an array, of which each element is the element of arrays of the array
     jq -s 'map(.[])'
 
-### map, group by, select, sort, top slice, add sum: given an array of array
+### Top frequent keys: group by, count, sort, select to filter
+
+    jq '
+        group_by(.key)
+        |map({"key": .[0].key, "count": length, "value": .[0].value})
+        |sort_by(-.count)
+        |map(select(.count>1))
+       '
+
+### map, select, sort, top slice, add sum, group by, unique_by: given an array of array
 
     jq 'map(.[]?) 
 	| group_by(.key)
     | map({name: .[0].key, length: length, key1: .[0].key1} 
-	  |select(.key1=="value1")) 
+    | select(.key1=="value1")) 
 	| sort_by(-.length)
 	|.[0:100]
 	| map(.count)
 	| add
 	'
+	[{"key": 1}, {"key": 1}, {"key": 2}]
 
 ### group by and count, given an array of objects
 
