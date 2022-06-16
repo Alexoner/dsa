@@ -4,9 +4,14 @@
 # network interfaces, address
 ip addr # get ip address
 
-# route table
+# route table display
 ip route # check route table
 netstate -rn # check route table
+route -n # display route table
+
+# route table manipulation
+# ip route add #
+# ip route del 
 
 # dns
 cat /etc/resolve.conf # check local dns config
