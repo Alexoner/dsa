@@ -24,7 +24,7 @@ test_array = hvd.broadcast(test_array, 0, "test array")
 
 # each process compute a small part of something and then compute the average etc.
 # compute a small part
-x = np.mean(test_array[rank*rows:(rank+1)*(rows),:,:])
+x = np.mean(test_array[rank*rows:(rank+1)*(rows), :, :])
 # groud truth
 y_bar = np.mean(test_array)
 

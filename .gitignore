@@ -33,7 +33,7 @@
 *.app
 *.pyc
 
-build/**
+**/build/**
 log/*
 
 .clangd/**
