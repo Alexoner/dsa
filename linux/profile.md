@@ -12,14 +12,16 @@ Reference:
 [gprof, valgrind, gperftools](http://gernotklingler.com/blog/gprof-valgrind-gperftools-evaluation-tools-application-level-cpu-profiling-linux/), 
 [perf_events](http://www.brendangregg.com/perf.html)
 
-For large applications, heavy profiling tools isn't appropriate. Light-weighted tools like `perf_events` comes in handy.
-One strategy is to use `perf_events` to draw statistics about most heavy low level system call, then override those
-functions with `LD_PERLOAD` magic to get information of corresponding call stacks.
+For large applications, heavy profiling tools aren't appropriate for heavy overhead.
+Light-weighted tools like `perf_events` comes in handy.  
+One strategy is to use `perf_events` to draw statistics about most heavy low level system call, then override system call functions with `LD_PERLOAD` magic to get information of corresponding call stacks.
 
 If you want to debug a specific module, profiling with manually inserted code to draw statistics of program execution
 will be a good choice if external tools don't work.
 
 ## perf_event
+
+[perf_events](http://www.brendangregg.com/perf.html).
 The USE(Utilization Saturation and Errors) Method: http://www.brendangregg.com/usemethod.html .
 
 ### setup
@@ -28,23 +30,37 @@ The USE(Utilization Saturation and Errors) Method: http://www.brendangregg.com/u
 	echo 0 | sudo tee /proc/sys/kernel/kptr_restrict
 	sudo mount -o remount,mode=755 /sys/kernel/tracing/  # for perf trace
 
-### Record cpu clock
+### help
+
+	perf 
+	perf list  # list supported events
+
+### perf stat
+
+Gather performance counter statistics.
+
+    perf stat -e 'sched:*'  # statistics about scheduler events
+
+### perf record
 
     perf record -e cpu-clock -g ./a.out # profile cpu time, with call stack graph, if compiling with -fno-omit-frame-pointer
     perf record -e cpu-clock --call-graph dwarf ./a.out # alternative call graph: dwarf. profile cpu time of ./a.out by sampling with cpu-clock event 
-    perf record -e cs --call-graph dwarf ./a.out # profile context switch of ./a.out by sampling event 
 	perf record -e cpu-clock,duration_time,faults,cs -g ./a.out # sample events: cpu, duration, page faults, context switch,
+
+### perf report
+
     perf report -n # report, -n print sample counts.
 
 ### Off-CPU analysis
 
-Generic thread states
-Performance issues can be categorized into one of two types:
+Generic thread states performance issues can be categorized into one of two types:
+
 - On-CPU: where threads are spending time running on-CPU.
 - Off-CPU: where time is spent waiting while blocked on I/O, locks, timers, paging/swapping, etc.
 
+Generate perf off-cpu flame graph:
 
-	echo 1 > /proc/sys/kernel/sched_schedstats # since Linux kernel 4.5
+    echo 1 | sudo tee /proc/sys/kernel/sched_schedstats # since Linux kernel 4.5
 	perf record -e sched:sched_stat_sleep -e sched:sched_switch \
 		-e sched:sched_process_exit -a -g -o perf.data.raw sleep 1
 	perf inject -v -s -i perf.data.raw -o perf.data
@@ -55,22 +71,32 @@ Performance issues can be categorized into one of two types:
 		./stackcollapse.pl | \
 		./flamegraph.pl --countname=ms --title="Off-CPU Time Flame Graph" --colors=io > offcpu.svg
 
+
 Reference:
 - http://www.brendangregg.com/offcpuanalysis.html
 - http://www.brendangregg.com/blog/2015-02-26/linux-perf-off-cpu-flame-graph.html
-- https://github.com/iovisor/bcc#tracing
+- [BPF Compiler Collection](https://github.com/iovisor/bcc)
+- [perf sched for Linux CPU scheduler analysis](https://www.brendangregg.com/blog/2017-03-16/perf-sched.html)
 
 Note:
 Maybe kernel parameters need to be tuned.
 
+### perf trace 
+
+`strace` insipired tool. Usage:
+
+    perf trace -s ./a.out  # trace system calls and summarize
+
 ### eBPF - bcc tools
+
 `eBPF` is a revolutionary technology that can run sandboxed programs in the Linux kernel without changing kernel source code or loading kernel modules.
 It's a kernel virtual machine for profiling/tracing.
 
-Reference:
-https://ebpf.io/what-is-ebpf/
+Reference:  
 
-http://www.brendangregg.com/blog/2019-01-01/learn-ebpf-tracing.html
+- https://ebpf.io/what-is-ebpf/
+- [BPF Compiler Collection](https://github.com/iovisor/bcc)
+- http://www.brendangregg.com/blog/2019-01-01/learn-ebpf-tracing.html
 
 ### gprof
 `gprof` uses a hybrid of instruments and sampling.
