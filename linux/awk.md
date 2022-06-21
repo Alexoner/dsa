@@ -72,6 +72,9 @@ All arrays in AWK are `ASSOCIATIVE ARRAYS`, so they allow associating an arbitra
     # PRINT second-to-last column
     echo 'a b c d'|awk '{print $1, $(NF-1)}'
 
+    # print first n
+    cat input |awk '{if (NR>N) next; print $0}'
+
     # awk print from nth to last column (removing leading space), removing first, second columns
     echo 'a b c d' | awk '{$1=$2=$3="";print $0}' |sed -r 's/^\s+//g'
 
