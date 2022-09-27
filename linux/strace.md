@@ -10,8 +10,8 @@
 
     man strace
     strace -f $COMMAND
-    strace -f $PID
-    strace -Ttt -f -p $PID -o app.strace # print out syscall
+    strace -f -p $PID
+    strace -fp $PID -Ttt -o app.strace # print out syscall
     strace -f -Ttt -e trace=%file -s 1024 ./a.out # trace file events of process a.out and its children processes. 1024 maximum lengto for argument data
     strace -w -c # show syscall latency
 
