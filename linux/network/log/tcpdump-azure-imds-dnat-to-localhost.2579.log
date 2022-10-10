@@ -1,0 +1,406 @@
+kubernetes node host:
+
+highlight
+---------
+TCP 3 handshakes redirected.
+HTTP request/response to NAT destination.
+
+
+NODE HOST LOG, with NMI
+--------------------
+
+ aks-nodepool1-13131839-vmss000003  ~  tcpdump -i any 'tcp and ( host 10.244.9.12 or host 16.254.169.254 or port 2579 )' -vv
+tcpdump: data link type LINUX_SLL2
+tcpdump: listening on any, link-type LINUX_SLL2 (Linux cooked v2), snapshot length 262144 bytes
+10:45:05.334060 cbr0  In  IP (tos 0x0, ttl 64, id 59798, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.9.34056 > localhost.2579: Flags [.], cksum 0x9324 (incorrect -> 0x7769), seq 2125075163, ack 498722647, win 501, options [nop,nop,TS val 3965239941 ecr 3564028257], length 0
+10:45:12.099476 vethe3f4404e P   IP (tos 0x0, ttl 64, id 4616, offset 0, flags [DF], proto TCP (6), length 60)
+    10.244.9.12.34748 > 169.254.169.254.80: Flags [S], cksum 0x682b (incorrect -> 0xe04f), seq 2257807409, win 64240, options [mss 1460,sackOK,TS val 1733174947 ecr 0,nop,wscale 7], length 0
+10:45:12.099476 cbr0  In  IP (tos 0x0, ttl 64, id 4616, offset 0, flags [DF], proto TCP (6), length 60)
+    10.244.9.12.34748 > localhost.2579: Flags [S], cksum 0x932f (incorrect -> 0xab88), seq 2257807409, win 64240, options [mss 1460,sackOK,TS val 1733174947 ecr 0,nop,wscale 7], length 0
+10:45:12.099594 cbr0  Out IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    169.254.169.254.80 > 10.244.9.12.34748: Flags [S.], cksum 0x682b (incorrect -> 0x7001), seq 2232330765, ack 2257807410, win 65160, options [mss 1460,sackOK,TS val 176173833 ecr 1733174947,nop,wscale 7], length 0
+10:45:12.099598 vethe3f4404e Out IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    169.254.169.254.80 > 10.244.9.12.34748: Flags [S.], cksum 0x682b (incorrect -> 0x7001), seq 2232330765, ack 2257807410, win 65160, options [mss 1460,sackOK,TS val 176173833 ecr 1733174947,nop,wscale 7], length 0
+10:45:12.099610 vethe3f4404e P   IP (tos 0x0, ttl 64, id 4617, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.34748 > 169.254.169.254.80: Flags [.], cksum 0x6823 (incorrect -> 0x9b60), seq 1, ack 1, win 502, options [nop,nop,TS val 1733174947 ecr 176173833], length 0
+10:45:12.099610 cbr0  In  IP (tos 0x0, ttl 64, id 4617, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.34748 > localhost.2579: Flags [.], cksum 0x9327 (incorrect -> 0x6699), seq 2257807410, ack 2232330766, win 502, options [nop,nop,TS val 1733174947 ecr 176173833], length 0
+10:45:12.099710 vethe3f4404e P   IP (tos 0x0, ttl 64, id 4618, offset 0, flags [DF], proto TCP (6), length 285)
+    10.244.9.12.34748 > 169.254.169.254.80: Flags [P.], cksum 0x690c (incorrect -> 0x7990), seq 1:234, ack 1, win 502, options [nop,nop,TS val 1733174947 ecr 176173833], length 233: HTTP, length: 233
+        GET /metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://management.azure.com/&client_id=2d##REDACTED##5c HTTP/1.1
+        Host: 169.254.169.254
+        User-Agent: curl/7.81.0
+        Accept: */*
+        Metadata:true
+
+10:45:12.099710 cbr0  In  IP (tos 0x0, ttl 64, id 4618, offset 0, flags [DF], proto TCP (6), length 285)
+    10.244.9.12.34748 > localhost.2579: Flags [P.], cksum 0x9410 (incorrect -> 0x44c9), seq 0:233, ack 1, win 502, options [nop,nop,TS val 1733174947 ecr 176173833], length 233
+10:45:12.099784 cbr0  Out IP (tos 0x0, ttl 64, id 37512, offset 0, flags [DF], proto TCP (6), length 52)
+    169.254.169.254.80 > 10.244.9.12.34748: Flags [.], cksum 0x6823 (incorrect -> 0x9a71), seq 1, ack 234, win 508, options [nop,nop,TS val 176173833 ecr 1733174947], length 0
+10:45:12.099787 vethe3f4404e Out IP (tos 0x0, ttl 64, id 37512, offset 0, flags [DF], proto TCP (6), length 52)
+    169.254.169.254.80 > 10.244.9.12.34748: Flags [.], cksum 0x6823 (incorrect -> 0x9a71), seq 1, ack 234, win 508, options [nop,nop,TS val 176173833 ecr 1733174947], length 0
+10:45:12.107145 cbr0  Out IP (tos 0x0, ttl 64, id 37513, offset 0, flags [DF], proto TCP (6), length 1956)
+    169.254.169.254.80 > 10.244.9.12.34748: Flags [P.], cksum 0x6f93 (incorrect -> 0x6377), seq 1:1905, ack 234, win 508, options [nop,nop,TS val 176173841 ecr 1733174947], length 1904: HTTP, length: 1904
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+        Date: Sun, 09 Oct 2022 10:45:12 GMT
+        Content-Length: 1794
+
+        {"access_token":"ey####REDACTED####ZMw","refresh_token":"","expires_in":"83322","expires_on":"1665395634","not_before":"1665308934","resource":"https://management.azure.com/","token_type":"Bearer"} [|http]
+10:45:12.107154 vethe3f4404e Out IP (tos 0x0, ttl 64, id 37513, offset 0, flags [DF], proto TCP (6), length 1956)
+    169.254.169.254.80 > 10.244.9.12.34748: Flags [P.], cksum 0x6f93 (incorrect -> 0x6377), seq 1:1905, ack 234, win 508, options [nop,nop,TS val 176173841 ecr 1733174947], length 1904: HTTP, length: 1904
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+        Date: Sun, 09 Oct 2022 10:45:12 GMT
+        Content-Length: 1794
+
+        {"access_token":"ey####REDACTED####ZMw","refresh_token":"","expires_in":"83322","expires_on":"1665395634","not_before":"1665308934","resource":"https://management.azure.com/","token_type":"Bearer"} [|http]
+10:45:12.107170 vethe3f4404e P   IP (tos 0x0, ttl 64, id 4619, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.34748 > 169.254.169.254.80: Flags [.], cksum 0x6823 (incorrect -> 0x92f9), seq 234, ack 1905, win 500, options [nop,nop,TS val 1733174955 ecr 176173841], length 0
+10:45:12.107170 cbr0  In  IP (tos 0x0, ttl 64, id 4619, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.34748 > localhost.2579: Flags [.], cksum 0x9327 (incorrect -> 0x5e32), seq 233, ack 1905, win 500, options [nop,nop,TS val 1733174955 ecr 176173841], length 0
+10:45:12.107505 vethe3f4404e P   IP (tos 0x0, ttl 64, id 4620, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.34748 > 169.254.169.254.80: Flags [F.], cksum 0x6823 (incorrect -> 0x92f7), seq 234, ack 1905, win 501, options [nop,nop,TS val 1733174955 ecr 176173841], length 0
+10:45:12.107505 cbr0  In  IP (tos 0x0, ttl 64, id 4620, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.34748 > localhost.2579: Flags [F.], cksum 0x9327 (incorrect -> 0x5e30), seq 233, ack 1905, win 501, options [nop,nop,TS val 1733174955 ecr 176173841], length 0
+10:45:12.107654 cbr0  Out IP (tos 0x0, ttl 64, id 37515, offset 0, flags [DF], proto TCP (6), length 52)
+    169.254.169.254.80 > 10.244.9.12.34748: Flags [F.], cksum 0x6823 (incorrect -> 0x92ef), seq 1905, ack 235, win 508, options [nop,nop,TS val 176173841 ecr 1733174955], length 0
+10:45:12.107660 vethe3f4404e Out IP (tos 0x0, ttl 64, id 37515, offset 0, flags [DF], proto TCP (6), length 52)
+    169.254.169.254.80 > 10.244.9.12.34748: Flags [F.], cksum 0x6823 (incorrect -> 0x92ef), seq 1905, ack 235, win 508, options [nop,nop,TS val 176173841 ecr 1733174955], length 0
+10:45:12.107672 vethe3f4404e P   IP (tos 0x0, ttl 64, id 4621, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.34748 > 169.254.169.254.80: Flags [.], cksum 0x6823 (incorrect -> 0x92f6), seq 235, ack 1906, win 501, options [nop,nop,TS val 1733174955 ecr 176173841], length 0
+10:45:12.107672 cbr0  In  IP (tos 0x0, ttl 64, id 4621, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.34748 > localhost.2579: Flags [.], cksum 0x9327 (incorrect -> 0x5e2f), seq 234, ack 1906, win 501, options [nop,nop,TS val 1733174955 ecr 176173841], length 0
+
+
+Node host, with nmi, response 404, $ tcpdump -i any 'tcp and host 10.244.9.12 ' -vvv
+-----------------------------------
+(tcptraceroute 169.254.169.254 80, with DNAT)
+03:39:53.646760 vethe3f4404e P   IP (tos 0x0, ttl 1, id 18330, offset 0, flags [none], proto TCP (6), length 40)
+    10.244.9.12.56449 > 169.254.169.254.80: Flags [S], cksum 0xf047 (correct), seq 1091451326, win 0, length 0
+03:39:53.646760 cbr0  In  IP (tos 0x0, ttl 1, id 18330, offset 0, flags [none], proto TCP (6), length 40)
+    10.244.9.12.56449 > localhost.2579: Flags [S], cksum 0xbb80 (correct), seq 1091451326, win 0, length 0
+03:39:53.646879 cbr0  Out IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 44)
+    169.254.169.254.80 > 10.244.9.12.56449: Flags [S.], cksum 0x681b (incorrect -> 0xc737), seq 3581296859, ack 1091451327, win 64240, options [mss 1460], length 0
+03:39:53.646882 vethe3f4404e Out IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 44)
+    169.254.169.254.80 > 10.244.9.12.56449: Flags [S.], cksum 0x681b (incorrect -> 0xc737), seq 3581296859, ack 1091451327, win 64240, options [mss 1460], length 0
+03:39:53.646893 vethe3f4404e P   IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    10.244.9.12.56449 > 169.254.169.254.80: Flags [R], cksum 0xf044 (correct), seq 1091451327, win 0, length 0
+03:39:53.646893 cbr0  In  IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    10.244.9.12.56449 > localhost.2579: Flags [R], cksum 0xbb7d (correct), seq 1091451327, win 0, length 0
+03:39:53.665869 vethe3f4404e P   IP (tos 0x0, ttl 1, id 54666, offset 0, flags [none], proto TCP (6), length 40)
+    10.244.9.12.56449 > 169.254.169.254.80: Flags [S], cksum 0xf047 (correct), seq 1091451326, win 0, length 0
+03:39:53.665869 cbr0  In  IP (tos 0x0, ttl 1, id 54666, offset 0, flags [none], proto TCP (6), length 40)
+    10.244.9.12.56449 > localhost.2579: Flags [S], cksum 0xbb80 (correct), seq 1091451326, win 0, length 0
+03:39:53.666038 cbr0  Out IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 44)
+    169.254.169.254.80 > 10.244.9.12.56449: Flags [S.], cksum 0x681b (incorrect -> 0x35eb), seq 3581596195, ack 1091451327, win 64240, options [mss 1460], length 0
+03:39:53.666041 vethe3f4404e Out IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 44)
+    169.254.169.254.80 > 10.244.9.12.56449: Flags [S.], cksum 0x681b (incorrect -> 0x35eb), seq 3581596195, ack 1091451327, win 64240, options [mss 1460], length 0
+03:39:53.666051 vethe3f4404e P   IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    10.244.9.12.56449 > 169.254.169.254.80: Flags [R], cksum 0xf044 (correct), seq 1091451327, win 0, length 0
+03:39:53.666051 cbr0  In  IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    10.244.9.12.56449 > localhost.2579: Flags [R], cksum 0xbb7d (correct), seq 1091451327, win 0, length 0
+03:39:53.674060 vethe3f4404e P   IP (tos 0x0, ttl 1, id 17857, offset 0, flags [none], proto TCP (6), length 40)
+    10.244.9.12.56449 > 169.254.169.254.80: Flags [S], cksum 0xf047 (correct), seq 1091451326, win 0, length 0
+03:39:53.674060 cbr0  In  IP (tos 0x0, ttl 1, id 17857, offset 0, flags [none], proto TCP (6), length 40)
+    10.244.9.12.56449 > localhost.2579: Flags [S], cksum 0xbb80 (correct), seq 1091451326, win 0, length 0
+03:39:53.674203 cbr0  Out IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 44)
+    169.254.169.254.80 > 10.244.9.12.56449: Flags [S.], cksum 0x681b (incorrect -> 0x437f), seq 3581723789, ack 1091451327, win 64240, options [mss 1460], length 0
+03:39:53.674206 vethe3f4404e Out IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 44)
+    169.254.169.254.80 > 10.244.9.12.56449: Flags [S.], cksum 0x681b (incorrect -> 0x437f), seq 3581723789, ack 1091451327, win 64240, options [mss 1460], length 0
+03:39:53.674216 vethe3f4404e P   IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    10.244.9.12.56449 > 169.254.169.254.80: Flags [R], cksum 0xf044 (correct), seq 1091451327, win 0, length 0
+03:39:53.674216 cbr0  In  IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    10.244.9.12.56449 > localhost.2579: Flags [R], cksum 0xbb7d (correct), seq 1091451327, win 0, length 0
+
+(tcptraceroute, without DNAT)
+<F11>05:18:01.492248 vethe3f4404e P   IP (tos 0x0, ttl 1, id 45330, offset 0, flags [none], proto TCP (6), length 40)
+    10.244.9.12.33095 > 169.254.169.254.80: Flags [S], cksum 0xf003 (correct), seq 410959308, win 0, length 0
+05:18:01.492248 cbr0  In  IP (tos 0x0, ttl 1, id 45330, offset 0, flags [none], proto TCP (6), length 40)
+    10.244.9.12.33095 > 169.254.169.254.80: Flags [S], cksum 0xf003 (correct), seq 410959308, win 0, length 0
+05:18:01.502076 vethe3f4404e P   IP (tos 0x0, ttl 1, id 24595, offset 0, flags [none], proto TCP (6), length 40)
+    10.244.9.12.33095 > 169.254.169.254.80: Flags [S], cksum 0xf003 (correct), seq 410959308, win 0, length 0
+05:18:01.502076 cbr0  In  IP (tos 0x0, ttl 1, id 24595, offset 0, flags [none], proto TCP (6), length 40)
+    10.244.9.12.33095 > 169.254.169.254.80: Flags [S], cksum 0xf003 (correct), seq 410959308, win 0, length 0
+05:18:01.518068 vethe3f4404e P   IP (tos 0x0, ttl 1, id 64929, offset 0, flags [none], proto TCP (6), length 40)
+    10.244.9.12.33095 > 169.254.169.254.80: Flags [S], cksum 0xf003 (correct), seq 410959308, win 0, length 0
+05:18:01.518068 cbr0  In  IP (tos 0x0, ttl 1, id 64929, offset 0, flags [none], proto TCP (6), length 40)
+    10.244.9.12.33095 > 169.254.169.254.80: Flags [S], cksum 0xf003 (correct), seq 410959308, win 0, length 0
+05:18:01.534059 vethe3f4404e P   IP (tos 0x0, ttl 2, id 26164, offset 0, flags [none], proto TCP (6), length 40)
+    10.244.9.12.33095 > 169.254.169.254.80: Flags [S], cksum 0xf003 (correct), seq 410959308, win 0, length 0
+05:18:01.534059 cbr0  In  IP (tos 0x0, ttl 2, id 26164, offset 0, flags [none], proto TCP (6), length 40)
+    10.244.9.12.33095 > 169.254.169.254.80: Flags [S], cksum 0xf003 (correct), seq 410959308, win 0, length 0
+05:18:01.534723 cbr0  Out IP (tos 0x0, ttl 127, id 19950, offset 0, flags [DF], proto TCP (6), length 44)
+    169.254.169.254.80 > 10.244.9.12.33095: Flags [S.], cksum 0x668f (correct), seq 1357455693, ack 410959309, win 65392, options [mss 1460], length 0
+05:18:01.534729 vethe3f4404e Out IP (tos 0x0, ttl 127, id 19950, offset 0, flags [DF], proto TCP (6), length 44)
+    169.254.169.254.80 > 10.244.9.12.33095: Flags [S.], cksum 0x668f (correct), seq 1357455693, ack 410959309, win 65392, options [mss 1460], length 0
+05:18:01.534746 vethe3f4404e P   IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    10.244.9.12.33095 > 169.254.169.254.80: Flags [R], cksum 0xf000 (correct), seq 410959309, win 0, length 0
+05:18:01.534746 cbr0  In  IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    10.244.9.12.33095 > 169.254.169.254.80: Flags [R], cksum 0xf000 (correct), seq 410959309, win 0, length 0
+05:18:01.569303 vethe3f4404e P   IP (tos 0x0, ttl 2, id 9968, offset 0, flags [none], proto TCP (6), length 40)
+    10.244.9.12.33095 > 169.254.169.254.80: Flags [S], cksum 0xf003 (correct), seq 410959308, win 0, length 0
+05:18:01.569303 cbr0  In  IP (tos 0x0, ttl 2, id 9968, offset 0, flags [none], proto TCP (6), length 40)
+    10.244.9.12.33095 > 169.254.169.254.80: Flags [S], cksum 0xf003 (correct), seq 410959308, win 0, length 0
+05:18:01.570025 cbr0  Out IP (tos 0x0, ttl 127, id 19956, offset 0, flags [DF], proto TCP (6), length 44)
+    169.254.169.254.80 > 10.244.9.12.33095: Flags [S.], cksum 0xde9a (correct), seq 1357490497, ack 410959309, win 65392, options [mss 1460], length 0
+05:18:01.570030 vethe3f4404e Out IP (tos 0x0, ttl 127, id 19956, offset 0, flags [DF], proto TCP (6), length 44)
+    169.254.169.254.80 > 10.244.9.12.33095: Flags [S.], cksum 0xde9a (correct), seq 1357490497, ack 410959309, win 65392, options [mss 1460], length 0
+05:18:01.570055 vethe3f4404e P   IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    10.244.9.12.33095 > 169.254.169.254.80: Flags [R], cksum 0xf000 (correct), seq 410959309, win 0, length 0
+05:18:01.570055 cbr0  In  IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    10.244.9.12.33095 > 169.254.169.254.80: Flags [R], cksum 0xf000 (correct), seq 410959309, win 0, length 0
+05:18:01.582077 vethe3f4404e P   IP (tos 0x0, ttl 2, id 18291, offset 0, flags [none], proto TCP (6), length 40)
+    10.244.9.12.33095 > 169.254.169.254.80: Flags [S], cksum 0xf003 (correct), seq 410959308, win 0, length 0
+05:18:01.582077 cbr0  In  IP (tos 0x0, ttl 2, id 18291, offset 0, flags [none], proto TCP (6), length 40)
+    10.244.9.12.33095 > 169.254.169.254.80: Flags [S], cksum 0xf003 (correct), seq 410959308, win 0, length 0
+05:18:01.582512 cbr0  Out IP (tos 0x0, ttl 127, id 19957, offset 0, flags [DF], proto TCP (6), length 44)
+    169.254.169.254.80 > 10.244.9.12.33095: Flags [S.], cksum 0xa3a4 (correct), seq 1357505591, ack 410959309, win 65392, options [mss 1460], length 0
+05:18:01.582523 vethe3f4404e Out IP (tos 0x0, ttl 127, id 19957, offset 0, flags [DF], proto TCP (6), length 44)
+    169.254.169.254.80 > 10.244.9.12.33095: Flags [S.], cksum 0xa3a4 (correct), seq 1357505591, ack 410959309, win 65392, options [mss 1460], length 0
+05:18:01.582540 vethe3f4404e P   IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    10.244.9.12.33095 > 169.254.169.254.80: Flags [R], cksum 0xf000 (correct), seq 410959309, win 0, length 0
+05:18:01.582540 cbr0  In  IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    10.244.9.12.33095 > 169.254.169.254.80: Flags [R], cksum 0xf000 (correct), seq 410959309, win 0, length 0
+
+
+(curl -H Metadata:true 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://management.azure.com/&client_id=2db3##### REDACTED #####2f5c')
+03:40:11.688691 vethe3f4404e P   IP (tos 0x0, ttl 64, id 8582, offset 0, flags [DF], proto TCP (6), length 60)
+    10.244.9.12.38334 > 169.254.169.254.80: Flags [S], cksum 0x682b (incorrect -> 0xc193), seq 119452602, win 64240, options [mss 1460,sackOK,TS val 1794074536 ecr 0,nop,wscale 7], length 0
+03:40:11.688691 cbr0  In  IP (tos 0x0, ttl 64, id 8582, offset 0, flags [DF], proto TCP (6), length 60)
+    10.244.9.12.38334 > localhost.2579: Flags [S], cksum 0x932f (incorrect -> 0x8ccc), seq 119452602, win 64240, options [mss 1460,sackOK,TS val 1794074536 ecr 0,nop,wscale 7], length 0
+03:40:11.688811 cbr0  Out IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    169.254.169.254.80 > 10.244.9.12.38334: Flags [S.], cksum 0x682b (incorrect -> 0x39d4), seq 2713411627, ack 119452603, win 65160, options [mss 1460,sackOK,TS val 237073422 ecr 1794074536,nop,wscale 7], length 0
+03:40:11.688815 vethe3f4404e Out IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    169.254.169.254.80 > 10.244.9.12.38334: Flags [S.], cksum 0x682b (incorrect -> 0x39d4), seq 2713411627, ack 119452603, win 65160, options [mss 1460,sackOK,TS val 237073422 ecr 1794074536,nop,wscale 7], length 0
+03:40:11.688826 vethe3f4404e P   IP (tos 0x0, ttl 64, id 8583, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.38334 > 169.254.169.254.80: Flags [.], cksum 0x6823 (incorrect -> 0x6533), seq 1, ack 1, win 502, options [nop,nop,TS val 1794074536 ecr 237073422], length 0
+03:40:11.688826 cbr0  In  IP (tos 0x0, ttl 64, id 8583, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.38334 > localhost.2579: Flags [.], cksum 0x9327 (incorrect -> 0x306c), seq 119452603, ack 2713411628, win 502, options [nop,nop,TS val 1794074536 ecr 237073422], length 0
+03:40:11.688915 vethe3f4404e P   IP (tos 0x0, ttl 64, id 8584, offset 0, flags [DF], proto TCP (6), length 285)
+    10.244.9.12.38334 > 169.254.169.254.80: Flags [P.], cksum 0x690c (incorrect -> 0x4363), seq 1:234, ack 1, win 502, options [nop,nop,TS val 1794074536 ecr 237073422], length 233: HTTP, length: 233
+        GET /metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://management.azure.com/&client_id=2db3##### REDACTED #####2f5c HTTP/1.1
+        Host: 169.254.169.254
+        User-Agent: curl/7.81.0
+        Accept: */*
+        Metadata:true
+
+03:40:11.688915 cbr0  In  IP (tos 0x0, ttl 64, id 8584, offset 0, flags [DF], proto TCP (6), length 285)
+    10.244.9.12.38334 > localhost.2579: Flags [P.], cksum 0x9410 (incorrect -> 0x0e9c), seq 0:233, ack 1, win 502, options [nop,nop,TS val 1794074536 ecr 237073422], length 233
+03:40:11.688957 cbr0  Out IP (tos 0x0, ttl 64, id 638, offset 0, flags [DF], proto TCP (6), length 52)
+    169.254.169.254.80 > 10.244.9.12.38334: Flags [.], cksum 0x6823 (incorrect -> 0x6444), seq 1, ack 234, win 508, options [nop,nop,TS val 237073422 ecr 1794074536], length 0
+03:40:11.688958 vethe3f4404e Out IP (tos 0x0, ttl 64, id 638, offset 0, flags [DF], proto TCP (6), length 52)
+    169.254.169.254.80 > 10.244.9.12.38334: Flags [.], cksum 0x6823 (incorrect -> 0x6444), seq 1, ack 234, win 508, options [nop,nop,TS val 237073422 ecr 1794074536], length 0
+03:40:11.689290 cbr0  Out IP (tos 0x0, ttl 64, id 639, offset 0, flags [DF], proto TCP (6), length 283)
+    169.254.169.254.80 > 10.244.9.12.38334: Flags [P.], cksum 0x690a (incorrect -> 0x7b9c), seq 1:232, ack 234, win 508, options [nop,nop,TS val 237073423 ecr 1794074536], length 231: HTTP, length: 231
+        HTTP/1.1 404 Not Found
+        Content-Type: text/plain; charset=utf-8
+        X-Content-Type-Options: nosniff
+        Date: Mon, 10 Oct 2022 03:40:11 GMT
+        Content-Length: 74
+
+        no azure identity found for request clientID 2db3##### REDACTED #####2f5c
+03:40:11.689298 vethe3f4404e Out IP (tos 0x0, ttl 64, id 639, offset 0, flags [DF], proto TCP (6), length 283)
+    169.254.169.254.80 > 10.244.9.12.38334: Flags [P.], cksum 0x690a (incorrect -> 0x7b9c), seq 1:232, ack 234, win 508, options [nop,nop,TS val 237073423 ecr 1794074536], length 231: HTTP, length: 231
+        HTTP/1.1 404 Not Found
+        Content-Type: text/plain; charset=utf-8
+        X-Content-Type-Options: nosniff
+        Date: Mon, 10 Oct 2022 03:40:11 GMT
+        Content-Length: 74
+
+        no azure identity found for request clientID 2db3##### REDACTED #####2f5c
+03:40:11.689309 vethe3f4404e P   IP (tos 0x0, ttl 64, id 8585, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.38334 > 169.254.169.254.80: Flags [.], cksum 0x6823 (incorrect -> 0x6362), seq 234, ack 232, win 501, options [nop,nop,TS val 1794074537 ecr 237073423], length 0
+03:40:11.689309 cbr0  In  IP (tos 0x0, ttl 64, id 8585, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.38334 > localhost.2579: Flags [.], cksum 0x9327 (incorrect -> 0x2e9b), seq 233, ack 232, win 501, options [nop,nop,TS val 1794074537 ecr 237073423], length 0
+03:40:11.689453 vethe3f4404e P   IP (tos 0x0, ttl 64, id 8586, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.38334 > 169.254.169.254.80: Flags [F.], cksum 0x6823 (incorrect -> 0x6361), seq 234, ack 232, win 501, options [nop,nop,TS val 1794074537 ecr 237073423], length 0
+03:40:11.689453 cbr0  In  IP (tos 0x0, ttl 64, id 8586, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.38334 > localhost.2579: Flags [F.], cksum 0x9327 (incorrect -> 0x2e9a), seq 233, ack 232, win 501, options [nop,nop,TS val 1794074537 ecr 237073423], length 0
+03:40:11.689550 cbr0  Out IP (tos 0x0, ttl 64, id 640, offset 0, flags [DF], proto TCP (6), length 52)
+    169.254.169.254.80 > 10.244.9.12.38334: Flags [F.], cksum 0x6823 (incorrect -> 0x6359), seq 232, ack 235, win 508, options [nop,nop,TS val 237073423 ecr 1794074537], length 0
+03:40:11.689553 vethe3f4404e Out IP (tos 0x0, ttl 64, id 640, offset 0, flags [DF], proto TCP (6), length 52)
+    169.254.169.254.80 > 10.244.9.12.38334: Flags [F.], cksum 0x6823 (incorrect -> 0x6359), seq 232, ack 235, win 508, options [nop,nop,TS val 237073423 ecr 1794074537], length 0
+03:40:11.689561 vethe3f4404e P   IP (tos 0x0, ttl 64, id 8587, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.38334 > 169.254.169.254.80: Flags [.], cksum 0x6823 (incorrect -> 0x6360), seq 235, ack 233, win 501, options [nop,nop,TS val 1794074537 ecr 237073423], length 0
+03:40:11.689561 cbr0  In  IP (tos 0x0, ttl 64, id 8587, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.38334 > localhost.2579: Flags [.], cksum 0x9327 (incorrect -> 0x2e99), seq 234, ack 233, win 501, options [nop,nop,TS val 1794074537 ecr 237073423], length 0
+
+
+
+in kubernetes pod(client), with NMI:
+--------------------------
+
+10:45:12.099473 IP (tos 0x0, ttl 64, id 4616, offset 0, flags [DF], proto TCP (6), length 60)
+    ubuntu.34748 > 169.254.169.254.http: Flags [S], cksum 0x682b (incorrect -> 0xe04f), seq 2257807409, win 64240, options [mss 1460,sackOK,TS val 1733174947 ecr 0,nop,wscale 7], length 0
+10:45:12.099599 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    169.254.169.254.http > ubuntu.34748: Flags [S.], cksum 0x682b (incorrect -> 0x7001), seq 2232330765, ack 2257807410, win 65160, options [mss 1460,sackOK,TS val 176173833 ecr 1733174947,nop,wscale 7], length 0
+10:45:12.099609 IP (tos 0x0, ttl 64, id 4617, offset 0, flags [DF], proto TCP (6), length 52)
+    ubuntu.34748 > 169.254.169.254.http: Flags [.], cksum 0x6823 (incorrect -> 0x9b60), seq 1, ack 1, win 502, options [nop,nop,TS val 1733174947 ecr 176173833], length 0
+10:45:12.099709 IP (tos 0x0, ttl 64, id 4618, offset 0, flags [DF], proto TCP (6), length 285)
+    ubuntu.34748 > 169.254.169.254.http: Flags [P.], cksum 0x690c (incorrect -> 0x7990), seq 1:234, ack 1, win 502, options [nop,nop,TS val 1733174947 ecr 176173833], length 233: HTTP, length: 233
+        GET /metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://management.azure.com/&client_id=2d##REDACTED##5c HTTP/1.1
+        Host: 169.254.169.254
+        User-Agent: curl/7.81.0
+        Accept: */*
+        Metadata:true
+
+10:45:12.099788 IP (tos 0x0, ttl 64, id 37512, offset 0, flags [DF], proto TCP (6), length 52)
+    169.254.169.254.http > ubuntu.34748: Flags [.], cksum 0x6823 (incorrect -> 0x9a71), seq 1, ack 234, win 508, options [nop,nop,TS val 176173833 ecr 1733174947], length 0
+10:45:12.107156 IP (tos 0x0, ttl 64, id 37513, offset 0, flags [DF], proto TCP (6), length 1956)
+    169.254.169.254.http > ubuntu.34748: Flags [P.], cksum 0x6f93 (incorrect -> 0x6377), seq 1:1905, ack 234, win 508, options [nop,nop,TS val 176173841 ecr 1733174947], length 1904: HTTP, length: 1904
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+        Date: Sun, 09 Oct 2022 10:45:12 GMT
+        Content-Length: 1794
+
+        {"access_token":"ey####REDACTED####ZMw","refresh_token":"","expires_in":"83322","expires_on":"1665395634","not_before":"1665308934","resource":"https://management.azure.com/","token_type":"Bearer"} [|http]
+10:45:12.107169 IP (tos 0x0, ttl 64, id 4619, offset 0, flags [DF], proto TCP (6), length 52)
+    ubuntu.34748 > 169.254.169.254.http: Flags [.], cksum 0x6823 (incorrect -> 0x92f9), seq 234, ack 1905, win 500, options [nop,nop,TS val 1733174955 ecr 176173841], length 0
+10:45:12.107503 IP (tos 0x0, ttl 64, id 4620, offset 0, flags [DF], proto TCP (6), length 52)
+    ubuntu.34748 > 169.254.169.254.http: Flags [F.], cksum 0x6823 (incorrect -> 0x92f7), seq 234, ack 1905, win 501, options [nop,nop,TS val 1733174955 ecr 176173841], length 0
+10:45:12.107661 IP (tos 0x0, ttl 64, id 37515, offset 0, flags [DF], proto TCP (6), length 52)
+    169.254.169.254.http > ubuntu.34748: Flags [F.], cksum 0x6823 (incorrect -> 0x92ef), seq 1905, ack 235, win 508, options [nop,nop,TS val 176173841 ecr 1733174955], length 0
+10:45:12.107671 IP (tos 0x0, ttl 64, id 4621, offset 0, flags [DF], proto TCP (6), length 52)
+    ubuntu.34748 > 169.254.169.254.http: Flags [.], cksum 0x6823 (incorrect -> 0x92f6), seq 235, ack 1906, win 501, options [nop,nop,TS val 1733174955 ecr 176173841], length 0
+
+
+
+host network, no NAT:
+tcpdump -i any tcp and ( (host 10.224.0.7 or host 169.254.169.254) and port 80 ) -vv
+----------------------
+
+10:57:24.466885 eth0  Out IP (tos 0x0, ttl 64, id 55667, offset 0, flags [DF], proto TCP (6), length 60)
+    aks-nodepool1-13131839-vmss000003.internal.cloudapp.net.59184 > 169.254.169.254.80: Flags [S], cksum 0x5f12 (incorrect -> 0x6041), seq 464613464, win 64240, options [mss 1460,sackOK,TS val 2155649507 ecr 0,nop,wscale 7], length 0
+10:57:24.466888 enP51733s1 Out IP (tos 0x0, ttl 64, id 55667, offset 0, flags [DF], proto TCP (6), length 60)
+    aks-nodepool1-13131839-vmss000003.internal.cloudapp.net.59184 > 169.254.169.254.80: Flags [S], cksum 0x5f12 (incorrect -> 0x6041), seq 464613464, win 64240, options [mss 1460,sackOK,TS val 2155649507 ecr 0,nop,wscale 7], length 0
+10:57:24.467486 enP51733s1 In  IP (tos 0x0, ttl 128, id 17125, offset 0, flags [DF], proto TCP (6), length 60)
+    169.254.169.254.80 > aks-nodepool1-13131839-vmss000003.internal.cloudapp.net.59184: Flags [S.], cksum 0x21b0 (correct), seq 3122703164, ack 464613465, win 65535, options [mss 1460,nop,wscale 8,sackOK,TS val 1246267850 ecr 2155649507], length 0
+10:57:24.467486 eth0  In  IP (tos 0x0, ttl 128, id 17125, offset 0, flags [DF], proto TCP (6), length 60)
+    169.254.169.254.80 > aks-nodepool1-13131839-vmss000003.internal.cloudapp.net.59184: Flags [S.], cksum 0x21b0 (correct), seq 3122703164, ack 464613465, win 65535, options [mss 1460,nop,wscale 8,sackOK,TS val 1246267850 ecr 2155649507], length 0
+10:57:24.467546 eth0  Out IP (tos 0x0, ttl 64, id 55668, offset 0, flags [DF], proto TCP (6), length 52)
+    aks-nodepool1-13131839-vmss000003.internal.cloudapp.net.59184 > 169.254.169.254.80: Flags [.], cksum 0x5f0a (incorrect -> 0x4e86), seq 1, ack 1, win 502, options [nop,nop,TS val 2155649508 ecr 1246267850], length 0
+10:57:24.467548 enP51733s1 Out IP (tos 0x0, ttl 64, id 55668, offset 0, flags [DF], proto TCP (6), length 52)
+    aks-nodepool1-13131839-vmss000003.internal.cloudapp.net.59184 > 169.254.169.254.80: Flags [.], cksum 0x5f0a (incorrect -> 0x4e86), seq 1, ack 1, win 502, options [nop,nop,TS val 2155649508 ecr 1246267850], length 0
+10:57:24.467594 eth0  Out IP (tos 0x0, ttl 64, id 55669, offset 0, flags [DF], proto TCP (6), length 285)
+    aks-nodepool1-13131839-vmss000003.internal.cloudapp.net.59184 > 169.254.169.254.80: Flags [P.], cksum 0x5ff3 (incorrect -> 0x29b6), seq 1:234, ack 1, win 502, options [nop,nop,TS val 2155649508 ecr 1246267850], length 233: HTTP, length: 233
+        GET /metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://management.azure.com/&client_id=2db##REDACTED##5c HTTP/1.1
+        Host: 169.254.169.254
+        User-Agent: curl/7.83.1
+        Accept: */*
+        Metadata:true
+
+10:57:24.467595 enP51733s1 Out IP (tos 0x0, ttl 64, id 55669, offset 0, flags [DF], proto TCP (6), length 285)
+    aks-nodepool1-13131839-vmss000003.internal.cloudapp.net.59184 > 169.254.169.254.80: Flags [P.], cksum 0x5ff3 (incorrect -> 0x29b6), seq 1:234, ack 1, win 502, options [nop,nop,TS val 2155649508 ecr 1246267850], length 233: HTTP, length: 233
+        GET /metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://management.azure.com/&client_id=2db##REDACTED##5c HTTP/1.1
+        Host: 169.254.169.254
+        User-Agent: curl/7.83.1
+        Accept: */*
+        Metadata:true
+
+10:57:24.475231 enP51733s1 In  IP (tos 0x0, ttl 128, id 17126, offset 0, flags [DF], proto TCP (6), length 2057)
+    169.254.169.254.80 > aks-nodepool1-13131839-vmss000003.internal.cloudapp.net.59184: Flags [P.], cksum 0x66df (incorrect -> 0x9dcb), seq 1:2006, ack 234, win 49153, options [nop,nop,TS val 1246267858 ecr 2155649508], length 2005: HTTP, length: 2005
+        HTTP/1.1 200 OK
+        Content-Type: application/json; charset=utf-8
+        Server: IMDS/150.870.65.684
+        Date: Sun, 09 Oct 2022 10:57:23 GMT
+        Content-Length: 1851
+
+        {"access_token":"eyJ0e####REDACTED####rI3A","client_id":"2db##REDACTED##5c","expires_in":"86219","expires_on":"1665399263","ext_expires_in":"86399","not_before":"1665312563","resource":"https://management.azure.com/","token_type":"Bearer"} [|http]
+10:57:24.475231 eth0  In  IP (tos 0x0, ttl 128, id 17126, offset 0, flags [DF], proto TCP (6), length 2057)
+    169.254.169.254.80 > aks-nodepool1-13131839-vmss000003.internal.cloudapp.net.59184: Flags [P.], cksum 0x66df (incorrect -> 0x9dcb), seq 1:2006, ack 234, win 49153, options [nop,nop,TS val 1246267858 ecr 2155649508], length 2005: HTTP, length: 2005
+        HTTP/1.1 200 OK
+        Content-Type: application/json; charset=utf-8
+        Server: IMDS/150.870.65.684
+        Date: Sun, 09 Oct 2022 10:57:23 GMT
+        Content-Length: 1851
+
+        {"access_token":"eyJ0e####REDACTED####rI3A","client_id":"2db##REDACTED##5c","expires_in":"86219","expires_on":"1665399263","ext_expires_in":"86399","not_before":"1665312563","resource":"https://management.azure.com/","token_type":"Bearer"} [|http]
+10:57:24.475286 eth0  Out IP (tos 0x0, ttl 64, id 55670, offset 0, flags [DF], proto TCP (6), length 52)
+    aks-nodepool1-13131839-vmss000003.internal.cloudapp.net.59184 > 169.254.169.254.80: Flags [.], cksum 0x5f0a (incorrect -> 0x45ba), seq 234, ack 2006, win 500, options [nop,nop,TS val 2155649516 ecr 1246267858], length 0
+10:57:24.475288 enP51733s1 Out IP (tos 0x0, ttl 64, id 55670, offset 0, flags [DF], proto TCP (6), length 52)
+    aks-nodepool1-13131839-vmss000003.internal.cloudapp.net.59184 > 169.254.169.254.80: Flags [.], cksum 0x5f0a (incorrect -> 0x45ba), seq 234, ack 2006, win 500, options [nop,nop,TS val 2155649516 ecr 1246267858], length 0
+10:57:24.475550 eth0  Out IP (tos 0x0, ttl 64, id 55671, offset 0, flags [DF], proto TCP (6), length 52)
+    aks-nodepool1-13131839-vmss000003.internal.cloudapp.net.59184 > 169.254.169.254.80: Flags [F.], cksum 0x5f0a (incorrect -> 0x45b8), seq 234, ack 2006, win 501, options [nop,nop,TS val 2155649516 ecr 1246267858], length 0
+10:57:24.475553 enP51733s1 Out IP (tos 0x0, ttl 64, id 55671, offset 0, flags [DF], proto TCP (6), length 52)
+    aks-nodepool1-13131839-vmss000003.internal.cloudapp.net.59184 > 169.254.169.254.80: Flags [F.], cksum 0x5f0a (incorrect -> 0x45b8), seq 234, ack 2006, win 501, options [nop,nop,TS val 2155649516 ecr 1246267858], length 0
+10:57:24.475622 enP51733s1 In  IP (tos 0x0, ttl 128, id 17128, offset 0, flags [DF], proto TCP (6), length 52)
+    169.254.169.254.80 > aks-nodepool1-13131839-vmss000003.internal.cloudapp.net.59184: Flags [F.], cksum 0x87aa (correct), seq 2006, ack 235, win 49153, options [nop,nop,TS val 1246267858 ecr 2155649516], length 0
+10:57:24.475622 eth0  In  IP (tos 0x0, ttl 128, id 17128, offset 0, flags [DF], proto TCP (6), length 52)
+    169.254.169.254.80 > aks-nodepool1-13131839-vmss000003.internal.cloudapp.net.59184: Flags [F.], cksum 0x87aa (correct), seq 2006, ack 235, win 49153, options [nop,nop,TS val 1246267858 ecr 2155649516], length 0
+10:57:24.475658 eth0  Out IP (tos 0x0, ttl 64, id 55672, offset 0, flags [DF], proto TCP (6), length 52)
+    aks-nodepool1-13131839-vmss000003.internal.cloudapp.net.59184 > 169.254.169.254.80: Flags [.], cksum 0x5f0a (incorrect -> 0x45b7), seq 235, ack 2007, win 501, options [nop,nop,TS val 2155649516 ecr 1246267858], length 0
+10:57:24.475659 enP51733s1 Out IP (tos 0x0, ttl 64, id 55672, offset 0, flags [DF], proto TCP (6), length 52)
+    aks-nodepool1-13131839-vmss000003.internal.cloudapp.net.59184 > 169.254.169.254.80: Flags [.], cksum 0x5f0a (incorrect -> 0x45b7), seq 235, ack 2007, win 501, options [nop,nop,TS val 2155649516 ecr 1246267858], length 0
+
+
+node host without NMI,  aks-nodepool1-13131839-vmss000003  ~  tcpdump -i any tcp port 80 and host 10.244.9.12 and 169.254.169.254 -vvv
+----------------------------------
+
+tcpdump: data link type LINUX_SLL2
+tcpdump: listening on any, link-type LINUX_SLL2 (Linux cooked v2), snapshot length 262144 bytes
+03:19:50.638329 vethe3f4404e P   IP (tos 0x0, ttl 64, id 5942, offset 0, flags [DF], proto TCP (6), length 60)
+    10.244.9.12.57842 > 169.254.169.254.80: Flags [S], cksum 0x682b (incorrect -> 0xc934), seq 1280490621, win 64240, options [mss 1460,sackOK,TS val 1792853486 ecr 0,nop,wscale 7], length 0
+03:19:50.638329 cbr0  In  IP (tos 0x0, ttl 64, id 5942, offset 0, flags [DF], proto TCP (6), length 60)
+    10.244.9.12.57842 > 169.254.169.254.80: Flags [S], cksum 0x682b (incorrect -> 0xc934), seq 1280490621, win 64240, options [mss 1460,sackOK,TS val 1792853486 ecr 0,nop,wscale 7], length 0
+03:19:50.638996 cbr0  Out IP (tos 0x0, ttl 127, id 49926, offset 0, flags [DF], proto TCP (6), length 60)
+    169.254.169.254.80 > 10.244.9.12.57842: Flags [S.], cksum 0xd90a (correct), seq 3800415895, ack 1280490622, win 65535, options [mss 1460,nop,wscale 8,sackOK,TS val 1305213983 ecr 1792853486], length 0
+03:19:50.638999 vethe3f4404e Out IP (tos 0x0, ttl 127, id 49926, offset 0, flags [DF], proto TCP (6), length 60)
+    169.254.169.254.80 > 10.244.9.12.57842: Flags [S.], cksum 0xd90a (correct), seq 3800415895, ack 1280490622, win 65535, options [mss 1460,nop,wscale 8,sackOK,TS val 1305213983 ecr 1792853486], length 0
+03:19:50.639013 vethe3f4404e P   IP (tos 0x0, ttl 64, id 5943, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.57842 > 169.254.169.254.80: Flags [.], cksum 0x6823 (incorrect -> 0x05e2), seq 1, ack 1, win 502, options [nop,nop,TS val 1792853486 ecr 1305213983], length 0
+03:19:50.639013 cbr0  In  IP (tos 0x0, ttl 64, id 5943, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.57842 > 169.254.169.254.80: Flags [.], cksum 0x6823 (incorrect -> 0x05e2), seq 1, ack 1, win 502, options [nop,nop,TS val 1792853486 ecr 1305213983], length 0
+03:19:50.639080 vethe3f4404e P   IP (tos 0x0, ttl 64, id 5944, offset 0, flags [DF], proto TCP (6), length 285)
+    10.244.9.12.57842 > 169.254.169.254.80: Flags [P.], cksum 0x690c (incorrect -> 0xe410), seq 1:234, ack 1, win 502, options [nop,nop,TS val 1792853487 ecr 1305213983], length 233: HTTP, length: 233
+        GET /metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://management.azure.com/&client_id=2db##REDACTED##f5c HTTP/1.1
+        Host: 169.254.169.254
+        User-Agent: curl/7.81.0
+        Accept: */*
+        Metadata:true
+
+03:19:50.639080 cbr0  In  IP (tos 0x0, ttl 64, id 5944, offset 0, flags [DF], proto TCP (6), length 285)
+    10.244.9.12.57842 > 169.254.169.254.80: Flags [P.], cksum 0x690c (incorrect -> 0xe410), seq 1:234, ack 1, win 502, options [nop,nop,TS val 1792853487 ecr 1305213983], length 233: HTTP, length: 233
+        GET /metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://management.azure.com/&client_id=2db##REDACTED##f5c HTTP/1.1
+        Host: 169.254.169.254
+        User-Agent: curl/7.81.0
+        Accept: */*
+        Metadata:true
+
+03:19:50.645628 cbr0  Out IP (tos 0x0, ttl 127, id 49927, offset 0, flags [DF], proto TCP (6), length 2057)
+    169.254.169.254.80 > 10.244.9.12.57842: Flags [P.], cksum 0x6ff8 (incorrect -> 0x02ef), seq 1:2006, ack 234, win 49153, options [nop,nop,TS val 1305213990 ecr 1792853487], length 2005: HTTP, length: 2005
+        HTTP/1.1 200 OK
+        Content-Type: application/json; charset=utf-8
+        Server: IMDS/150.870.65.684
+        Date: Mon, 10 Oct 2022 03:19:49 GMT
+        Content-Length: 1851
+
+        {"access_token":"eyJ0e####REDACTED####4iOg","client_id":"2db##REDACTED##f5c","expires_in":"84077","expires_on":"1665456067","ext_expires_in":"86399","not_before":"1665369367","resource":"https://management.azure.com/","token_type":"Bearer"} [|http]
+03:19:50.645634 vethe3f4404e Out IP (tos 0x0, ttl 127, id 49927, offset 0, flags [DF], proto TCP (6), length 2057)
+    169.254.169.254.80 > 10.244.9.12.57842: Flags [P.], cksum 0x6ff8 (incorrect -> 0x02ef), seq 1:2006, ack 234, win 49153, options [nop,nop,TS val 1305213990 ecr 1792853487], length 2005: HTTP, length: 2005
+        HTTP/1.1 200 OK
+        Content-Type: application/json; charset=utf-8
+        Server: IMDS/150.870.65.684
+        Date: Mon, 10 Oct 2022 03:19:49 GMT
+        Content-Length: 1851
+
+        {"access_token":"eyJ0e####REDACTED####4iOg","client_id":"2db##REDACTED##f5c","expires_in":"84077","expires_on":"1665456067","ext_expires_in":"86399","not_before":"1665369367","resource":"https://management.azure.com/","token_type":"Bearer"} [|http]
+03:19:50.645663 vethe3f4404e P   IP (tos 0x0, ttl 64, id 5945, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.57842 > 169.254.169.254.80: Flags [.], cksum 0x6823 (incorrect -> 0xfd17), seq 234, ack 2006, win 500, options [nop,nop,TS val 1792853493 ecr 1305213990], length 0
+03:19:50.645663 cbr0  In  IP (tos 0x0, ttl 64, id 5945, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.57842 > 169.254.169.254.80: Flags [.], cksum 0x6823 (incorrect -> 0xfd17), seq 234, ack 2006, win 500, options [nop,nop,TS val 1792853493 ecr 1305213990], length 0
+03:19:50.645861 vethe3f4404e P   IP (tos 0x0, ttl 64, id 5946, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.57842 > 169.254.169.254.80: Flags [F.], cksum 0x6823 (incorrect -> 0xfd15), seq 234, ack 2006, win 501, options [nop,nop,TS val 1792853493 ecr 1305213990], length 0
+03:19:50.645861 cbr0  In  IP (tos 0x0, ttl 64, id 5946, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.57842 > 169.254.169.254.80: Flags [F.], cksum 0x6823 (incorrect -> 0xfd15), seq 234, ack 2006, win 501, options [nop,nop,TS val 1792853493 ecr 1305213990], length 0
+03:19:50.646051 cbr0  Out IP (tos 0x0, ttl 127, id 49929, offset 0, flags [DF], proto TCP (6), length 52)
+    169.254.169.254.80 > 10.244.9.12.57842: Flags [F.], cksum 0x3f08 (correct), seq 2006, ack 235, win 49153, options [nop,nop,TS val 1305213990 ecr 1792853493], length 0
+03:19:50.646055 vethe3f4404e Out IP (tos 0x0, ttl 127, id 49929, offset 0, flags [DF], proto TCP (6), length 52)
+    169.254.169.254.80 > 10.244.9.12.57842: Flags [F.], cksum 0x3f08 (correct), seq 2006, ack 235, win 49153, options [nop,nop,TS val 1305213990 ecr 1792853493], length 0
+03:19:50.646066 vethe3f4404e P   IP (tos 0x0, ttl 64, id 5947, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.57842 > 169.254.169.254.80: Flags [.], cksum 0x6823 (incorrect -> 0xfd13), seq 235, ack 2007, win 501, options [nop,nop,TS val 1792853494 ecr 1305213990], length 0
+03:19:50.646066 cbr0  In  IP (tos 0x0, ttl 64, id 5947, offset 0, flags [DF], proto TCP (6), length 52)
+    10.244.9.12.57842 > 169.254.169.254.80: Flags [.], cksum 0x6823 (incorrect -> 0xfd13), seq 235, ack 2007, win 501, options [nop,nop,TS val 1792853494 ecr 1305213990], length 0
+
+

@@ -3,6 +3,7 @@
 `GDB`, Strace, objdump, core dump, 
 
 ### Core dump
+
 When a process runs into `segmentation fault`, the operating system can dump the process state.
 
 Make sure `ulimit`  for core size is not 0.

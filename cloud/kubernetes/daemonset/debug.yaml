@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    component: debug
+  name: debug
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      component: debug
+      tier: node
+  template:
+    metadata:
+      labels:
+        component: debug
+        tier: node
+    spec:
+      containers:
+      - command:
+        # - nsenter
+        # - --target
+        # - "1"
+        # - -m
+        # - -u
+        # - -i
+        # - -n
+        # - -p
+        # - --
+        - bash
+        - -c
+        - |
+          sleep infinity
+        image: nicolaka/netshoot
+        imagePullPolicy: IfNotPresent
+        name: debug
+        resources:
+          requests:
+            cpu: 10m
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /host
+          name: host-root
+      dnsPolicy: ClusterFirst
+      hostPID: true
+      hostNetwork: true
+      hostIPC: true
+      # securityContext:
+        # runAsUser: 0
+        # fsGroup: 0
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      restartPolicy: Always
+      volumes:
+      - hostPath:
+          path: /
+          type: ""
+        name: host-root
+  updateStrategy:
+    type: OnDelete
