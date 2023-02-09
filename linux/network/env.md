@@ -2,6 +2,10 @@
 
 ## proxy
 
+`http_proxy`: for target host with http traffic
+`https_proxy`: for taget host with https traffic.
+Their values, which are the proxy endpoints, can be either `http://` for tunneling proxy, or `https://` for intercepting proxy.
+
 	export http_proxy="http://PROXY_SERVER:PORT"
 	# setting https_proxy to an HTTP address will use the server as a HTTPS forward proxy/tunnel.
 	export https_proxy="http://PROXY_SERVER:PORT"
