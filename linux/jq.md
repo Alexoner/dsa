@@ -182,6 +182,7 @@ test(val), test(regex; flags)
         |sort_by(-.count)
         |map(select(.count>1))
        '
+    az group list --subscription REDACTED |jq -r 'map(select(.name|startswith("Default"))) | map(.id)|.[]' |xargs -I {} az tag update --operation merge --resource-id '{}' --tags cleanup:Policy=DoNotDelete donotdelete=true --verbose
 
 ### map, select, sort, top slice, add sum, group by, unique_by: given an array of array
 

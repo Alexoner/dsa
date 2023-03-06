@@ -33,5 +33,6 @@
 	(find /proc -type l | xargs ls -l | fgrep "$FILE") 2>/dev/null
 
     # network
-	netstat -npte  # check socket status
+	netstat -nlpte  # check socket status, listening
+    netstat -napte  # check socket status, all(listening + non-listenning)
 	cat /proc/net/tcp
