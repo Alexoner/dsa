@@ -8,8 +8,8 @@ Different DNS resolution results may occur depending on whether to use `/etc/res
 
 	dig www.google.com
 	dig +search +short www.google.com  # +[no]search Use [do not use] the search list defined by the searchlist or domain directive in resolv.conf (if any). The search list is not used by default.
-	nslookup www.google.com
-	host www.google.com
+	nslookup www.google.com # nslookup doens't use local /etc/hosts file
+	host www.google.com     # dig, host read local /etc/hosts file
 
 	dig +short myip.opendns.com @resolver1.opendns.com # get public IP address from special-purpose DNS server.
 
@@ -30,3 +30,9 @@ Add `nameserver x.x.x.x` to `/etc/resolv.conf`
 #### Add static DNS record to `/etc/hosts`
 
 Add `x.x.x.x domain-name` to `/etc/hosts`.
+
+### Reverse DNS lookup
+
+Look up domain name from IP address.
+
+    dig +x IP

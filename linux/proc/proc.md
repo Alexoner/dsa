@@ -36,3 +36,8 @@
 	netstat -nlpte  # check socket status, listening
     netstat -napte  # check socket status, all(listening + non-listenning)
 	cat /proc/net/tcp
+
+## kill a tcp connection
+
+    sudo apt install -y dsniff
+    sudo tcpkill -i lo port 48928  # example kill local port 48928
