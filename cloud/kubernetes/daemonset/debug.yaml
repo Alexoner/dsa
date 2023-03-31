@@ -31,7 +31,8 @@ spec:
         - -c
         - |
           sleep infinity
-        image: nicolaka/netshoot
+        # image: nicolaka/netshoot
+        image: ubuntu
         imagePullPolicy: IfNotPresent
         name: debug
         resources:
@@ -41,7 +42,7 @@ spec:
           privileged: true
         volumeMounts:
         - mountPath: /host
-          name: host-root
+          name: host-root  # access the host file system
       dnsPolicy: ClusterFirst
       hostPID: true
       hostNetwork: true

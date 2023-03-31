@@ -1,0 +1,558 @@
+
+
+## kube-exec: open a shell to the Kubernetes nodes
+
+A tool to debug Kubernetes nodes, by spawning a priviliged shell to the node: [kube-exec](https://github.com/mohatb/kubectl-exec).
+
+Note that `kubectl debug` command doesn't give enough privileges such as permission to run `iptables`.
+
+
+```shell
+#!/usr/bin/env bash
+
+#Check kubectl client exists
+if ! command -v kubectl &> /dev/null
+then
+    printf "Kubectl client could not be found. Please install Kubectl client before running kubectl-exec.\nRefer to: https://kubernetes.io/docs/tasks/tools/\n\n"
+    exit 1
+fi
+
+#Check client major/minor versions
+kubectl_major_version=$(kubectl version --client -o yaml | grep -i "major" | awk '{ print $2 }' | sed 's/"//g')
+kubectl_minor_version=$(kubectl version --client -o yaml | grep -i "minor" | awk '{ print $2 }' | sed 's/"//g')
+
+if [[ $kubectl_major_version -gt 1 ]] || [[ $kubectl_major_version -eq 1 && $kubectl_minor_version -ge 18 ]]
+then
+        use_generator=false
+        echo "Kuberetes client version is $kubectl_major_version.$kubectl_minor_version. Generator will not be used since it is deprecated."
+elif [[ $kubectl_major_version -eq 1 && $kubectl_minor_version -lt 18 ]]
+then
+        use_generator=true
+        echo "Kuberetes client version is $kubectl_major_version.$kubectl_minor_version. Generator will be used."
+else
+        echo "Invalid kubectl version, exiting."
+        exit 1
+fi
+
+#Usage message
+usage()
+{
+        echo 'Interactive:'
+        echo '$ kubectl-exec'
+        echo " "
+        echo 'Non-Interactive'
+        echo '$ kubectl-exec NODE'
+        echo ""
+        echo "Examples:"
+        echo ""
+        echo "Access node shell:"
+        echo "kubectl-exec"
+        echo "kubectl-exec minikube"
+        echo ""
+        echo "Mount The host filesystem to priviliged pod"
+        echo "kubectl-exec -mount"
+        echo "kubectl-exec -mount node1"
+        echo ""
+        echo "Access node filesystem with web interface in the browser:"
+        echo "kubectl-exec -filemanager"
+        echo "kubectl-exec -filemanager node1"
+        echo " "
+        exit 0
+}
+
+#windows function to ssh to linux nodes
+LINUXNODES () {
+
+    IMAGE="alpine"
+    POD="$NODE-exec-$(echo $RANDOM)"
+
+    # Check the node existance
+    kubectl get node "$NODE" >/dev/null || exit 1
+
+    #nsenter JSON overrrides
+    OVERRIDES="$(cat <<EOT
+{
+  "spec": {
+    "nodeName": "$NODE",
+    "hostPID": true,
+    "containers": [
+      {
+        "securityContext": {
+          "privileged": true,
+          "capabilities": {
+               "add": [ "SYS_PTRACE" ]
+          }
+        },
+        "image": "$IMAGE",
+        "name": "nsenter",
+        "stdin": true,
+        "stdinOnce": true,
+        "tty": true,
+        "command": [ "nsenter", "--target", "1", "--mount", "--uts", "--ipc", "--net", "--pid", "--", "bash", "-l" ]
+      }
+    ]
+  }
+}
+EOT
+)"
+
+echo "creating pod \"$POD\" on node \"$NODE\""
+if [ $use_generator = true ]
+then
+        kubectl run --rm --image $IMAGE --overrides="$OVERRIDES" --generator=run-pod/v1 -ti "$POD"
+else
+        kubectl run --rm --image $IMAGE --overrides="$OVERRIDES" -ti "$POD"
+fi
+}
+
+#windows function to ssh to windows nodes
+WINDOWSNODES () {
+
+echo "SSH into windows VM"
+read -p "Enter your windows node ssh user: " WINDOWSSSHUSER
+read -s -p "Enter your windows ssh password: " WINDOWSSSHPASSWORD
+
+    IMAGE="mohatb/alpine:latest"
+    POD="$NODE-exec-$(env LC_CTYPE=C tr -dc a-z0-9 < /dev/urandom | head -c 6)"
+
+    # Check the node existance and IP
+    kubectl get nodes "$NODE" -o wide >/dev/null || exit 1
+    WINNODEIP=$(kubectl get node $NODE --output=jsonpath='{.status.addresses[?(@.type=="InternalIP")].address}')
+
+    #nsenter JSON overrrides
+    OVERRIDES="$(cat <<EOT
+{
+  "spec": {
+    "nodeSelector": {
+      "kubernetes.io/os": "linux"
+    },
+    "containers": [
+      {
+        "securityContext": {
+          "privileged": true,
+          "capabilities": {
+               "add": [ "SYS_PTRACE" ]
+          }
+        },
+        "image": "$IMAGE",
+        "imagePullPolicy": "Always",
+        "command": [
+          "/bin/sh",
+          "-c"
+        ],
+        "args": [
+          "sshpass -p $WINDOWSSSHPASSWORD ssh -o StrictHostKeyChecking=no $WINDOWSSSHUSER@$WINNODEIP"
+        ],
+        "name": "ssh",
+        "stdin": true,
+        "stdinOnce": true,
+        "tty": true
+      }
+    ]
+  }
+}
+EOT
+)"
+
+echo "creating pod \"$POD\" for windows ssh"
+
+if [ $use_generator = true ]
+then
+        kubectl run --rm --image $IMAGE --overrides="$OVERRIDES" --generator=run-pod/v1 -ti "$POD"
+else
+        kubectl run --rm --image $IMAGE --overrides="$OVERRIDES" -ti "$POD"
+fi
+
+}
+
+#function to mount linux root file system to pod
+LINUXHOSTMOUNT () {
+
+    IMAGE="alpine"
+    POD="$NODE-hostpath-mount"
+
+    # Check the node existance
+    kubectl get node "$NODE" >/dev/null || exit 1
+
+    OVERRIDES="$(cat <<EOT
+{
+  "spec": {
+    "nodeName": "$NODE",
+    "hostPID": true,
+    "containers": [
+      {
+        "securityContext": {
+          "privileged": true,
+          "capabilities": {
+               "add": [ "SYS_PTRACE" ]
+          }
+        },
+        "image": "$IMAGE",
+        "name": "nsenter",
+        "stdin": true,
+        "stdinOnce": true,
+        "tty": true,
+        "command": [ "nsenter", "--target", "1", "--mount", "--uts", "--ipc", "--net", "--pid", "--", "bash", "-l" ]
+      }
+    ]
+  }
+}
+EOT
+)"
+
+
+echo "creating host pod \"$POD\" on node \"$NODE\""
+echo ""
+echo "You can copy data between your local machine and the node with the below examples:"
+echo ""
+echo "From Local -> Node:"
+echo "kubectl cp /etc/hostname default/$POD:/tmp/hostname"
+echo ""
+echo "From Node -> Local"
+echo "kubectl cp default/$POD:/etc/hostname /tmp/hostname"
+echo ""
+
+if [ $use_generator = true ]
+then
+        kubectl run --image $IMAGE --overrides="$OVERRIDES" --generator=run-pod/v1 "$POD"
+else
+        kubectl run --image $IMAGE --overrides="$OVERRIDES" "$POD"
+fi
+
+}
+
+# Windows -mount function
+WINDOWSHOSTMOUNT () {
+    IMAGE="mohatb/mountcifs"
+    POD="$NODE-host-filemanager"
+
+    # Check the node existance
+    kubectl get node "$NODE" >/dev/null || exit 1
+    read -p "Enter the windows ssh username: " WINDOWSSSHUSERNAME
+    read -s -p "Enter the windows ssh password: " WINDOWSSSHPASSWORD
+    echo ""
+    WINDOWSIPADDRESS=$(kubectl get node $NODE --output=jsonpath='{.status.addresses[?(@.type=="InternalIP")].address}')
+    
+    OVERRIDES="$(cat <<EOT
+{
+  "spec": {
+    "nodeSelector": {
+      "kubernetes.io/os": "linux"
+    },
+    "containers": [
+      {
+        "securityContext": {
+          "privileged": true,
+          "capabilities": {
+               "add": [ "SYS_PTRACE" ]
+          }
+        },
+        "image": "$IMAGE",
+        "imagePullPolicy": "Always",
+        "command": [
+          "/bin/sh",
+          "-c"
+        ],
+        "args": [
+          "mkdir -p /mnt/windows_share/c ; mount -t cifs -o username=$WINDOWSSSHUSERNAME,password=$WINDOWSSSHPASSWORD //$WINDOWSIPADDRESS/c$ /mnt/windows_share/c ; sleep infinity"
+        ],
+        "name": "mount"
+      }
+    ]
+  }
+}
+
+EOT
+)"
+
+echo "creating host pod \"$POD\" on node \"$NODE\""
+echo ""
+echo "You can copy data between your local machine and the node with the below examples:"
+echo ""
+echo "From Local -> Node:"
+echo "kubectl cp /etc/hostname default/$POD:/mnt/winsows_share/c/tmp/hostname.txt"
+echo ""
+echo "From Node -> Local"
+echo "kubectl cp default/$POD:/mnt/windows_share/c/Windows/System32/drivers/etc/hosts /tmp/hosts"
+echo ""
+
+
+if [ $use_generator = true ]
+then
+        kubectl run --image $IMAGE --overrides="$OVERRIDES" --generator=run-pod/v1 "$POD"
+else
+        kubectl run --image $IMAGE --overrides="$OVERRIDES" "$POD"
+fi
+}
+
+#Function for -filemanager browser on Linux
+
+EXECFILEMANAGERLINUX () {
+
+    IMAGE="mohatb/filemanager:latest"
+    POD="$NODE-host-filemanager"
+    echo "$NODE"
+
+    # Check the node existance
+    kubectl get node "$NODE" >/dev/null || exit 1
+
+    OVERRIDES="$(cat <<EOT
+{
+  "spec": {
+      "containers": [
+          {
+              "image": "$IMAGE",
+              "imagePullPolicy": "Always",
+              "name": "filemanager",
+              "resources": {},
+              "securityContext": {
+                "privileged": true,
+                "capabilities": {
+                    "add": [ "SYS_PTRACE" ]
+                }
+                },
+              "volumeMounts": [
+                  {
+                      "mountPath": "/srv",
+                      "name": "host-root"
+                  }
+              ]
+          }
+      ],
+      "nodeName": "$NODE",
+      "volumes": [
+          {
+              "hostPath": {
+                  "path": "/",
+                  "type": ""
+              },
+              "name": "host-root"
+          }
+      ]
+  }
+}
+
+EOT
+)"
+
+echo ""
+echo -e "Creating filemanager pod ${BLUE}\"$POD\"${NC} for node ${BLUE}\"$NODE\"${NC}"
+echo ""
+echo "Run the below port-forward command to establish a proxy connection to the filemanager pod"
+echo -e "> ${BLUE}kubectl port-forward $POD 8002:80${NC}"
+echo ""
+echo "Open your browser and go to the below URL"
+echo -e "> ${BLUE}http://127.0.0.1:8002${NC}"
+echo ""
+
+if [ $use_generator = true ]
+then
+        kubectl run --image $IMAGE --overrides="$OVERRIDES" --generator=run-pod/v1 "$POD"
+else
+        kubectl run --image $IMAGE --overrides="$OVERRIDES" "$POD"
+fi
+
+}
+
+#Function to start filemanager with -filemanager flag on windows nodes.
+EXECFILEMANAGERWINDOWS() {
+  
+    IMAGE="mohatb/filemanager:withcifs"
+    POD="$NODE-host-filemanager"
+
+    # Check the node existance
+    kubectl get node "$NODE" >/dev/null || exit 1
+    read -p "Enter the windows ssh username: " WINDOWSSSHUSERNAME
+    read -s -p "Enter the windows ssh password: " WINDOWSSSHPASSWORD
+    WINDOWSIPADDRESS=$(kubectl get node $NODE --output=jsonpath='{.status.addresses[?(@.type=="InternalIP")].address}')
+
+    OVERRIDES="$(cat <<EOT
+{
+  "spec": {
+    "nodeSelector": {
+      "kubernetes.io/os": "linux"
+    },
+      "containers": [
+          {
+              "image": "$IMAGE",
+              "imagePullPolicy": "Always",
+              "command": [
+                "/bin/sh",
+                "-c"
+              ],
+              "args": [
+                "mkdir -p /srv/winsows_share/c ; mount -t cifs -o username=$WINDOWSSSHUSERNAME,password=$WINDOWSSSHPASSWORD //$WINDOWSIPADDRESS/c$ /srv/winsows_share/c ; ./filebrowser"
+              ],
+              "name": "filemanager",
+              "resources": {},
+              "securityContext": {
+                "privileged": true,
+                "capabilities": {
+                    "add": [ "SYS_PTRACE" ]
+                }
+              }
+          }
+      ]
+  }
+}
+
+EOT
+)"
+
+echo ""
+echo -e "Creating filemanager pod ${BLUE}\"$POD\"${NC} for node ${BLUE}\"$NODE\"${NC}"
+echo ""
+echo "Run the below port-forward command to establish a proxy connection to the filemanager pod"
+echo -e "> ${BLUE}kubectl port-forward $POD 8002:80${NC}"
+echo ""
+echo "Open your browser and go to the below URL"
+echo -e "> ${BLUE}http://127.0.0.1:8002${NC}"
+echo ""
+
+if [ $use_generator = true ]
+then
+        kubectl run --image $IMAGE --overrides="$OVERRIDES" --generator=run-pod/v1 "$POD"
+else
+        kubectl run --image $IMAGE --overrides="$OVERRIDES" "$POD"
+fi
+
+}
+
+
+##########################################################################
+#Exection Start
+##########################################################################
+
+#Colors for echo command
+RED='\033[0;31m'
+BLUE='\033[0;34m'
+Green='\033[0;32m'
+NC='\033[0m'
+
+
+#check if user is looking for documentation with -h
+if [ "$1" = "-h" ]
+then
+        usage
+        exit 1
+fi
+
+#Check user input for shell access
+if [ -z "$1" ]; then
+        
+        mapfile -t nodenumber < <( kubectl get nodes --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' )
+
+        for i in "${!nodenumber[@]}"; do
+          printf "$i ${nodenumber[i]} \n"
+        done
+        
+        read -p "Enter the node number: " NODE_INDEX
+        NODE=${nodenumber[NODE_INDEX]}
+
+    else
+        NODE=$1
+    fi
+
+#Statement to check if user is looking to mount root file system in linux nodes to the pod.
+if [ "$1" = "-mount" ] && [ -n "$2" ]; then
+#Check if the user provided node number
+       NODE="$2"
+       NODEOS=$(kubectl get node $NODE -o jsonpath="{.metadata.labels.\kubernetes\.io/os}")
+          if [[ $NODEOS = "windows" ]]
+          then
+              WINDOWSHOSTMOUNT
+              exit 1
+          else
+              LINUXHOSTMOUNT
+              exit 1
+          fi
+        exit 1
+  elif [ "$1" = "-mount" ] && [ -z "$2" ]; then
+#If the user did not provide a node number, use interactive to get it.
+		mapfile -t nodenumber < <( kubectl get nodes --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' )
+
+        for i in "${!nodenumber[@]}"; do
+          printf "$i ${nodenumber[i]} \n"
+        done
+        
+        read -p "Enter the node number: " NODE_INDEX
+        NODE=${nodenumber[NODE_INDEX]}
+        NODEOS=$(kubectl get node $NODE -o jsonpath="{.metadata.labels.\kubernetes\.io/os}")
+        if [[ $NODEOS = "windows" ]]
+          then
+              WINDOWSHOSTMOUNT
+              exit 1
+          else
+              LINUXHOSTMOUNT
+              exit 1
+        fi
+        exit 1
+fi
+
+#Statement to check if user is looking to mount root file system in linux nodes to the pod.
+if [ "$1" = "-filemanager" ] && [ -n "$2" ]; then
+#Check if the user provided node number
+       NODE="$2"
+       NODEOS=$(kubectl get node $NODE -o jsonpath="{.metadata.labels.\kubernetes\.io/os}")
+          if [[ $NODEOS = "windows" ]]
+          then
+              EXECFILEMANAGERWINDOWS
+              exit 1
+          else
+              EXECFILEMANAGERLINUX
+              exit 1
+          fi
+        exit 1
+#If the user did not provide a node number, use interactive to get it.
+  elif [ "$1" = "-filemanager" ] && [ -z "$2" ]; then
+		mapfile -t nodenum < <( kubectl get nodes --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' )
+        for i in "${!nodenum[@]}"; do
+          printf "$i ${nodenum[i]} \n"
+        done
+        
+        read -p "Enter the node number: " NODE_INDEX
+        NODE=${nodenum[NODE_INDEX]}
+        NODEOS=$(kubectl get node $NODE -o jsonpath="{.metadata.labels.\kubernetes\.io/os}")
+        if [[ $NODEOS = "windows" ]]
+          then
+              EXECFILEMANAGERWINDOWS
+              exit 1
+          else
+              EXECFILEMANAGERLINUX
+              exit 1
+        fi
+        exit 1
+fi
+
+#Evaluate if windows node.
+NODEOS=$(kubectl get node $NODE -o jsonpath="{.metadata.labels.\kubernetes\.io/os}")
+
+if [[ $NODEOS = "windows" ]]
+then
+    WINDOWSNODES
+else
+    LINUXNODES
+fi
+```
+
+### How it works
+
+For Linux, It works by creating a pod (with a priviledged container) in the node you specified and using nsenter for getting a shell into your kubernetes nodes.
+
+```shell
+nsenter --target 1 --mount --uts --ipc --net --pid -- bash -l
+```
+
+
+## chroot
+
+If the host file system is mounted on path `/host`, then use `chroot /host` to switch to the host filesystem.
+
+## nsenter
+
+After accessing the shell of the node, use nsenter to perform operations in different namespaces of Linux.
+
+    ps aux |grep "process_name"
+    nsenter -t $PID -n -- bash
+    netstat -nlpte
+    iptables -t nat -L
