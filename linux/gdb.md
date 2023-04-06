@@ -1,5 +1,14 @@
 # gdb
+
 Compile the binaries with debug symbols, and run it with gdb.
+
+Applicable to `C`, `C++`, `rust`, `Cython` for application level stack trace.
+
+For `golang`, `dlv` applies to.
+
+## installation
+
+    apt install -y gdb
 
 ## Start gdb
 
@@ -8,6 +17,31 @@ Compile the binaries with debug symbols, and run it with gdb.
     gdb program core
     gdb program pid
     gdb -p $PID
+
+### Debug python with gdb(`cython` interpreter)
+
+Need python debugging symbols and gdb auto-load files.
+
+    apt install -y gdb python3-dbg
+
+    gdb `which python` -p $PID
+    # if running into py-bt not 
+
+    (gdb) info auto-load
+    gdb-scripts:  No auto-load scripts.
+    libthread-db:  No auto-loaded libthread-db.
+    local-gdbinit:  Local .gdbinit file was not found.
+    python-scripts:
+    Loaded  Script
+    Yes     /usr/share/gdb/auto-load/usr/bin/python3.8-gdb.py
+    (gdb) source /usr/share/gdb/auto-load/usr/bin/python3.8-gdb.py  # if not loaded
+
+To navigate application level backtrace, use `py-` commands: `py-bt`, `py-up`, `py-down`, `py-print`, `py-list`.
+
+Reference: 
+
+- https://www.podoliaka.org/2016/04/10/debugging-cpython-gdb/
+- https://devguide.python.org/advanced-tools/gdb/
 
 ## Execute commands at startup
 

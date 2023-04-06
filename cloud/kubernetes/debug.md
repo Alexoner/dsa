@@ -548,11 +548,18 @@ nsenter --target 1 --mount --uts --ipc --net --pid -- bash -l
 
 If the host file system is mounted on path `/host`, then use `chroot /host` to switch to the host filesystem.
 
-## nsenter
+## nsenter: enter namespace
 
 After accessing the shell of the node, use nsenter to perform operations in different namespaces of Linux.
 
-    ps aux |grep "process_name"
-    nsenter -t $PID -n -- bash
+    crictl ps  # list container processes
+    ps aux |grep "process_name" # get target process ID
+    ls /proc/$PID/ns/   # list namespace of a process
+
+    nsenter -t $PID -n -- bash  # enter network namespace
+    ip netns identify  $PID # identify network namespace
+    nsenter -a -- bash -l # or enter all namespace
     netstat -nlpte
     iptables -t nat -L
+
+
