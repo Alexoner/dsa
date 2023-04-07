@@ -4,8 +4,6 @@ Compile the binaries with debug symbols, and run it with gdb.
 
 Applicable to `C`, `C++`, `rust`, `Cython` for application level stack trace.
 
-For `golang`, `dlv` applies to.
-
 ## installation
 
     apt install -y gdb
@@ -34,14 +32,34 @@ Need python debugging symbols and gdb auto-load files.
     python-scripts:
     Loaded  Script
     Yes     /usr/share/gdb/auto-load/usr/bin/python3.8-gdb.py
-    (gdb) source /usr/share/gdb/auto-load/usr/bin/python3.8-gdb.py  # if not loaded
+    (gdb) source /usr/share/gdb/auto-load/usr/bin/python3.8-gdb.py  # if gdb extension not loaded
 
 To navigate application level backtrace, use `py-` commands: `py-bt`, `py-up`, `py-down`, `py-print`, `py-list`.
 
-Reference: 
+Reference:
 
 - https://www.podoliaka.org/2016/04/10/debugging-cpython-gdb/
 - https://devguide.python.org/advanced-tools/gdb/
+
+### Debug Go with GDB
+
+    go build -gcflags=all="-N -l" -o main main.go
+    # don't use -ldflags=-w to omit debug infroamtion
+    gdb main
+    gdb> source $GOROOT/src/runtime/runtime-gdb.py
+    # somehow gdb attach doesn't work well, lacking golang stacktrace
+
+For `golang`, `dlv` applies to.
+
+Reference:
+
+- https://go.dev/doc/gdb
+
+### Debug rust with GDB
+
+    RUST_LOG=debug cargo run
+    # then start gdb, works well with native gdb commands
+
 
 ## Execute commands at startup
 

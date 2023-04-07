@@ -37,3 +37,8 @@
 log/*
 
 .clangd/**
+
+
+# Added by cargo
+
+/target
