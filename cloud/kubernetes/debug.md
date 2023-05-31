@@ -553,7 +553,9 @@ If the host file system is mounted on path `/host`, then use `chroot /host` to s
 After accessing the shell of the node, use nsenter to perform operations in different namespaces of Linux.
 
     crictl ps  # list container processes
-    ps aux |grep "process_name" # get target process ID
+    crictl inspect CONTAINER_ID |grep -i 'pid' # get container pid
+    # ps aux |grep "process_name" # get target process ID
+    ps -ef |grep PID
     ls /proc/$PID/ns/   # list namespace of a process
 
     nsenter -t $PID -n -- bash  # enter network namespace
